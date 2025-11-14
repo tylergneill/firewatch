@@ -1,5 +1,6 @@
 import pathlib
 import re
+from collections import deque
 
 
 def find_app_version():
@@ -30,16 +31,11 @@ LOG_RE = re.compile(
 def tail_lines(path: pathlib.Path, n: int):
     """Return last n lines of a text file as bytes."""
     try:
+        dq = deque(maxlen=n)
         with path.open("rb") as f:
-            f.seek(0, 2)
-            size = f.tell()
-            block = -1024
-            data = b""
-            while len(data.splitlines()) <= n and -block < size:
-                f.seek(block, 2)
-                data = f.read(-block) + data
-                block *= 2
-        return data.splitlines()[-n:]
+            for line in f:
+                dq.append(line.rstrip(b"\n"))
+        return list(dq)
     except FileNotFoundError:
         return []
 
