@@ -1,0 +1,30 @@
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:11 +0000] "GET /themes.php HTTP/1.1" 404 207 "-" "-" 0.001
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:12 +0000] "GET /ini.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:12 +0000] "GET /as.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:13 +0000] "GET /shell.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:13 +0000] "GET /ws.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:14 +0000] "GET /dropdown.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:14 +0000] "GET /makeasmtp.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:14 +0000] "GET /wp-sigunq.php HTTP/1.1" 404 207 "-" "-" 0.001
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:15 +0000] "GET /wso112233.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:15 +0000] "GET /alfanew.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:16 +0000] "GET /fw.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:16 +0000] "GET /install.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:16 +0000] "GET /wp-login.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:17 +0000] "GET /wp-content/plugins/google-seo-rank/module.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:17 +0000] "GET /chosen.php HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 20.222.117.51 - - [14/Nov/2025:19:33:18 +0000] "GET /simple.php HTTP/1.1" 404 207 "-" "-" 0.002
+www.panditya.info 443 85.208.96.193 - - [14/Nov/2025:19:46:26 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.002
+www.panditya.info 443 85.208.96.194 - - [14/Nov/2025:19:46:26 +0000] "GET /seti/by_collection/UTA%20Dharma%C5%9B%C4%81stra/visualize HTTP/1.1" 200 1744 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.002
+www.panditya.info 443 85.208.96.204 - - [14/Nov/2025:19:48:32 +0000] "GET /seti/by_collection/V%C4%81t%C4%81yana%20and%20Pram%C4%81%E1%B9%87a%20NLP/visualize HTTP/1.1" 200 1831 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.002
+www.panditya.info 443 52.167.144.233 - - [14/Nov/2025:19:48:34 +0000] "GET /sitemap.xml HTTP/1.1" 404 207 "-" "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36" 0.002
+www.panditya.info 443 85.208.96.203 - - [14/Nov/2025:20:10:07 +0000] "GET /seti/by_collection/GRETIL/visualize HTTP/1.1" 500 265 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.003
+panditya.info 443 47.130.1.73 - - [14/Nov/2025:20:15:16 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 47.130.1.73 - - [14/Nov/2025:20:15:17 +0000] "GET / HTTP/1.1" 200 1521 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124" 0.003
+panditya.info 443 47.130.1.73 - - [14/Nov/2025:20:15:19 +0000] "GET /static/js/graph.js HTTP/1.1" 200 5426 "-" "python-httpx/0.24.1" 0.005
+panditya.info 443 47.130.1.73 - - [14/Nov/2025:20:15:20 +0000] "GET /static/js/dropdown.js HTTP/1.1" 200 1071 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 47.130.1.73 - - [14/Nov/2025:20:15:20 +0000] "GET /js HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 43.165.189.206 - - [14/Nov/2025:20:29:39 +0000] "GET / HTTP/1.1" 200 1521 "http://panditya.info" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.002
+panditya.info 443 43.156.202.34 - - [14/Nov/2025:20:30:06 +0000] "GET / HTTP/1.1" 200 1521 "http://www.panditya.info" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.002
+www.panditya.info 443 85.208.96.199 - - [14/Nov/2025:20:49:37 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.002
+www.panditya.info 443 185.191.171.1 - - [14/Nov/2025:20:49:37 +0000] "GET /seti/by_collection/SARIT/visualize HTTP/1.1" 200 2061 "-" "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)" 0.002

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Raw log tails</h2>
+
+{% if app_logs %}
+  {% for app_name, lines in app_logs.items() %}
+    <h3>{{ app_name }}</h3>
+    {% if lines %}
+      <pre>
+{% for line in lines %}
+{{ line }}
+{% endfor %}
+      </pre>
+    {% else %}
+      <p><em>No lines found for this log.</em></p>
+    {% endif %}
+  {% endfor %}
+{% else %}
+  <p><em>No log files configured.</em></p>
+{% endif %}
+{% endblock %}

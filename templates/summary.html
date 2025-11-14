@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Summary</h2>
+<p>Parsed lines across all apps: <strong>{{ total }}</strong></p>
+
+<h3>By app</h3>
+{% if app_counts %}
+<table>
+  <tr><th>App</th><th>Count</th></tr>
+  {% for app, count in app_counts %}
+  <tr>
+    <td>{{ app }}</td>
+    <td>{{ count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p><em>No parsed entries for any app.</em></p>
+{% endif %}
+
+<h3>By host</h3>
+{% if host_counts %}
+<table>
+  <tr><th>Host</th><th>Count</th></tr>
+  {% for host, count in host_counts %}
+  <tr>
+    <td>{{ host }}</td>
+    <td>{{ count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p><em>No host data.</em></p>
+{% endif %}
+
+<h3>Top IPs (across apps)</h3>
+{% if ip_counts %}
+<table>
+  <tr><th>IP</th><th>Count</th></tr>
+  {% for ip, count in ip_counts %}
+  <tr>
+    <td>{{ ip }}</td>
+    <td>{{ count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p><em>No IP data.</em></p>
+{% endif %}
+
+<h3>Status codes</h3>
+{% if status_counts %}
+<table>
+  <tr><th>Status</th><th>Count</th></tr>
+  {% for status, count in status_counts %}
+  <tr>
+    <td>{{ status }}</td>
+    <td>{{ count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p><em>No status data.</em></p>
+{% endif %}
+{% endblock %}
