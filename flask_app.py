@@ -22,10 +22,11 @@ if DEBUG_ENV:
 else:
     # Real server paths
     LOG_FILES = {
-        "panditya": pathlib.Path("/var/log/nginx/panditya.access.log"),
+        "skrutable": pathlib.Path("/var/log/nginx/skrutable.access.log"),
+        "splitter-server": pathlib.Path("/var/log/nginx/splitter-server.access.log"),
         "vatayana": pathlib.Path("/var/log/nginx/vatayana.access.log"),
+        "panditya": pathlib.Path("/var/log/nginx/panditya.access.log"),
         "hansel":   pathlib.Path("/var/log/nginx/hansel.access.log"),
-        # add more apps here
     }
 
 MAX_LINES_PER_FILE = 200
