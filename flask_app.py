@@ -11,23 +11,22 @@ DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
 
-# Log files per app
-if DEBUG_ENV:
-    # Local sample files for testing
-    LOG_FILES = {
-        "panditya": pathlib.Path("sample_panditya.log"),
-        "vatayana": pathlib.Path("sample_vatayana.log"),
-        "hansel":   pathlib.Path("sample_hansel.log"),
-    }
-else:
-    # Real server paths
-    LOG_FILES = {
-        "skrutable": pathlib.Path("/var/log/nginx/skrutable.access.log"),
-        "splitter-server": pathlib.Path("/var/log/nginx/splitter-server.access.log"),
-        "vatayana": pathlib.Path("/var/log/nginx/vatayana.access.log"),
-        "panditya": pathlib.Path("/var/log/nginx/panditya.access.log"),
-        "hansel":   pathlib.Path("/var/log/nginx/hansel.access.log"),
-    }
+LOCAL_LOG_FILE_MAIN_PATH = pathlib.Path("../lookout-tower-sharded-data")
+app_names = ["skrutable", "splitter-server", "vatayana", "panditya", "hansel"]
+app_names += [
+    app_name + '-stg'
+    for app_name in app_names
+    if app_name != "splitter-server"
+]
+
+SERVER_LOG_FILE_MAIN_PATH = pathlib.Path("/var/log/nginx/")
+
+LOG_FILE_MAIN_PATH = LOCAL_LOG_FILE_MAIN_PATH if DEBUG_ENV else SERVER_LOG_FILE_MAIN_PATH
+
+LOG_FILES = {
+    app_name: LOG_FILE_MAIN_PATH / app_name
+    for app_name in app_names
+}
 
 MAX_LINES_PER_FILE = 200
 
