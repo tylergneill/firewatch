@@ -38,9 +38,16 @@
     <h1>lookout-tower</h1>
     <p>{{ app_version }}</p>
     <nav>
-      <a href="/summary">Summary</a>
-      <a href="/raw">Raw tails</a>
+      <a href="/summary?start_date={{ start_date }}&end_date={{ end_date }}">Summary</a>
+      <a href="/raw?start_date={{ start_date }}&end_date={{ end_date }}">Raw logs</a>
     </nav>
+    <form method="get" action="">
+      <label for="start_date">Start date:</label>
+      <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+      <label for="end_date">End date:</label>
+      <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+      <button type="submit">Go</button>
+    </form>
     <hr>
     {% block content %}{% endblock %}
   </body>
