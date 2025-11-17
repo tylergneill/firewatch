@@ -78,8 +78,8 @@
     
           <hr>
     
-          <p>Total entries: {{ total }}</p>
-          <p>Average request time: {{ "%.4f"|format(avg_req_time) }}s</p>
+          <p>Total entries: {{ total|commify }}</p>
+          <p>Average request time: {{ "%.3f"|format(avg_req_time) }}s</p>
     
           {% if filter_ip or filter_ua %}
           <p>
@@ -97,7 +97,7 @@
                       {% for app, count in app_counts %}
                       <tr>
                           <td>{{ app }}</td>
-                          <td>{{ count }}</td>
+                          <td>{{ count|commify }}</td>
                       </tr>
                       {% endfor %}
                   </table>
@@ -108,7 +108,7 @@
                       {% for status, count in status_counts %}
                       <tr>
                           <td>{{ status }}</td>
-                          <td>{{ count }}</td>
+                          <td>{{ count|commify }}</td>
                       </tr>
                       {% endfor %}
                   </table>
@@ -128,7 +128,7 @@
                       {% for item in ip_counts %}
                       <tr class="ip-row" data-ip="{{ item.ip }}">
                           <td><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}">{{ item.ip }}</a></td>
-                          <td>{{ item.count }}</td>
+                          <td>{{ item.count|commify }}</td>
                           <td class="geo-location">-</td>
                       </tr>
                       {% endfor %}
@@ -141,7 +141,7 @@
                       {% for ua, count in ua_counts %}
                       <tr>
                           <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}">{{ ua|truncate(30) }}</a></td>
-                          <td>{{ count }}</td>
+                          <td>{{ count|commify }}</td>
                       </tr>
                       {% endfor %}
                   </table>

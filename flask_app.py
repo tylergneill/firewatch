@@ -44,6 +44,10 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.debug = DEBUG_ENV
 
+@app.template_filter('commify')
+def commify_filter(value):
+    return "{:,}".format(value)
+
 
 @app.route("/")
 def index():
