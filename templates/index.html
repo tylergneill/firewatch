@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>firewatch</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 1.5rem;
+      }
+      nav a {
+        margin-right: 1rem;
+      }
+      table {
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 0.25rem 0.5rem;
+        text-align: left;
+      }
+      h1 {
+        margin-bottom: 0.5rem;
+      }
+      h1 a {
+        text-decoration: none;
+        color: inherit;
+      }
+      h2, h3 {
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+      pre {
+        background: #f7f7f7;
+        padding: 0.75rem;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1><a href="/">firewatch</a></h1>
+    <p>{{ app_version }}</p>
+    <hr>
+    <div class="control-panel">
+      <form method="post" action="{{ url_for('select_apps') }}" id="select_apps_form" style="display: inline;">
+          <label>Apps:</label>
+          {% for app_name in app_names %}
+              <input class="form-check-input" type="checkbox" name="apps" value="{{ app_name }}" id="app_{{ app_name }}" {% if app_name in selected_apps %}checked{% endif %} style="display: inline-block; margin-right: 0.25rem;">
+              <label class="form-check-label" for="app_{{ app_name }}" onclick="select_app('{{ app_name }}')" style="display: inline-block; margin-right: 1rem;">{{ app_name }}</label>
+          {% endfor %}
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          <a href="#" onclick="select_all_apps()">Select All</a>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          <button type="submit" class="btn btn-primary btn-sm" style="display: inline-block;">Apply multiple</button>
+      </form>
+      <hr>
+      <form method="get" action="{{ url_for('index') }}">
+        <input type="hidden" name="view" value="{{ request.endpoint }}">
+        <label for="start_date">Start:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+        <label for="end_date">End:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        <button type="submit">Go</button>
+      </form>
+    </div>
+    <hr>
+        <div>
+            <button onclick="show_view('summary')">Summary</button>
+            <button onclick="show_view('tail')">Tail</button>
+        </div>
+        <hr>
+        <div id="loading_view">
+            <p>Loading...</p>
+        </div>
+        <div id="summary_view" style="display: none;">
+          <h2>Summary</h2>
+    
+          <hr>
+    
+          <p>Total entries: {{ total }}</p>
+          <p>Average request time: {{ "%.4f"|format(avg_req_time) }}s</p>
+    
+          {% if filter_ip or filter_ua %}
+          <p>
+              <strong>Filters active:</strong>
+              {% if filter_ip %} IP: {{ filter_ip }} <a href="{{ url_for('index', start_date=start_date, end_date=end_date, ua=filter_ua) }}">(clear)</a> {% endif %}
+              {% if filter_ua %} UA: {{ filter_ua }} <a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip) }}">(clear)</a> {% endif %}
+              <a href="{{ url_for('index', start_date=start_date, end_date=end_date) }}">(clear all)</a>
+          </p>
+          {% endif %}
+    
+          <div class="row">
+              <div class="col-md-3">
+                  <h3>By App</h3>
+                  <table class="table table-sm">
+                      {% for app, count in app_counts %}
+                      <tr>
+                          <td>{{ app }}</td>
+                          <td>{{ count }}</td>
+                      </tr>
+                      {% endfor %}
+                  </table>
+              </div>
+              <div class="col-md-3">
+                  <h3>By Status</h3>
+                  <table class="table table-sm">
+                      {% for status, count in status_counts %}
+                      <tr>
+                          <td>{{ status }}</td>
+                          <td>{{ count }}</td>
+                      </tr>
+                      {% endfor %}
+                  </table>
+              </div>
+              <div class="col-md-3">
+                  <h3>By IP (Top 20)</h3>
+                  <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>IP</th>
+                              <th>Count</th>
+                              <th>Location</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      {% for item in ip_counts %}
+                      <tr class="ip-row" data-ip="{{ item.ip }}">
+                          <td><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}">{{ item.ip }}</a></td>
+                          <td>{{ item.count }}</td>
+                          <td class="geo-location">-</td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              <div class="col-md-3">
+                  <h3>By User Agent (Top 20)</h3>
+                  <table class="table table-sm">
+                      {% for ua, count in ua_counts %}
+                      <tr>
+                          <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}">{{ ua|truncate(30) }}</a></td>
+                          <td>{{ count }}</td>
+                      </tr>
+                      {% endfor %}
+                  </table>
+              </div>
+          </div>
+        </div>
+        <div id="tail_view" style="display: none;">
+          <h2>Tail logs</h2>
+    
+          <form method="get" action="{{ url_for('index') }}">
+              <input type="hidden" name="start_date" value="{{ start_date }}">
+              <input type="hidden" name="end_date" value="{{ end_date }}">
+              <label for="num_lines">Number of lines:</label>
+              <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
+              <button type="submit">Update</button>
+          </form>
+    
+          {% if app_logs %}
+            {% for app_name, lines in app_logs.items() %}
+              <h3>{{ app_name }}</h3>
+              {% if lines %}
+                <pre>
+          {% for line in lines %}
+          {{ line }}
+          {% endfor %}
+                </pre>
+              {% else %}
+                <p><em>No lines found for this log.</em></p>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <p><em>No log files configured.</em></p>
+          {% endif %}
+        </div>
+        <script>
+          function show_view(view_name) {
+            document.getElementById('loading_view').style.display = 'none';
+            document.getElementById('summary_view').style.display = 'none';
+            document.getElementById('tail_view').style.display = 'none';
+            document.getElementById(view_name + '_view').style.display = 'block';
+          }
+    
+                window.onload = () => {
+    
+                  show_view('summary');
+    
+                };        function select_app(app_name) {
+            var checkboxes = document.getElementsByName('apps');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = checkboxes[i].value === app_name;
+            }
+            document.getElementById('select_apps_form').submit();
+        }
+
+        function select_all_apps() {
+            var checkboxes = document.getElementsByName('apps');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = true;
+            }
+        }
+    </script>
+    <script>
+    document.getElementById('find-locations-btn').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = '...';
+
+        document.querySelectorAll('.ip-row').forEach(row => {
+            const ip = row.dataset.ip;
+            const locationCell = row.querySelector('.geo-location');
+            locationCell.textContent = 'Loading...';
+
+            fetch(`/api/geo/${ip}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
+                    } else if (data.status === 'success') {
+                        const locationParts = [data.city, data.regionName, a.country].filter(Boolean);
+                        locationCell.textContent = locationParts.join(', ') || '?';
+                    } else {
+                        locationCell.textContent = 'Unknown';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching geo location:', error);
+                    locationCell.innerHTML = `<span class="text-danger" title="${error}">Error</span>`;
+                });
+        });
+    });
+    </script>
+  </body>
+</html>

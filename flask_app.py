@@ -48,7 +48,7 @@ app.debug = DEBUG_ENV
 @app.route("/")
 def index():
     start_date, end_date = get_dates_from_request_args(request.args)
-    selected_apps = session.get('selected_apps') or app_names
+    selected_apps = session.get('selected_apps') or (app_names[:1])
 
     # Tail log data
     try:
@@ -109,7 +109,7 @@ def index():
     avg_req_time = total_req_time / total if total > 0 else 0
 
     return render_template(
-        "base.html",
+        "index.html",
         app_version=APP_VERSION,
         start_date=start_date.isoformat(),
         end_date=end_date.isoformat(),
