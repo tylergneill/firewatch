@@ -237,7 +237,7 @@
                     if (data.error) {
                         locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
                     } else if (data.status === 'success') {
-                        const locationParts = [data.city, data.regionName, a.country].filter(Boolean);
+                        const locationParts = [data.city, data.regionName, data.country].filter(Boolean);
                         locationCell.textContent = locationParts.join(', ') || '?';
                     } else {
                         locationCell.textContent = 'Unknown';
