@@ -13,7 +13,7 @@ DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
 
-LOCAL_LOG_FILE_MAIN_PATH = pathlib.Path("../lookout-tower-sharded-data")
+LOCAL_LOG_FILE_MAIN_PATH = pathlib.Path("../firewatch-sharded-data")
 app_names = [
     "skrutable",
     "splitter-server",
