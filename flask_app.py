@@ -38,7 +38,7 @@ LOG_FILES = {
     for app_name in app_names
 }
 
-MAX_LINES_PER_FILE = 200
+MAX_LINES_PER_FILE = 20
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -49,21 +49,8 @@ app.debug = DEBUG_ENV
 def index():
     start_date, end_date = get_dates_from_request_args(request.args)
     selected_apps = session.get('selected_apps') or app_names
-    return render_template(
-        "base.html",
-        app_version=APP_VERSION,
-        start_date=start_date.isoformat(),
-        end_date=end_date.isoformat(),
-        app_names=app_names,
-        selected_apps=selected_apps,
-    )
 
-
-@app.route("/raw")
-def raw_view():
-    start_date, end_date = get_dates_from_request_args(request.args)
-    selected_apps = session.get('selected_apps') or app_names
-
+    # Raw view data
     try:
         num_lines = int(request.args.get('num_lines', MAX_LINES_PER_FILE))
     except (ValueError, TypeError):
@@ -88,24 +75,8 @@ def raw_view():
         text_lines = [l.decode("utf-8", errors="replace") for l in all_lines]
         app_logs[app_name] = text_lines
 
-    return render_template(
-        "raw.html",
-        app_logs=app_logs,
-        start_date=start_date.isoformat(),
-        end_date=end_date.isoformat(),
-        app_names=app_names,
-        selected_apps=selected_apps,
-        num_lines=num_lines,
-    )
-
-
-@app.route("/summary")
-def summary_view():
-    start_date, end_date = get_dates_from_request_args(request.args)
-    selected_apps = session.get('selected_apps') or app_names
-
+    # Summary view data
     parsed_entries = []
-
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_MAIN_PATH, start_date, end_date)
         lines = read_lines_from_files(log_files)
@@ -138,20 +109,26 @@ def summary_view():
     avg_req_time = total_req_time / total if total > 0 else 0
 
     return render_template(
-        "summary.html",
+        "base.html",
+        app_version=APP_VERSION,
+        start_date=start_date.isoformat(),
+        end_date=end_date.isoformat(),
+        app_names=app_names,
+        selected_apps=selected_apps,
+        app_logs=app_logs,
+        num_lines=num_lines,
         total=total,
         ip_counts=ip_counts_top20,
         ua_counts=ua_counts.most_common(20),
         status_counts=status_counts.most_common(),
         app_counts=app_counts.most_common(),
-        start_date=start_date.isoformat(),
-        end_date=end_date.isoformat(),
-        app_names=app_names,
-        selected_apps=selected_apps,
         filter_ip=filter_ip,
         filter_ua=filter_ua,
         avg_req_time=avg_req_time,
     )
+
+
+
 
 
 @app.route('/api/geo/<ip>')
