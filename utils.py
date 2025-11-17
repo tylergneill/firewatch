@@ -1,6 +1,9 @@
 import pathlib
 import re
 from collections import deque
+import requests
+import json
+import datetime
 
 
 def find_app_version():
@@ -57,6 +60,14 @@ def parse_line(line: bytes):
     d = m.groupdict()
 
     try:
+        # Format: 16/Nov/2025:15:04:05 +0000
+        log_time_str = d["time"].split(':')[0]
+        log_datetime = datetime.datetime.strptime(log_time_str, '%d/%b/%Y')
+        log_date = log_datetime.date()
+    except (ValueError, IndexError):
+        log_date = None
+
+    try:
         req_time = float(d["req_time"])
     except ValueError:
         req_time = None
@@ -69,4 +80,49 @@ def parse_line(line: bytes):
         "path": d["path"],
         "method": d["method"],
         "req_time": req_time,
+        "ua": d["ua"],
+        "date": log_date,
     }
+
+
+GEO_CACHE_FILE = pathlib.Path("ip_geocache.json")
+
+def load_geo_cache():
+    if GEO_CACHE_FILE.exists():
+        with GEO_CACHE_FILE.open("r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {} # Return empty dict if file is corrupt
+    return {}
+
+def save_geo_cache(cache):
+    with GEO_CACHE_FILE.open("w") as f:
+        json.dump(cache, f, indent=2)
+
+def get_geo_for_ip(ip: str):
+    cache = load_geo_cache()
+    if ip in cache:
+        return cache[ip]
+
+    # Don't geolocate private/local IPs
+    if ip.startswith("192.168.") or ip.startswith("10.") or ip.startswith("172.") or ip == "127.0.0.1" or ip.startswith("::"):
+         geo_info = {"country": "Private", "city": "N/A", "regionName": "N/A", "query": ip}
+         cache[ip] = geo_info
+         save_geo_cache(cache)
+         return geo_info
+
+    try:
+        # The user mentioned this API
+        response = requests.get(f"http://ip-api.com/json/{ip}?fields=country,regionName,city,query", timeout=3)
+        response.raise_for_status()
+        data = response.json()
+        cache[ip] = data
+        save_geo_cache(cache)
+        return data
+    except requests.exceptions.RequestException:
+        # Fail silently and cache the failure so we don't keep trying
+        geo_info = {"error": "Failed to fetch", "query": ip}
+        cache[ip] = geo_info
+        save_geo_cache(cache)
+        return geo_info

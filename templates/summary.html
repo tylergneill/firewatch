@@ -2,65 +2,96 @@
 
 {% block content %}
 <h2>Summary</h2>
-<p>Parsed lines across all apps: <strong>{{ total }}</strong></p>
 
-<h3>By app</h3>
-{% if app_counts %}
-<table>
-  <tr><th>App</th><th>Count</th></tr>
-  {% for app, count in app_counts %}
-  <tr>
-    <td>{{ app }}</td>
-    <td>{{ count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-<p><em>No parsed entries for any app.</em></p>
+<form method="post" action="{{ url_for('summary_view', start_date=start_date, end_date=end_date) }}">
+    <div class="form-group">
+        <label>Filter by Apps:</label>
+        {% for app_name in app_names %}
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="apps" value="{{ app_name }}" id="app_{{ app_name }}" {% if app_name in selected_apps %}checked{% endif %}>
+            <label class="form-check-label" for="app_{{ app_name }}">{{ app_name }}</label>
+        </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+</form>
+
+<hr>
+
+<p>Total entries: {{ total }}</p>
+<p>Average request time: {{ "%.4f"|format(avg_req_time) }}s</p>
+
+{% if filter_ip or filter_ua %}
+<p>
+    <strong>Filters active:</strong>
+    {% if filter_ip %} IP: {{ filter_ip }} <a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ua=filter_ua) }}">(clear)</a> {% endif %}
+    {% if filter_ua %} UA: {{ filter_ua }} <a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=filter_ip) }}">(clear)</a> {% endif %}
+    <a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date) }}">(clear all)</a>
+</p>
 {% endif %}
 
-<h3>By host</h3>
-{% if host_counts %}
-<table>
-  <tr><th>Host</th><th>Count</th></tr>
-  {% for host, count in host_counts %}
-  <tr>
-    <td>{{ host }}</td>
-    <td>{{ count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-<p><em>No host data.</em></p>
-{% endif %}
-
-<h3>Top IPs (across apps)</h3>
-{% if ip_counts %}
-<table>
-  <tr><th>IP</th><th>Count</th></tr>
-  {% for ip, count in ip_counts %}
-  <tr>
-    <td>{{ ip }}</td>
-    <td>{{ count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-<p><em>No IP data.</em></p>
-{% endif %}
-
-<h3>Status codes</h3>
-{% if status_counts %}
-<table>
-  <tr><th>Status</th><th>Count</th></tr>
-  {% for status, count in status_counts %}
-  <tr>
-    <td>{{ status }}</td>
-    <td>{{ count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% else %}
-<p><em>No status data.</em></p>
-{% endif %}
+<div class="row">
+    <div class="col-md-3">
+        <h3>By App</h3>
+        <table class="table table-sm">
+            {% for app, count in app_counts %}
+            <tr>
+                <td>{{ app }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-3">
+        <h3>By Status</h3>
+        <table class="table table-sm">
+            {% for status, count in status_counts %}
+            <tr>
+                <td>{{ status }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-3">
+        <h3>By User Agent (Top 20)</h3>
+        <table class="table table-sm">
+            {% for ua, count in ua_counts %}
+            <tr>
+                <td title="{{ ua }}"><a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}">{{ ua|truncate(30) }}</a></td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-3">
+        <h3>By IP (Top 20)</h3>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>IP</th>
+                    <th>Count</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in ip_counts %}
+            <tr>
+                <td><a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}">{{ item.ip }}</a></td>
+                <td>{{ item.count }}</td>
+                <td>
+                    {% if item.geo and not item.geo.error %}
+                        {% if item.geo.city %}{{ item.geo.city }}, {% endif %}{% if item.geo.regionName %}{{ item.geo.regionName }}, {% endif %}{{ item.geo.country or '?' }}
+                    {% elif item.geo.error %}
+                        <span class="text-danger" title="{{ item.geo.error }}">Error</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
