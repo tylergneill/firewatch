@@ -3,19 +3,6 @@
 {% block content %}
 <h2>Summary</h2>
 
-<form method="post" action="{{ url_for('summary_view', start_date=start_date, end_date=end_date) }}">
-    <div class="form-group">
-        <label>Filter by Apps:</label>
-        {% for app_name in app_names %}
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" name="apps" value="{{ app_name }}" id="app_{{ app_name }}" {% if app_name in selected_apps %}checked{% endif %}>
-            <label class="form-check-label" for="app_{{ app_name }}">{{ app_name }}</label>
-        </div>
-        {% endfor %}
-    </div>
-    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-</form>
-
 <hr>
 
 <p>Total entries: {{ total }}</p>
@@ -66,6 +53,7 @@
     </div>
     <div class="col-md-3">
         <h3>By IP (Top 20)</h3>
+        <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -76,22 +64,47 @@
             </thead>
             <tbody>
             {% for item in ip_counts %}
-            <tr>
+            <tr class="ip-row" data-ip="{{ item.ip }}">
                 <td><a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}">{{ item.ip }}</a></td>
                 <td>{{ item.count }}</td>
-                <td>
-                    {% if item.geo and not item.geo.error %}
-                        {% if item.geo.city %}{{ item.geo.city }}, {% endif %}{% if item.geo.regionName %}{{ item.geo.regionName }}, {% endif %}{{ item.geo.country or '?' }}
-                    {% elif item.geo.error %}
-                        <span class="text-danger" title="{{ item.geo.error }}">Error</span>
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
+                <td class="geo-location">-</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% endblock %} {# This closes the content block #}
+
+{% block scripts %}
+<script>
+document.getElementById('find-locations-btn').addEventListener('click', function() {
+    this.disabled = true;
+    this.textContent = '...';
+
+    document.querySelectorAll('.ip-row').forEach(row => {
+        const ip = row.dataset.ip;
+        const locationCell = row.querySelector('.geo-location');
+        locationCell.textContent = 'Loading...';
+
+        fetch(`/api/geo/${ip}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
+                } else if (data.status === 'success') {
+                    const locationParts = [data.city, data.regionName, data.country].filter(Boolean);
+                    locationCell.textContent = locationParts.join(', ') || '?';
+                } else {
+                    locationCell.textContent = 'Unknown';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching geo location:', error);
+                locationCell.innerHTML = `<span class="text-danger" title="${error}">Error</span>`;
+            });
+    });
+});
+</script>
 {% endblock %}
+

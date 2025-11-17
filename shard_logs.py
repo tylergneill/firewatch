@@ -4,11 +4,11 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 if len(sys.argv) < 2:
-    print("Usage: shard_nginx_log.py /path/to/log [days_per_shard]", file=sys.stderr)
+    print("Usage: python shard_logs.py /path/to/log [days_per_shard]", file=sys.stderr)
     sys.exit(1)
 
 log_path = Path(sys.argv[1])
-days_per_shard = int(sys.argv[2]) if len(sys.argv) >= 3 else 7
+days_per_shard = int(sys.argv[2]) if len(sys.argv) >= 3 else 1
 
 # Nginx $time_local format: [15/Nov/2025:13:51:02 +0000]
 TIME_FMT = "%d/%b/%Y:%H:%M:%S %z"
@@ -59,9 +59,12 @@ def main():
         shard_start = first_ts + timedelta(days=shard_index * days_per_shard)
         shard_end = shard_start + timedelta(days=days_per_shard - 1)
 
-        # e.g. foo.log-20251101-20251114
+        # e.g. foo.log-2025-11-01-2025-11-14
         base = log_path.name
-        shard_name = f"{base}-{shard_start.date()}-{shard_end.date()}"
+        if shard_start.date() != shard_end.date():
+            shard_name = f"{base}-{shard_start.date()}-{shard_end.date()}"
+        else:
+            shard_name = f"{base}-{shard_start.date()}"
         shard_path = log_path.parent / shard_name
         if shard_path not in out_files:
             out_files[shard_path] = shard_path.open("a", encoding="utf-8")

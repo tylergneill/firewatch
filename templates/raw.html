@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Raw log tails</h2>
+<h2>Tail logs</h2>
+
+<form method="get" action="{{ url_for('raw_view') }}">
+    <input type="hidden" name="start_date" value="{{ start_date }}">
+    <input type="hidden" name="end_date" value="{{ end_date }}">
+    <label for="num_lines">Number of lines:</label>
+    <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
+    <button type="submit">Update</button>
+</form>
 
 {% if app_logs %}
   {% for app_name, lines in app_logs.items() %}
