@@ -50,7 +50,7 @@ def index():
     start_date, end_date = get_dates_from_request_args(request.args)
     selected_apps = session.get('selected_apps') or app_names
 
-    # Raw view data
+    # Tail log data
     try:
         num_lines = int(request.args.get('num_lines', MAX_LINES_PER_FILE))
     except (ValueError, TypeError):

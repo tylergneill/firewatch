@@ -41,17 +41,6 @@
         </table>
     </div>
     <div class="col-md-3">
-        <h3>By User Agent (Top 20)</h3>
-        <table class="table table-sm">
-            {% for ua, count in ua_counts %}
-            <tr>
-                <td title="{{ ua }}"><a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}">{{ ua|truncate(30) }}</a></td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div class="col-md-3">
         <h3>By IP (Top 20)</h3>
         <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
         <table class="table table-sm">
@@ -71,6 +60,17 @@
             </tr>
             {% endfor %}
             </tbody>
+        </table>
+    </div>
+    <div class="col-md-3">
+        <h3>By User Agent (Top 20)</h3>
+        <table class="table table-sm">
+            {% for ua, count in ua_counts %}
+            <tr>
+                <td title="{{ ua }}"><a href="{{ url_for('summary_view', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}">{{ ua|truncate(30) }}</a></td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
         </table>
     </div>
 </div>
