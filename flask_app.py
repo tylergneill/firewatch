@@ -16,7 +16,8 @@ DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
 
-LOCAL_LOG_FILE_MAIN_PATH = pathlib.Path("../firewatch-data")
+LOG_FILE_PATH = pathlib.Path("static/data")
+
 app_names = [
     "skrutable",
     "splitter-server",
@@ -29,12 +30,8 @@ app_names += [
     if app_name != "splitter-server"
 ]
 
-SERVER_LOG_FILE_MAIN_PATH = pathlib.Path("/var/log/nginx/")
-
-LOG_FILE_MAIN_PATH = LOCAL_LOG_FILE_MAIN_PATH if DEBUG_ENV else SERVER_LOG_FILE_MAIN_PATH
-
 LOG_FILES = {
-    app_name: LOG_FILE_MAIN_PATH / f"{app_name}-archive"
+    app_name: LOG_FILE_PATH / f"{app_name}-archive"
     for app_name in app_names
 }
 
@@ -66,7 +63,7 @@ def index():
 
     app_logs = {}
     for app_name in selected_apps:
-        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_MAIN_PATH, start_date, end_date)
+        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
 
         all_lines = []
         for log_file in log_files:
@@ -82,7 +79,7 @@ def index():
     # Summary view data
     parsed_entries = []
     for app_name in selected_apps:
-        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_MAIN_PATH, start_date, end_date)
+        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
         lines = read_lines_from_files(log_files)
         for l in lines:
             p = parse_line(l)
