@@ -76,37 +76,42 @@ def index():
         text_lines = [l.decode("utf-8", errors="replace") for l in all_lines]
         app_logs[app_name] = text_lines
 
-    # Summary view data
-    parsed_entries = []
-    for app_name in selected_apps:
-        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
-        lines = read_lines_from_files(log_files)
-        for l in lines:
-            p = parse_line(l)
-            if not p:
-                continue
-
-            p["app"] = app_name
-            parsed_entries.append(p)
-
+    # Summary view data (streaming, no big parsed_entries list)
     filter_ip = request.args.get('ip')
     filter_ua = request.args.get('ua')
 
-    if filter_ip:
-        parsed_entries = [p for p in parsed_entries if p['ip'] == filter_ip]
-    if filter_ua:
-        parsed_entries = [p for p in parsed_entries if p['ua'] == filter_ua]
+    total = 0
+    total_req_time = 0.0
 
-    total = len(parsed_entries)
+    ip_counts = Counter()
+    ua_counts = Counter()
+    status_counts = Counter()
+    app_counts = Counter()
 
-    ip_counts = Counter(p["ip"] for p in parsed_entries)
-    ua_counts = Counter(p["ua"] for p in parsed_entries)
-    status_counts = Counter(p["status"] for p in parsed_entries)
-    app_counts = Counter(p["app"] for p in parsed_entries)
+    for app_name in selected_apps:
+        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+        for line in read_lines_from_files(log_files):
+            p = parse_line(line)
+            if not p:
+                continue
+
+            # Apply filters
+            if filter_ip and p["ip"] != filter_ip:
+                continue
+            if filter_ua and p["ua"] != filter_ua:
+                continue
+
+            total += 1
+            ip_counts[p["ip"]] += 1
+            ua_counts[p["ua"]] += 1
+            status_counts[p["status"]] += 1
+            app_counts[app_name] += 1
+
+            req_time = p["req_time"]
+            if req_time is not None:
+                total_req_time += req_time
 
     ip_counts_top20 = [{"ip": ip, "count": count} for ip, count in ip_counts.most_common(20)]
-
-    total_req_time = sum(p['req_time'] for p in parsed_entries if p['req_time'] is not None)
     avg_req_time = total_req_time / total if total > 0 else 0
 
     return render_template(

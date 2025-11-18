@@ -1,9 +1,9 @@
 import logging
 import pathlib
 import re
-from collections import deque
 import requests
 import datetime
+import os
 
 
 def find_app_version():
@@ -33,12 +33,41 @@ LOG_RE = re.compile(
 
 def tail_lines(path: pathlib.Path, n: int):
     """Return last n lines of a text file as bytes."""
+    if n <= 0:
+        return []
     try:
-        dq = deque(maxlen=n)
         with path.open("rb") as f:
-            for line in f:
-                dq.append(line.rstrip(b"\n"))
-        return list(dq)
+            f.seek(0, os.SEEK_END)
+            file_size = f.tell()
+
+            if file_size == 0:
+                return []
+
+            offset = 0
+            lines_found = 0
+            buffer = b''
+            block_size = 4096  # Increased block size for efficiency
+
+            # Keep reading backwards from the end of the file in blocks
+            # until we find at least n + 1 newline characters.
+            while lines_found < (n + 1) and offset < file_size:
+                block_end_pos = file_size - offset
+                block_start_pos = max(0, block_end_pos - block_size)
+
+                f.seek(block_start_pos)
+                block = f.read(block_end_pos - block_start_pos)
+
+                buffer = block + buffer
+                lines_found = buffer.count(b'\n')
+                offset += block_size
+
+            # The original implementation returned lines with `rstrip(b"\n")`.
+            # `splitlines()` removes standard line endings, which is correct.
+            lines = buffer.splitlines()
+
+            # Return the last n lines.
+            return lines[-n:]
+
     except FileNotFoundError:
         return []
 
