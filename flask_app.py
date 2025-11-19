@@ -75,23 +75,51 @@ def index():
     # Determine the current view mode (summary or tail)
     view_mode = request.args.get('view_mode', 'summary')
 
+    # Filters for tail view
+    tail_filter_ip = request.args.get('ip') if view_mode == 'tail' else None
+    tail_filter_status = request.args.get('status') if view_mode == 'tail' else None
+
     app_logs = {}
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
 
-        all_lines = []
-        for log_file in log_files:
-            lines = tail_lines(log_file, num_lines)
-            all_lines.extend(lines)
+        # If filtering, we read all lines for the date range. Otherwise, we just tail.
+        if view_mode == 'tail' and (tail_filter_ip or tail_filter_status):
+            # Filtering mode for "tail" view: read all lines and filter
+            filtered_lines = []
+            for line_bytes in read_lines_from_files(log_files):
+                p = parse_line(line_bytes)
+                if not p:
+                    continue
 
-        if len(all_lines) > num_lines:
-            all_lines = all_lines[-num_lines:]
+                # IP filter
+                if tail_filter_ip and p['ip'] != tail_filter_ip:
+                    continue
 
-        text_lines = [l.decode("utf-8", errors="replace") for l in all_lines]
+                # Status filter
+                if tail_filter_status and p['status'] != tail_filter_status:
+                    continue
+
+                filtered_lines.append(line_bytes.decode("utf-8", errors="replace"))
+
+            text_lines = filtered_lines
+
+        else:
+            # Original tail behavior: get last N lines
+            all_lines_bytes = []
+            for log_file in log_files:
+                lines = tail_lines(log_file, num_lines)
+                all_lines_bytes.extend(lines)
+
+            if len(all_lines_bytes) > num_lines:
+                all_lines_bytes = all_lines_bytes[-num_lines:]
+
+            text_lines = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
+
         app_logs[app_name] = text_lines
 
     # Summary view data (streaming, no big parsed_entries list)
-    filter_ip = request.args.get('ip')
+    filter_ip = request.args.get('ip') if view_mode == 'summary' else None
     filter_ua = request.args.get('ua')
 
     total = 0
@@ -159,6 +187,8 @@ def index():
         filter_ip=filter_ip,
         filter_ua=filter_ua,
         avg_req_time=avg_req_time,
+        tail_filter_ip=tail_filter_ip,
+        tail_filter_status=tail_filter_status,
     )
 
 

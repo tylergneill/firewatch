@@ -51,15 +51,6 @@
           <p>Total entries: {{ total|commify }}</p>
           <p>Average request time: {{ "%.3f"|format(avg_req_time) }}s</p>
     
-          {% if filter_ip or filter_ua %}
-          <p>
-              <strong>Filters active:</strong>
-              {% if filter_ip %} IP: {{ filter_ip }} <a href="{{ url_for('index', start_date=start_date, end_date=end_date, ua=filter_ua) }}" onclick="showLoading()">(clear)</a> {% endif %}
-              {% if filter_ua %} UA: {{ filter_ua }} <a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip) }}" onclick="showLoading()">(clear)</a> {% endif %}
-              <a href="{{ url_for('index', start_date=start_date, end_date=end_date) }}" onclick="showLoading()">(clear all)</a>
-          </p>
-          {% endif %}
-    
           <div class="row">
               <div class="col-md-3">
                   <h3>By App</h3>
@@ -98,12 +89,12 @@
                       <tbody>
                       {% for item in ip_counts %}
                       <tr class="ip-row" data-ip="{{ item.ip }}">
-                          <td><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}" onclick="showLoading()">{{ item.ip }}</a></td>
+                          <td><a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
                           <td>{{ item.count|commify }}</td>
                           <td class="geo-location">-</td>
                           <td>
                               {% for status, count in item.status_summary.items() %}
-                                  {{ status }}: {{ count }}<br>
+                                  <a href="{{ url_for('index', view_mode='tail', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
                               {% endfor %}
                           </td>
                       </tr>
@@ -127,18 +118,28 @@
         <div id="tail_view" style="display: none;">
           <h2>Tail logs</h2>
     
-          <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
-              <input type="hidden" name="view_mode" id="view_mode_tail_form" value="{{ view_mode }}">
-              <input type="hidden" name="start_date" value="{{ start_date }}">
-              <input type="hidden" name="end_date" value="{{ end_date }}">
-              <label for="num_lines">Number of lines:</label>
-              <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
-              <button type="submit">Update</button>
-          </form>
+          {% if tail_filter_ip or tail_filter_status %}
+            <p>
+              Showing all matching lines.
+              <strong>Filters active:</strong>
+              {% if tail_filter_ip %} IP: {{ tail_filter_ip }} {% endif %}
+              {% if tail_filter_status %} Status: {{ tail_filter_status }} {% endif %}
+              <a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date) }}">(clear filters)</a>
+            </p>
+          {% else %}
+            <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
+                <input type="hidden" name="view_mode" id="view_mode_tail_form" value="{{ view_mode }}">
+                <input type="hidden" name="start_date" value="{{ start_date }}">
+                <input type="hidden" name="end_date" value="{{ end_date }}">
+                <label for="num_lines">Number of lines:</label>
+                <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
+                <button type="submit">Update</button>
+            </form>
+          {% endif %}
     
           {% if app_logs %}
             {% for app_name, lines in app_logs.items() %}
-              <h3>{{ app_name }}</h3>
+              <h3>{{ app_name }} ({{ lines|length }} lines)</h3>
               {% if lines %}
                 <pre>
           {% for line in lines %}
