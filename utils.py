@@ -4,6 +4,7 @@ import re
 import requests
 import datetime
 import os
+from functools import lru_cache
 
 
 def find_app_version():
@@ -105,19 +106,13 @@ def parse_line(line: bytes):
     }
 
 
-# In-memory cache for geolocation data
-GEO_CACHE = {}
-
+@lru_cache(maxsize=2048)
 def get_geo_for_ip(ip: str):
     """Get geo location for an IP, with in-memory caching."""
-    if ip in GEO_CACHE:
-        return GEO_CACHE[ip]
-
     try:
         response = requests.get(f"http://ip-api.com/json/{ip}", timeout=5)
         response.raise_for_status()
         data = response.json()
-        GEO_CACHE[ip] = data
         return data
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}

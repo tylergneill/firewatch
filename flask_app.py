@@ -1,5 +1,5 @@
 import os
-from collections import Counter
+from collections import Counter, defaultdict
 import pathlib
 
 
@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, j
 
 from utils import (
     find_app_version, parse_line, get_geo_for_ip,
-    find_archived_logs_for_daterange, get_log_sources_for_app,
+    get_log_sources_for_app,
     read_lines_from_files, get_dates_from_request_args, tail_lines
 )
 
@@ -61,6 +61,15 @@ def index():
     if not 1 <= num_lines <= 10000:
         num_lines = MAX_LINES_PER_FILE
 
+    # Top N parameter
+    try:
+        top_n = int(request.args.get('top_n', 20))
+    except (ValueError, TypeError):
+        top_n = 20
+    
+    if not 1 <= top_n <= 1000:
+        top_n = 20
+
     app_logs = {}
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
@@ -87,6 +96,7 @@ def index():
     ua_counts = Counter()
     status_counts = Counter()
     app_counts = Counter()
+    ip_status_counts = defaultdict(Counter) # Initialize defaultdict here
 
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
@@ -106,12 +116,21 @@ def index():
             ua_counts[p["ua"]] += 1
             status_counts[p["status"]] += 1
             app_counts[app_name] += 1
+            ip_status_counts[p["ip"]][p["status"]] += 1 # Populate ip_status_counts
 
             req_time = p["req_time"]
             if req_time is not None:
                 total_req_time += req_time
 
-    ip_counts_top20 = [{"ip": ip, "count": count} for ip, count in ip_counts.most_common(20)]
+    # Modified ip_counts_top to include status_summary
+    ip_counts_top = []
+    for ip, count in ip_counts.most_common(top_n):
+        ip_counts_top.append({
+            "ip": ip,
+            "count": count,
+            "status_summary": dict(ip_status_counts[ip].most_common())
+        })
+    
     avg_req_time = total_req_time / total if total > 0 else 0
 
     return render_template(
@@ -123,9 +142,10 @@ def index():
         selected_apps=selected_apps,
         app_logs=app_logs,
         num_lines=num_lines,
+        top_n=top_n,
         total=total,
-        ip_counts=ip_counts_top20,
-        ua_counts=ua_counts.most_common(20),
+        ip_counts=ip_counts_top,
+        ua_counts=ua_counts.most_common(top_n),
         status_counts=status_counts.most_common(),
         app_counts=app_counts.most_common(),
         filter_ip=filter_ip,

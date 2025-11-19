@@ -27,6 +27,8 @@
         <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
         <label for="end_date">End:</label>
         <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        <label for="top_n">Top N:</label>
+        <input type="number" id="top_n" name="top_n" value="{{ top_n }}" min="1" max="1000">
         <button type="submit">Go</button>
       </form>
     </div>
@@ -80,7 +82,7 @@
                   </table>
               </div>
               <div class="col-md-3">
-                  <h3>By IP (Top 20)</h3>
+                  <h3>By IP (Top {{ top_n }})</h3>
                   <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
                   <table class="table table-sm">
                       <thead>
@@ -88,6 +90,7 @@
                               <th>IP</th>
                               <th>Count</th>
                               <th>Location</th>
+                              <th>Status Summary</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -96,13 +99,18 @@
                           <td><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=item.ip, ua=filter_ua) }}" onclick="showLoading()">{{ item.ip }}</a></td>
                           <td>{{ item.count|commify }}</td>
                           <td class="geo-location">-</td>
+                          <td>
+                              {% for status, count in item.status_summary.items() %}
+                                  {{ status }}: {{ count }}<br>
+                              {% endfor %}
+                          </td>
                       </tr>
                       {% endfor %}
                       </tbody>
                   </table>
               </div>
               <div class="col-md-3">
-                  <h3>By User Agent (Top 20)</h3>
+                  <h3>By User Agent (Top {{ top_n }})</h3>
                   <table class="table table-sm">
                       {% for ua, count in ua_counts %}
                       <tr>
