@@ -30,3 +30,14 @@ pre {
   padding: 0.75rem;
   overflow-x: auto;
 }
+
+.header-container {
+    display: flex;
+    align-items: baseline;
+    margin-top: -2em;
+    margin-bottom: -1em;
+}
+
+.header-container h1 {
+    margin-right: 1em;
+}

@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <title>firewatch</title>
+    <link rel="icon" type="image/png" href="/static/web/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='web/style.css') }}">
   </head>
   <body>
-    <h1><a href="/">firewatch</a></h1>
-    <p>{{ app_version }}</p>
+    <div class="header-container">
+      <h1><a href="/">🔥&nbsp;&nbsp;firewatch</a></h1> <p>{{ app_version }}</p>
+    </div>
     <hr>
     <div class="control-panel">
       <form method="post" action="{{ url_for('select_apps') }}" id="select_apps_form" onsubmit="showLoading()">
