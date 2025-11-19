@@ -10,17 +10,39 @@
     <p>{{ app_version }}</p>
     <hr>
     <div class="control-panel">
-      <form method="post" action="{{ url_for('select_apps') }}" id="select_apps_form" style="display: inline;" onsubmit="showLoading()">
-          <input type="hidden" name="view_mode" id="view_mode_apps_form" value="{{ view_mode }}">
-          <label>Apps:</label>
-          {% for app_name in app_names %}
-              <input class="form-check-input" type="checkbox" name="apps" value="{{ app_name }}" id="app_{{ app_name }}" {% if app_name in selected_apps %}checked{% endif %} style="display: inline-block; margin-right: 0.25rem;">
-              <label class="form-check-label" for="app_{{ app_name }}" onclick="select_app('{{ app_name }}')" style="display: inline-block; margin-right: 1rem;">{{ app_name }}</label>
-          {% endfor %}
-          &nbsp;&nbsp;|&nbsp;&nbsp;
-          <a href="#" onclick="select_all_apps()">Select All</a>
-          &nbsp;&nbsp;|&nbsp;&nbsp;
-          <button type="submit" class="btn btn-primary btn-sm" style="display: inline-block;">Apply multiple</button>
+      <form method="post" action="{{ url_for('select_apps') }}" id="select_apps_form" onsubmit="showLoading()">
+        <input type="hidden" name="view_mode" id="view_mode_apps_form" value="{{ view_mode }}">
+        <table class="app-selector-table" style="width: 100%;">
+            <tr>
+                <!-- Prod row -->
+                {% for pair in app_pairs %}
+                <td>
+                    <input class="form-check-input app-checkbox app-prd" type="checkbox" name="apps" value="{{ pair.prd }}" id="app_{{ pair.prd }}" {% if pair.prd in selected_apps %}checked{% endif %}>
+                    <label class="form-check-label" for="app_{{ pair.prd }}" style="cursor: pointer;" onclick="select_single_app('{{ pair.prd }}')">{{ pair.prd }}</label>
+                </td>
+                {% endfor %}
+                <td style="text-align: right;"><a href="#" onclick="select_all_prd(true); return false;">All prd</a> / <a href="#" onclick="select_all_prd(false); return false;">Clear</a></td>
+            </tr>
+            <tr>
+                <!-- Stg row -->
+                {% for pair in app_pairs %}
+                <td>
+                    {% if pair.stg %}
+                    <input class="form-check-input app-checkbox app-stg" type="checkbox" name="apps" value="{{ pair.stg }}" id="app_{{ pair.stg }}" {% if pair.stg in selected_apps %}checked{% endif %}>
+                    <label class="form-check-label" for="app_{{ pair.stg }}" style="cursor: pointer;" onclick="select_single_app('{{ pair.stg }}')">{{ pair.stg }}</label>
+                    {% endif %}
+                </td>
+                {% endfor %}
+                <td style="text-align: right;"><a href="#" onclick="select_all_stg(true); return false;">All stg</a> / <a href="#" onclick="select_all_stg(false); return false;">Clear</a></td>
+            </tr>
+            <tr>
+                <td colspan="{{ app_pairs|length + 1 }}">
+                    <a href="#" onclick="select_all_apps(true); return false;">Select All</a> / <a href="#" onclick="select_all_apps(false); return false;">Clear All</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <button type="submit" class="btn btn-primary btn-sm">Apply multiple</button>
+                </td>
+            </tr>
+        </table>
       </form>
       <hr>
       <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
@@ -154,6 +176,11 @@
             <p><em>No log files configured.</em></p>
           {% endif %}
         </div>
+    <script>
+        const ALL_APPS = JSON.parse('{{ all_apps_json|safe }}');
+        const PRD_APPS = JSON.parse('{{ prd_apps_json|safe }}');
+        const STG_APPS = JSON.parse('{{ stg_apps_json|safe }}');
+    </script>
     <script src="{{ url_for('static', filename='web/script.js') }}"></script>
     <script>
         // On page load, set the initial view mode based on the value passed from the Flask backend

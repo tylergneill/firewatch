@@ -39,23 +39,49 @@ function set_view_mode_and_show(mode) {
     show_view(mode);
 }
 
+// The select_app function is no longer used with the new table layout.
+
 // Selects a single application and submits the form
-function select_app(app_name) {
-  var checkboxes = document.getElementsByName('apps');
-  for (var i = 0; i < checkboxes.length; i++) {
-      // Check only the selected app, uncheck others
-      checkboxes[i].checked = checkboxes[i].value === app_name;
-  }
-  showLoading(); // Show loading indicator
-  document.getElementById('select_apps_form').submit(); // Submit the form
+function select_single_app(app_name) {
+    // Uncheck all app checkboxes first
+    const all_checkboxes = document.querySelectorAll('.app-checkbox');
+    all_checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Check only the selected one
+    const checkbox = document.getElementById(`app_${app_name}`);
+    if (checkbox) {
+        checkbox.checked = true;
+    }
+
+    showLoading(); // Show loading indicator
+    document.getElementById('select_apps_form').submit(); // Submit the form
 }
 
-// Selects all applications
-function select_all_apps() {
-  var checkboxes = document.getElementsByName('apps');
-  for (var i = 0; i < checkboxes.length; i++) {
-      checkboxes[i].checked = true; // Check all app checkboxes
-  }
+// Generic function to set the checked state for a list of apps
+function set_apps_checked_state(apps_list, is_checked) {
+    apps_list.forEach(appName => {
+        const checkbox = document.getElementById(`app_${appName}`);
+        if (checkbox) {
+            checkbox.checked = is_checked;
+        }
+    });
+}
+
+// Selects or deselects all applications
+function select_all_apps(is_checked) {
+    set_apps_checked_state(ALL_APPS, is_checked);
+}
+
+// Selects or deselects all production applications
+function select_all_prd(is_checked) {
+    set_apps_checked_state(PRD_APPS, is_checked);
+}
+
+// Selects or deselects all staging applications
+function select_all_stg(is_checked) {
+    set_apps_checked_state(STG_APPS, is_checked);
 }
 // Event listener for the "Find Locations" button
 document.getElementById('find-locations-btn').addEventListener('click', function() {

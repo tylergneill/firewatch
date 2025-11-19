@@ -2,6 +2,7 @@ import os
 from collections import Counter, defaultdict
 import pathlib
 import datetime
+import json
 
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from urllib.parse import urlparse, parse_qs
@@ -175,12 +176,32 @@ def index():
     
     avg_req_time = total_req_time / total if total > 0 else 0
 
+    # Create a structured list of apps for the template
+    prod_app_names = sorted([name for name in app_names if not name.endswith('-stg')])
+    stg_app_names = sorted([name for name in app_names if name.endswith('-stg')])
+
+    app_pairs = []
+    prod_apps_with_stg = [name.replace('-stg', '') for name in stg_app_names]
+
+    for name in prod_app_names:
+        if name in prod_apps_with_stg:
+            app_pairs.append({'prd': name, 'stg': f'{name}-stg'})
+        else:
+            app_pairs.append({'prd': name, 'stg': None})
+
+    # Sort pairs alphabetically by prod name for consistent order
+    app_pairs.sort(key=lambda x: x['prd'])
+
     return render_template(
         "index.html",
         app_version=APP_VERSION,
         start_date=start_date.isoformat(),
         end_date=end_date.isoformat(),
         app_names=app_names,
+        app_pairs=app_pairs,
+        all_apps_json=json.dumps(app_names),
+        prd_apps_json=json.dumps(prod_app_names),
+        stg_apps_json=json.dumps(stg_app_names),
         selected_apps=selected_apps,
         app_logs=app_logs,
         num_lines=num_lines,
