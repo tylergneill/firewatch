@@ -17,16 +17,17 @@
         <table class="app-selector-table" style="width: 100%;">
             <tr>
                 <!-- Prod row -->
+                <td style="text-align: right;"><a href="#" onclick="select_all_prd(true); return false;">All prd</a> / <a href="#" onclick="select_all_prd(false); return false;">Clear</a></td>
                 {% for pair in app_pairs %}
                 <td>
                     <input class="form-check-input app-checkbox app-prd" type="checkbox" name="apps" value="{{ pair.prd }}" id="app_{{ pair.prd }}" {% if pair.prd in selected_apps %}checked{% endif %}>
                     <label class="form-check-label" for="app_{{ pair.prd }}" style="cursor: pointer;" onclick="select_single_app('{{ pair.prd }}')">{{ pair.prd }}</label>
                 </td>
                 {% endfor %}
-                <td style="text-align: right;"><a href="#" onclick="select_all_prd(true); return false;">All prd</a> / <a href="#" onclick="select_all_prd(false); return false;">Clear</a></td>
             </tr>
             <tr>
                 <!-- Stg row -->
+                <td style="text-align: right;"><a href="#" onclick="select_all_stg(true); return false;">All stg</a> / <a href="#" onclick="select_all_stg(false); return false;">Clear</a></td>
                 {% for pair in app_pairs %}
                 <td>
                     {% if pair.stg %}
@@ -35,10 +36,9 @@
                     {% endif %}
                 </td>
                 {% endfor %}
-                <td style="text-align: right;"><a href="#" onclick="select_all_stg(true); return false;">All stg</a> / <a href="#" onclick="select_all_stg(false); return false;">Clear</a></td>
             </tr>
             <tr>
-                <td colspan="{{ app_pairs|length + 1 }}">
+                <td colspan="{{ app_pairs|length + 1 }}" style="text-align: center;">
                     <a href="#" onclick="select_all_apps(true); return false;">Select All</a> / <a href="#" onclick="select_all_apps(false); return false;">Clear All</a>
                     &nbsp;&nbsp;|&nbsp;&nbsp;
                     <button type="submit" class="btn btn-primary btn-sm">Apply multiple</button>

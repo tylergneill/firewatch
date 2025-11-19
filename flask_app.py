@@ -25,7 +25,10 @@ app_names = [
     "splitter-server",
     "vatayana",
     "panditya",
-    "hansel"]
+    "hansel",
+    "firewatch",
+    "kalpataru-grove",
+]
 app_names += [
     app_name + '-stg'
     for app_name in app_names
