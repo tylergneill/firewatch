@@ -63,14 +63,21 @@ def index():
         num_lines = MAX_LINES_PER_FILE
 
     # Top N parameter: controls the number of top IPs/User Agents shown
-    try:
-        top_n = int(request.args.get('top_n', 20))
-    except (ValueError, TypeError):
-        top_n = 20
-    
-    # Ensure top_n is within reasonable bounds
-    if not 1 <= top_n <= 1000:
-        top_n = 20
+    # Get it from request args, fall back to session, then to default.
+    top_n_str = request.args.get('top_n')
+    if top_n_str:
+        try:
+            top_n = int(top_n_str)
+            # Ensure top_n is within reasonable bounds
+            if not 1 <= top_n <= 1000:
+                top_n = session.get('top_n', 20)
+        except (ValueError, TypeError):
+            top_n = session.get('top_n', 20)
+    else:
+        top_n = session.get('top_n', 20)
+
+    # Save the latest valid top_n to the session
+    session['top_n'] = top_n
 
     # Determine the current view mode (summary or tail)
     view_mode = request.args.get('view_mode', 'summary')
@@ -223,7 +230,7 @@ def select_apps():
         redirect_args['view_mode'] = request.form.get('view_mode', redirect_args.get('view_mode', 'summary'))
         redirect_args['start_date'] = redirect_args.get('start_date', request.form.get('start_date', (datetime.date.today() - datetime.timedelta(days=7)).isoformat()))
         redirect_args['end_date'] = redirect_args.get('end_date', request.form.get('end_date', datetime.date.today().isoformat()))
-        redirect_args['top_n'] = redirect_args.get('top_n', request.form.get('top_n', 20))
+        redirect_args['top_n'] = redirect_args.get('top_n', request.form.get('top_n', session.get('top_n', 20)))
         redirect_args['num_lines'] = redirect_args.get('num_lines', request.form.get('num_lines', MAX_LINES_PER_FILE))
 
         return redirect(url_for('index', **redirect_args))
