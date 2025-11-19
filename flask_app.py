@@ -128,7 +128,8 @@ def index():
 
     # Summary view data (streaming, no big parsed_entries list)
     filter_ip = request.args.get('ip') if view_mode == 'summary' else None
-    filter_ua = request.args.get('ua')
+    filter_ua = request.args.get('ua') if view_mode == 'summary' else None
+    filter_status = request.args.get('status') if view_mode == 'summary' else None
 
     total = 0
     total_req_time = 0.0
@@ -147,10 +148,12 @@ def index():
             if not p:
                 continue
 
-            # Apply filters for IP and User Agent
+            # Apply filters for IP, User Agent, and Status
             if filter_ip and p["ip"] != filter_ip:
                 continue
             if filter_ua and p["ua"] != filter_ua:
+                continue
+            if filter_status and p["status"] != filter_status:
                 continue
 
             total += 1
@@ -214,6 +217,7 @@ def index():
         app_counts=app_counts.most_common(),
         filter_ip=filter_ip,
         filter_ua=filter_ua,
+        filter_status=filter_status,
         avg_req_time=avg_req_time,
         tail_filter_ip=tail_filter_ip,
         tail_filter_status=tail_filter_status,

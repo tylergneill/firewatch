@@ -69,6 +69,25 @@
           <h2>Summary</h2>
     
           <hr>
+
+          {% if filter_ip or filter_ua or filter_status %}
+          <p>
+              <strong>Filters active:</strong>
+              {% if filter_ip %}
+                IP: {{ filter_ip }} <a href="{{ url_for('index', view_mode='summary', ua=filter_ua, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if filter_ua %}
+                UA: {{ filter_ua|truncate(30) }} <a href="{{ url_for('index', view_mode='summary', ip=filter_ip, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove UA filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if filter_status %}
+                Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='summary', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              <a href="{{ url_for('index', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
+          </p>
+          {% endif %}
     
           <p>Total entries: {{ total|commify }}</p>
           <p>Average request time: {{ "%.3f"|format(avg_req_time) }}s</p>
@@ -88,12 +107,24 @@
               <div class="col-md-3">
                   <h3>By Status</h3>
                   <table class="table table-sm">
-                      {% for status, count in status_counts %}
-                      <tr>
-                          <td>{{ status }}</td>
-                          <td>{{ count|commify }}</td>
-                      </tr>
-                      {% endfor %}
+                      <thead>
+                          <tr>
+                              <th>(filter summary)</th>
+                              <th>(filter tail)</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for status, count in status_counts %}
+                          <tr>
+                              <td>
+                                  <a href="{{ url_for('index', view_mode='summary', status=status, start_date=start_date, end_date=end_date, ip=filter_ip, ua=filter_ua) }}" title="Filter summary by status {{ status }}">{{ status }}</a>
+                              </td>
+                              <td>
+                                  <a href="{{ url_for('index', view_mode='tail', status=status, start_date=start_date, end_date=end_date) }}" title="Tail logs for status {{ status }}">{{ count|commify }}</a>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
                   </table>
               </div>
               <div class="col-md-3">
@@ -144,9 +175,17 @@
             <p>
               Showing all matching lines.
               <strong>Filters active:</strong>
-              {% if tail_filter_ip %} IP: {{ tail_filter_ip }} {% endif %}
-              {% if tail_filter_status %} Status: {{ tail_filter_status }} {% endif %}
-              <a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date) }}">(clear filters)</a>
+              {% if tail_filter_ip %}
+                IP: {{ tail_filter_ip }}
+                <a href="{{ url_for('index', view_mode='tail', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if tail_filter_status %}
+                Status: {{ tail_filter_status }}
+                <a href="{{ url_for('index', view_mode='tail', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              <a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
             </p>
           {% else %}
             <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
