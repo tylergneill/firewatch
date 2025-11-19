@@ -1,9 +1,10 @@
 import os
 from collections import Counter, defaultdict
 import pathlib
-
+import datetime
 
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
+from urllib.parse import urlparse, parse_qs
 
 from utils import (
     find_app_version, parse_line, get_geo_for_ip,
@@ -61,14 +62,18 @@ def index():
     if not 1 <= num_lines <= 10000:
         num_lines = MAX_LINES_PER_FILE
 
-    # Top N parameter
+    # Top N parameter: controls the number of top IPs/User Agents shown
     try:
         top_n = int(request.args.get('top_n', 20))
     except (ValueError, TypeError):
         top_n = 20
     
+    # Ensure top_n is within reasonable bounds
     if not 1 <= top_n <= 1000:
         top_n = 20
+
+    # Determine the current view mode (summary or tail)
+    view_mode = request.args.get('view_mode', 'summary')
 
     app_logs = {}
     for app_name in selected_apps:
@@ -96,7 +101,8 @@ def index():
     ua_counts = Counter()
     status_counts = Counter()
     app_counts = Counter()
-    ip_status_counts = defaultdict(Counter) # Initialize defaultdict here
+    # Stores status code counts for each IP address
+    ip_status_counts = defaultdict(Counter)
 
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
@@ -105,7 +111,7 @@ def index():
             if not p:
                 continue
 
-            # Apply filters
+            # Apply filters for IP and User Agent
             if filter_ip and p["ip"] != filter_ip:
                 continue
             if filter_ua and p["ua"] != filter_ua:
@@ -116,13 +122,14 @@ def index():
             ua_counts[p["ua"]] += 1
             status_counts[p["status"]] += 1
             app_counts[app_name] += 1
-            ip_status_counts[p["ip"]][p["status"]] += 1 # Populate ip_status_counts
+            # Increment status code count for the current IP
+            ip_status_counts[p["ip"]][p["status"]] += 1
 
             req_time = p["req_time"]
             if req_time is not None:
                 total_req_time += req_time
 
-    # Modified ip_counts_top to include status_summary
+    # Prepare top IPs with their aggregated status code summaries
     ip_counts_top = []
     for ip, count in ip_counts.most_common(top_n):
         ip_counts_top.append({
@@ -143,6 +150,7 @@ def index():
         app_logs=app_logs,
         num_lines=num_lines,
         top_n=top_n,
+        view_mode=view_mode,
         total=total,
         ip_counts=ip_counts_top,
         ua_counts=ua_counts.most_common(top_n),
@@ -165,9 +173,33 @@ def geo_for_ip(ip):
 
 @app.route("/select_apps", methods=['POST'])
 def select_apps():
+    # Update the session with the newly selected applications
     session['selected_apps'] = request.form.getlist('apps')
-    # Redirect back to the referring page
-    return redirect(request.referrer or url_for('index'))
+    
+    # Attempt to redirect the user back to the page they came from,
+    # preserving all existing query parameters to maintain the state (e.g., dates, top_n, view_mode).
+    referrer_url = request.referrer
+    if referrer_url:
+        parsed_url = urlparse(referrer_url)
+        query_params = parse_qs(parsed_url.query)
+        
+        # Convert list values from parse_qs to single values suitable for url_for.
+        redirect_args = {k: v[0] for k, v in query_params.items()}
+        
+        # Prioritize parameters submitted directly with the form (e.g., view_mode),
+        # then fallback to parameters from the referrer's query string,
+        # and finally to hardcoded defaults if neither is available.
+        # This ensures view state and other filters are maintained across app selections.
+        redirect_args['view_mode'] = request.form.get('view_mode', redirect_args.get('view_mode', 'summary'))
+        redirect_args['start_date'] = redirect_args.get('start_date', request.form.get('start_date', (datetime.date.today() - datetime.timedelta(days=7)).isoformat()))
+        redirect_args['end_date'] = redirect_args.get('end_date', request.form.get('end_date', datetime.date.today().isoformat()))
+        redirect_args['top_n'] = redirect_args.get('top_n', request.form.get('top_n', 20))
+        redirect_args['num_lines'] = redirect_args.get('num_lines', request.form.get('num_lines', MAX_LINES_PER_FILE))
+
+        return redirect(url_for('index', **redirect_args))
+    
+    # If no referrer is available, redirect to the default index page.
+    return redirect(url_for('index'))
 
 
 if __name__ == "__main__":

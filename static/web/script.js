@@ -1,10 +1,10 @@
-let loadingTimeoutId; // Declare a variable to hold the timeout ID
+let loadingTimeoutId; // Stores the timeout ID for the loading indicator
 
+// Shows a delayed loading indicator to prevent flicker on fast loads
 function showLoading() {
-  // Clear any previous timeout if an action is initiated again quickly
-  clearTimeout(loadingTimeoutId);
+  clearTimeout(loadingTimeoutId); // Clear any previous loading timeouts
 
-  // Set a timeout to show the loading view after 200ms
+  // Set a timeout to display the loading view after 200ms
   loadingTimeoutId = setTimeout(() => {
     document.getElementById('loading_view').style.display = 'block';
     document.getElementById('summary_view').style.display = 'none';
@@ -12,59 +12,80 @@ function showLoading() {
   }, 200);
 }
 
+// Activates the specified view (summary or tail) and hides others
 function show_view(view_name) {
-  // When a view is shown, ensure the loading view is hidden and clear any pending timeout
-  clearTimeout(loadingTimeoutId);
-  document.getElementById('loading_view').style.display = 'none';
-  document.getElementById('summary_view').style.display = 'none';
-  document.getElementById('tail_view').style.display = 'none';
-  document.getElementById(view_name + '_view').style.display = 'block';
+  clearTimeout(loadingTimeoutId); // Clear any pending loading timeouts
+  document.getElementById('loading_view').style.display = 'none'; // Hide loading indicator
+  document.getElementById('summary_view').style.display = 'none'; // Hide summary view
+  document.getElementById('tail_view').style.display = 'none'; // Hide tail view
+  document.getElementById(view_name + '_view').style.display = 'block'; // Display the selected view
 }
 
-window.onload = () => {
-  // When the page finishes loading, clear any pending loading timeout
-  clearTimeout(loadingTimeoutId);
-  // And then show the default view (summary)
-  show_view('summary');
-};
+// Function to set the view mode in hidden input fields and activate the corresponding view
+function set_view_mode_and_show(mode) {
+    // Update the hidden view_mode input in the app selection form
+    const appsFormInput = document.getElementById('view_mode_apps_form');
+    if (appsFormInput) appsFormInput.value = mode;
 
+    // Update the hidden view_mode input in the date/top N selection form
+    const dateFormInput = document.getElementById('view_mode_date_form');
+    if (dateFormInput) dateFormInput.value = mode;
+
+    // Update the hidden view_mode input in the tail log form
+    const tailFormInput = document.getElementById('view_mode_tail_form');
+    if (tailFormInput) tailFormInput.value = mode;
+    
+    // Activate the selected view
+    show_view(mode);
+}
+
+// Selects a single application and submits the form
 function select_app(app_name) {
   var checkboxes = document.getElementsByName('apps');
   for (var i = 0; i < checkboxes.length; i++) {
+      // Check only the selected app, uncheck others
       checkboxes[i].checked = checkboxes[i].value === app_name;
   }
-  showLoading(); // Initiate delayed loading indicator
-  document.getElementById('select_apps_form').submit();
+  showLoading(); // Show loading indicator
+  document.getElementById('select_apps_form').submit(); // Submit the form
 }
 
+// Selects all applications
 function select_all_apps() {
   var checkboxes = document.getElementsByName('apps');
   for (var i = 0; i < checkboxes.length; i++) {
-      checkboxes[i].checked = true;
+      checkboxes[i].checked = true; // Check all app checkboxes
   }
 }
+// Event listener for the "Find Locations" button
 document.getElementById('find-locations-btn').addEventListener('click', function() {
-    this.disabled = true;
-    this.textContent = '...';
+    this.disabled = true; // Disable button to prevent multiple clicks
+    this.textContent = '...'; // Change button text to indicate loading
 
+    // Iterate over each IP row in the table
     document.querySelectorAll('.ip-row').forEach(row => {
-        const ip = row.dataset.ip;
+        const ip = row.dataset.ip; // Get IP from data attribute
         const locationCell = row.querySelector('.geo-location');
-        locationCell.textContent = 'Loading...';
+        locationCell.textContent = 'Loading...'; // Show loading text in location cell
 
+        // Fetch geolocation data for the IP
         fetch(`/api/geo/${ip}`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
+                    // Display error if API returns one
                     locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
                 } else if (data.status === 'success') {
+                    // Display formatted location if successful
                     const locationParts = [data.city, data.regionName, data.country].filter(Boolean);
                     locationCell.textContent = locationParts.join(', ') || '?';
                 } else {
+                    // Indicate unknown status
                     locationCell.textContent = 'Unknown';
                 }
             })
             .catch(error => {
+                // Log and display fetch errors
                 console.error('Error fetching geo location:', error);
                 locationCell.innerHTML = `<span class="text-danger" title="${error}">Error</span>`;
             });
