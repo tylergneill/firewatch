@@ -136,7 +136,7 @@ def index():
     num_days = (end_date - start_date).days + 1
     for app_name in selected_apps:
         uptime_data[app_name] = {
-            (start_date + datetime.timedelta(days=i)): 'red' for i in range(num_days)
+            (start_date + datetime.timedelta(days=i)): {'2xx': 0, '5xx': 0, 'total': 0} for i in range(num_days)
         }
 
     app_logs = {}
@@ -169,10 +169,16 @@ def index():
             if p['time']:
                 log_date = p['time'].date()
                 if log_date in uptime_data.get(app_name, {}):
-                    if uptime_data[app_name][log_date] == 'red':
-                        uptime_data[app_name][log_date] = 'yellow'
-                    if p['status'] in ['200', '401']:
-                        uptime_data[app_name][log_date] = 'green'
+                    uptime_data[app_name][log_date]['total'] += 1
+                    try:
+                        status_code = int(p['status'])
+                        if 200 <= status_code < 300:
+                            uptime_data[app_name][log_date]['2xx'] += 1
+                        elif 500 <= status_code < 600:
+                            uptime_data[app_name][log_date]['5xx'] += 1
+                    except (ValueError, TypeError):
+                        # Ignore statuses that are not integers
+                        pass
 
             # Requests data
             total += 1
@@ -186,6 +192,35 @@ def index():
                 app_response_times[app_name].append(p["req_time"])
     
     # --- Post-processing and Preparation for Render ---
+
+    # Finalize uptime data colors
+    final_uptime_data = {}
+    for app_name, daily_counts in uptime_data.items():
+        final_uptime_data[app_name] = {}
+        for date, counts in daily_counts.items():
+            
+            color = 'red' # Default to red if not explicitly set below
+
+            if counts['total'] == 0:
+                color = 'no-activity' # Dark gray for zero activity
+            elif counts['2xx'] == 0:
+                color = 'red' # No 200s, but there is activity
+            else:
+                # We have activity and 2xx requests
+                if counts['5xx'] == 0:
+                    color = 'blue' # Activity, 200s, and NO 500s
+                else:
+                    # We have 5xx errors, calculate ratio
+                    ratio = counts['5xx'] / counts['2xx']
+                    if ratio >= 0.1: # User's threshold for "too high"
+                        color = 'yellow' # High ratio of 5xx to 2xx
+                    else:
+                        color = 'green' # Low ratio of 5xx to 2xx
+            
+            final_uptime_data[app_name][date] = color
+    
+    uptime_data = final_uptime_data
+
     ip_counts_top = []
     for ip, count in ip_counts.most_common(top_n):
         ip_counts_top.append({
@@ -232,36 +267,44 @@ def index():
         for code, count in app_data['statuses'].items():
             app_counts_totals[code] += count
 
-        def calculate_percentiles(data, percentiles_to_calc):
-            if not data:
-                return {p: 0 for p in percentiles_to_calc}
-            data.sort()
-            n = len(data)
-            results = {}
-            for p in percentiles_to_calc:
-                idx = int((p / 100) * (n - 1))
-                results[p] = data[idx] * 1000
-            return results
+    def calculate_percentiles(data, percentiles_to_calc):
+        if not data:
+            return {p: 0 for p in percentiles_to_calc}
+        data.sort()
+        n = len(data)
+        results = {}
+        for p in percentiles_to_calc:
+            idx = int((p / 100) * (n - 1))
+            results[p] = data[idx] * 1000
+        return results
 
-        percentiles_to_calculate = [50, 75, 90, 95, 99]
-        app_percentile_stats = []
+    percentiles_to_calculate = [50, 75, 90, 95, 99]
+    app_percentile_stats = []
 
-        sorted_apps = sorted(selected_apps)
+    sorted_apps = sorted(selected_apps)
 
-        for app_name in sorted_apps:
-            response_times = app_response_times.get(app_name, [])
-            total_requests = sum(app_counts[app_name].values())
-            if not response_times:
-                # Still show the app, but with 0 stats
-                stats = {p: 0 for p in percentiles_to_calculate}
-            else:
-                stats = calculate_percentiles(response_times, percentiles_to_calculate)
+    for app_name in sorted_apps:
+        response_times = app_response_times.get(app_name, [])
+        total_requests = sum(app_counts[app_name].values())
+        if not response_times:
+            # Still show the app, but with 0 stats
+            stats = {p: 0 for p in percentiles_to_calculate}
+        else:
+            stats = calculate_percentiles(response_times, percentiles_to_calculate)
 
-            app_percentile_stats.append({
-                "name": app_name,
-                "total": total_requests,
-                "percentiles": stats
-            })
+        app_percentile_stats.append({
+            "name": app_name,
+            "total": total_requests,
+            "percentiles": stats
+        })
+
+    uptime_color_explanations = {
+        'no-activity': 'No activity',
+        'red': 'Activity, but no 200s',
+        'yellow': 'High 5xx/2xx error ratio (>= 10%)',
+        'green': 'Healthy (5xx/2xx < 10%)',
+        'blue': 'Activity, 200s, and no 5xx errors'
+    }
 
     return render_template(
         "index.html",
@@ -295,6 +338,7 @@ def index():
         uptime_data=uptime_data,
         app_percentile_stats=app_percentile_stats,
         percentiles_to_calculate=percentiles_to_calculate,
+        uptime_color_explanations=uptime_color_explanations,
     )
 
 

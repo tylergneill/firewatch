@@ -73,3 +73,11 @@ pre {
     background-color: #dc3545;
 }
 
+.status-blue {
+    background-color: rgb(44, 78, 113);
+}
+
+.status-no-activity {
+    background-color: #e9ecef; /* Medium-light gray for zero activity */
+}
+

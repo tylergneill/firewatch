@@ -72,7 +72,7 @@
                 <h3>{{ app_name }}</h3>
                 <div class="status-bar">
                     {% for date, status in daily_statuses.items() %}
-                        <div class="status-day status-{{ status }}" title="{{ date.isoformat() }}: {{ status }}"></div>
+                        <div class="status-day status-{{ status }}" title="{{ date.isoformat() }}: {{ uptime_color_explanations.get(status, status) }}"></div>
                     {% endfor %}
                 </div>
             {% endfor %}
