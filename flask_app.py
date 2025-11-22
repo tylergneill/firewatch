@@ -240,7 +240,7 @@ def index():
             results = {}
             for p in percentiles_to_calc:
                 idx = int((p / 100) * (n - 1))
-                                results[p] = data[idx] * 1000
+                results[p] = data[idx] * 1000
             return results
 
         percentiles_to_calculate = [50, 75, 90, 95, 99]
