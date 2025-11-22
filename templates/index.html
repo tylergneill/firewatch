@@ -113,7 +113,7 @@
                               <th>App</th>
                               <th>Total</th>
                               {% for code in all_status_codes %}
-                                  <th>{{ code }}</th>
+                                  <th><a href="{{ url_for('index', view_mode='requests', status=code, start_date=start_date, end_date=end_date) }}" title="{{ http_status_codes.get(code, '') }}">{{ code }}</a></th>
                               {% endfor %}
                           </tr>
                       </thead>
@@ -133,33 +133,10 @@
                               <td><strong>Total</strong></td>
                               <td><strong>{{ app_counts_totals.total|commify }}</strong></td>
                               {% for code in all_status_codes %}
-                                  <td><strong>{{ app_counts_totals[code]|commify }}</strong></td>
+                                  <td><strong><a href="{{ url_for('index', view_mode='raw', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
                               {% endfor %}
                           </tr>
                       </tfoot>
-                  </table>
-              </div>
-              <div class="col-md-3">
-                  <h3>By Status</h3>
-                  <table class="table table-sm">
-                      <thead>
-                          <tr>
-                              <th>(filter requests)</th>
-                              <th>(filter raw)</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {% for status, count in status_counts %}
-                          <tr>
-                              <td>
-                                  <a href="{{ url_for('index', view_mode='requests', status=status, start_date=start_date, end_date=end_date, ip=filter_ip, ua=filter_ua) }}" title="Filter requests by status {{ status }}">{{ status }}</a>
-                              </td>
-                              <td>
-                                  <a href="{{ url_for('index', view_mode='raw', status=status, start_date=start_date, end_date=end_date) }}" title="Raw logs for status {{ status }}">{{ count|commify }}</a>
-                              </td>
-                          </tr>
-                          {% endfor %}
-                      </tbody>
                   </table>
               </div>
               <hr>
