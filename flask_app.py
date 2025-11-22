@@ -54,7 +54,10 @@ def commify_filter(value):
 @app.route("/")
 def index():
     start_date, end_date = get_dates_from_request_args(request.args)
-    selected_apps = session.get('selected_apps') or (app_names[:1])
+    prod_app_names = sorted([name for name in app_names if not name.endswith('-stg')])
+    stg_app_names = sorted([name for name in app_names if name.endswith('-stg')])
+
+    selected_apps = session.get('selected_apps') or prod_app_names
 
     # Tail log data
     try:
