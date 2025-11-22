@@ -77,9 +77,11 @@ def commify_filter(value):
 def index():
     start_date, end_date = get_dates_from_request_args(request.args)
     prod_app_names = sorted([name for name in app_names if not name.endswith('-stg')])
+    non_default_items = {'firewatch', 'kalpataru-grove'}
+    default_prod_app_names = [app for app in prod_app_names if app not in non_default_items]
     stg_app_names = sorted([name for name in app_names if name.endswith('-stg')])
 
-    selected_apps = session.get('selected_apps') or prod_app_names
+    selected_apps = session.get('selected_apps') or default_prod_app_names
 
     # Tail log data
     try:
@@ -221,8 +223,8 @@ def index():
         }
         app_counts_table.append(app_data)
     
-    # Sort by total descending
-    app_counts_table.sort(key=lambda x: x['total'], reverse=True)
+    # Sort by name
+    app_counts_table.sort(key=lambda x: x['name'])
 
     app_counts_totals = defaultdict(int)
     for app_data in app_counts_table:
@@ -244,7 +246,7 @@ def index():
     percentiles_to_calculate = [75, 90, 95, 99]
     app_percentile_stats = []
 
-    sorted_apps = sorted(selected_apps, key=lambda app: sum(app_counts[app].values()), reverse=True)
+    sorted_apps = sorted(selected_apps)
 
     for app_name in sorted_apps:
         response_times = app_response_times.get(app_name, [])
