@@ -198,6 +198,14 @@ def index():
     # Sort pairs alphabetically by prod name for consistent order
     app_pairs.sort(key=lambda x: x['prd'])
 
+    # Ensure all selected apps are in app_counts, even if count is 0
+    app_counts_list = [
+        (app, app_counts.get(app, 0))
+        for app in selected_apps
+    ]
+    # Sort by count descending
+    app_counts_list.sort(key=lambda x: x[1], reverse=True)
+
     return render_template(
         "index.html",
         app_version=APP_VERSION,
@@ -217,7 +225,7 @@ def index():
         ip_counts=ip_counts_top,
         ua_counts=ua_counts.most_common(top_n),
         status_counts=status_counts.most_common(),
-        app_counts=app_counts.most_common(),
+        app_counts=app_counts_list,
         filter_ip=filter_ip,
         filter_ua=filter_ua,
         filter_status=filter_status,
