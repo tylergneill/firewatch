@@ -180,9 +180,9 @@ def get_dates_from_request_args(request_args):
     start_date_str = request_args.get('start_date')
 
     try:
-        end_date = datetime.date.fromisoformat(end_date_str) if end_date_str else datetime.date.today()
-        start_date = datetime.date.fromisoformat(start_date_str) if start_date_str else (datetime.date.today() - datetime.timedelta(days=7))
+        end_date = datetime.date.fromisoformat(end_date_str) if end_date_str else datetime.date(2025, 11, 15)
+        start_date = datetime.date.fromisoformat(start_date_str) if start_date_str else datetime.date(2025, 11, 11)
     except ValueError:
-        end_date = datetime.date.today()
-        start_date = datetime.date.today() - datetime.timedelta(days=7)
+        end_date = datetime.date(2025, 11, 15)
+        start_date = datetime.date(2025, 11, 11)
     return start_date, end_date
