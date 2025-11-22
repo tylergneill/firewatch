@@ -158,16 +158,20 @@
                   </table>
               </div>
               <div class="col-md-3">
-                  <h3>By User Agent (Top {{ top_n }})</h3>
-                  <table class="table table-sm">
-                      {% for ua, count in ua_counts %}
-                      <tr>
-                          <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}" onclick="showLoading()">{{ ua|truncate(30) }}</a></td>
-                          <td>{{ count|commify }}</td>
-                      </tr>
-                      {% endfor %}
-                  </table>
+                  <button onclick="toggle_ua_counts()">Show By User Agent</button>
+                  <div id="ua_counts_wrapper" style="display: none;">
+                    <h3>By User Agent (Top {{ top_n }})</h3>
+                    <table class="table table-sm">
+                        {% for ua, count in ua_counts %}
+                        <tr>
+                            <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}" onclick="showLoading()">{{ ua|truncate(30) }}</a></td>
+                            <td>{{ count|commify }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                  </div>
               </div>
+              <br/>
           </div>
         </div>
         <div id="tail_view" style="display: none;">

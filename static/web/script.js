@@ -117,3 +117,12 @@ document.getElementById('find-locations-btn').addEventListener('click', function
             });
     });
 });
+
+function toggle_ua_counts() {
+    var wrapper = document.getElementById("ua_counts_wrapper");
+    if (wrapper.style.display === "none") {
+        wrapper.style.display = "block";
+    } else {
+        wrapper.style.display = "none";
+    }
+}
