@@ -127,6 +127,7 @@ def index():
     status_counts = Counter()
     app_counts = defaultdict(Counter)
     ip_status_counts = defaultdict(Counter)
+    app_response_times = defaultdict(list)
     
     # Initialize uptime data structures
     uptime_data = {}
@@ -180,6 +181,7 @@ def index():
             ip_status_counts[p["ip"]][p["status"]] += 1
             if p["req_time"] is not None:
                 total_req_time += p["req_time"]
+                app_response_times[app_name].append(p["req_time"])
     
     # --- Post-processing and Preparation for Render ---
     ip_counts_top = []
@@ -228,7 +230,36 @@ def index():
         for code, count in app_data['statuses'].items():
             app_counts_totals[code] += count
 
+    def calculate_percentiles(data, percentiles_to_calc):
+        if not data:
+            return {p: 0 for p in percentiles_to_calc}
+        data.sort()
+        n = len(data)
+        results = {}
+        for p in percentiles_to_calc:
+            idx = int((p / 100) * (n - 1))
+            results[p] = data[idx]
+        return results
 
+    percentiles_to_calculate = [75, 90, 95, 99]
+    app_percentile_stats = []
+
+    sorted_apps = sorted(selected_apps, key=lambda app: sum(app_counts[app].values()), reverse=True)
+
+    for app_name in sorted_apps:
+        response_times = app_response_times.get(app_name, [])
+        total_requests = sum(app_counts[app_name].values())
+        if not response_times:
+            # Still show the app, but with 0 stats
+            stats = {p: 0 for p in percentiles_to_calculate}
+        else:
+            stats = calculate_percentiles(response_times, percentiles_to_calculate)
+
+        app_percentile_stats.append({
+            "name": app_name,
+            "total": total_requests,
+            "percentiles": stats
+        })
 
     return render_template(
         "index.html",
@@ -260,10 +291,9 @@ def index():
         tail_filter_ip=tail_filter_ip,
         tail_filter_status=tail_filter_status,
         uptime_data=uptime_data,
+        app_percentile_stats=app_percentile_stats,
+        percentiles_to_calculate=percentiles_to_calculate,
     )
-
-
-
 
 
 @app.route('/api/geo/<ip>')

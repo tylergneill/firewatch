@@ -106,7 +106,7 @@
     
           <div class="row">
               <div class="col-md-3">
-                  <h3>By App</h3>
+                  <h3>By Status</h3>
                   <table class="table table-sm">
                       <thead>
                           <tr>
@@ -137,6 +137,31 @@
                               {% endfor %}
                           </tr>
                       </tfoot>
+                  </table>
+              </div>
+              <div class="col-md-3">
+                  <h3>By Response Time (seconds)</h3>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              <th>Total</th>
+                              {% for p in percentiles_to_calculate %}
+                                  <th>P{{ p }}</th>
+                              {% endfor %}
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for app_data in app_percentile_stats %}
+                          <tr>
+                              <td>{{ app_data.name }}</td>
+                              <td>{{ app_data.total|commify }}</td>
+                              {% for p in percentiles_to_calculate %}
+                                  <td>{{ "%.3f"|format(app_data.percentiles[p]) }}</td>
+                              {% endfor %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
                   </table>
               </div>
               <hr>
