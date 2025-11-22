@@ -60,12 +60,24 @@
     </div>
     <hr>
         <div>
+            <button onclick="set_view_mode_and_show('uptime')">Uptime</button>
             <button onclick="set_view_mode_and_show('summary')">Summary</button>
             <button onclick="set_view_mode_and_show('tail')">Tail</button>
         </div>
         <hr>
         <div id="loading_view" style="display: none;">
             <p>Loading...</p>
+        </div>
+        <div id="uptime_view" style="display: none;">
+          <h2>Uptime</h2>
+            {% for app_name, daily_statuses in uptime_data.items() %}
+                <h3>{{ app_name }}</h3>
+                <div class="status-bar">
+                    {% for date, status in daily_statuses.items() %}
+                        <div class="status-day status-{{ status }}" title="{{ date.isoformat() }}: {{ status }}"></div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
         </div>
         <div id="summary_view" style="display: none;">
           <h2>Summary</h2>
@@ -98,12 +110,35 @@
               <div class="col-md-3">
                   <h3>By App</h3>
                   <table class="table table-sm">
-                      {% for app, count in app_counts %}
-                      <tr>
-                          <td>{{ app }}</td>
-                          <td>{{ count|commify }}</td>
-                      </tr>
-                      {% endfor %}
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              <th>Total</th>
+                              {% for code in all_status_codes %}
+                                  <th>{{ code }}</th>
+                              {% endfor %}
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for app_data in app_counts %}
+                          <tr>
+                              <td>{{ app_data.name }}</td>
+                              <td>{{ app_data.total|commify }}</td>
+                              {% for code in all_status_codes %}
+                                  <td>{{ app_data.statuses[code]|commify }}</td>
+                              {% endfor %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                      <tfoot>
+                          <tr>
+                              <td><strong>Total</strong></td>
+                              <td><strong>{{ app_counts_totals.total|commify }}</strong></td>
+                              {% for code in all_status_codes %}
+                                  <td><strong>{{ app_counts_totals[code]|commify }}</strong></td>
+                              {% endfor %}
+                          </tr>
+                      </tfoot>
                   </table>
               </div>
               <div class="col-md-3">

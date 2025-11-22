@@ -94,6 +94,11 @@ def parse_line(line: bytes):
     except ValueError:
         req_time = None
 
+    try:
+        time = datetime.datetime.strptime(d['time'], "%d/%b/%Y:%H:%M:%S %z")
+    except (ValueError, KeyError):
+        time = None
+
     return {
         "raw": s,
         "ip": d["ip"],
@@ -103,6 +108,7 @@ def parse_line(line: bytes):
         "method": d["method"],
         "req_time": req_time,
         "ua": d["ua"],
+        "time": time,
     }
 
 
@@ -138,33 +144,23 @@ def get_log_sources_for_app(app_name, log_files_config, log_file_main_path, star
     Finds all relevant log files for a given app and date range,
     including archived files and the current log file.
     """
-    # The archive path should be the main log file path, as sharded logs are placed there directly.
-    # The original `archive_path` was trying to create a subdirectory like `app_name-archive`,
-    # which is not how `shard_logs.py` works.
-    archive_dir = log_file_main_path
+    archive_dir = log_files_config[app_name]
 
-    # 1. Get dated log files from the main log directory
-    # The glob pattern needs to match the sharded log file names.
-    # Example: skrutable-2025-11-01
     log_files = set()
     delta = end_date - start_date
     for i in range(delta.days + 1):
         day = start_date + datetime.timedelta(days=i)
         date_str = day.isoformat()
-        # The user reported that the previous glob pattern was wrong.
-        # The hardcoded "-app.access.log" is too specific.
-        # We'll try a more generic pattern based on the app name.
-        for p in archive_dir.glob(f"{app_name}-archive/{app_name}*{date_str}*"):
-            log_files.add(p)
+        archived_log_path = archive_dir / f"{app_name}-app.access.log-{date_str}"
+        if archived_log_path.is_file():
+            log_files.add(archived_log_path)
 
-    # 2. Add the current log if the selected date range includes today.
+    # Add the current log if the selected date range includes today.
     today = datetime.date.today()
     if start_date <= today and today <= end_date:
-        # The current log file path also needs to be corrected.
-        # We assume the unsharded log is just named after the app.
         current_log_path = log_file_main_path / f"{app_name}-app.access.log"
         if current_log_path.is_file():
-            log_files.add(current_log_path) # Use add to avoid duplicates if it's also sharded for today
+            log_files.add(current_log_path)
 
     return sorted(list(log_files))
 

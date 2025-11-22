@@ -18,6 +18,7 @@ function show_view(view_name) {
   document.getElementById('loading_view').style.display = 'none'; // Hide loading indicator
   document.getElementById('summary_view').style.display = 'none'; // Hide summary view
   document.getElementById('tail_view').style.display = 'none'; // Hide tail view
+  document.getElementById('uptime_view').style.display = 'none'; // Hide uptime view
   document.getElementById(view_name + '_view').style.display = 'block'; // Display the selected view
 }
 

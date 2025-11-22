@@ -140,7 +140,7 @@ def index():
     ip_counts = Counter()
     ua_counts = Counter()
     status_counts = Counter()
-    app_counts = Counter()
+    app_counts = defaultdict(Counter)
     # Stores status code counts for each IP address
     ip_status_counts = defaultdict(Counter)
 
@@ -163,7 +163,7 @@ def index():
             ip_counts[p["ip"]] += 1
             ua_counts[p["ua"]] += 1
             status_counts[p["status"]] += 1
-            app_counts[app_name] += 1
+            app_counts[app_name][p["status"]] += 1
             # Increment status code count for the current IP
             ip_status_counts[p["ip"]][p["status"]] += 1
 
@@ -198,13 +198,52 @@ def index():
     # Sort pairs alphabetically by prod name for consistent order
     app_pairs.sort(key=lambda x: x['prd'])
 
-    # Ensure all selected apps are in app_counts, even if count is 0
-    app_counts_list = [
-        (app, app_counts.get(app, 0))
-        for app in selected_apps
-    ]
-    # Sort by count descending
-    app_counts_list.sort(key=lambda x: x[1], reverse=True)
+    all_status_codes = sorted(list(status_counts.keys()))
+
+    app_counts_table = []
+    for app_name in selected_apps:
+        app_data = {
+            "name": app_name,
+            "total": sum(app_counts[app_name].values()),
+            "statuses": { code: app_counts[app_name].get(code, 0) for code in all_status_codes }
+        }
+        app_counts_table.append(app_data)
+    
+    # Sort by total descending
+    app_counts_table.sort(key=lambda x: x['total'], reverse=True)
+
+    app_counts_totals = defaultdict(int)
+    for app_data in app_counts_table:
+        app_counts_totals['total'] += app_data['total']
+        for code, count in app_data['statuses'].items():
+            app_counts_totals[code] += count
+
+    uptime_data = {}
+    if view_mode == 'uptime':
+        num_days = (end_date - start_date).days + 1
+        
+        for app_name in selected_apps:
+            # Initialize all days as 'red'
+            daily_status = { (start_date + datetime.timedelta(days=i)): 'red' for i in range(num_days) }
+
+            log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+            
+            for line in read_lines_from_files(log_files):
+                p = parse_line(line)
+                if not p or not p['time']:
+                    continue
+                
+                log_date = p['time'].date()
+                if log_date in daily_status:
+                    # Upgrade to yellow if red
+                    if daily_status[log_date] == 'red':
+                        daily_status[log_date] = 'yellow'
+                    
+                    # Upgrade to green if 200 or 401
+                    if p['status'] in ['200', '401']:
+                        daily_status[log_date] = 'green'
+            
+            uptime_data[app_name] = daily_status
 
     return render_template(
         "index.html",
@@ -225,13 +264,16 @@ def index():
         ip_counts=ip_counts_top,
         ua_counts=ua_counts.most_common(top_n),
         status_counts=status_counts.most_common(),
-        app_counts=app_counts_list,
+        app_counts=app_counts_table,
+        app_counts_totals=app_counts_totals,
+        all_status_codes=all_status_codes,
         filter_ip=filter_ip,
         filter_ua=filter_ua,
         filter_status=filter_status,
         avg_req_time=avg_req_time,
         tail_filter_ip=tail_filter_ip,
         tail_filter_status=tail_filter_status,
+        uptime_data=uptime_data,
     )
 
 
