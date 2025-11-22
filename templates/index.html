@@ -140,12 +140,11 @@
                   </table>
               </div>
               <div class="col-md-3">
-                  <h3>By Response Time (seconds)</h3>
+                  <h3>By Response Time (ms)</h3>
                   <table class="table table-sm">
                       <thead>
                           <tr>
                               <th>App</th>
-                              <th>Total</th>
                               {% for p in percentiles_to_calculate %}
                                   <th>P{{ p }}</th>
                               {% endfor %}
@@ -155,9 +154,8 @@
                           {% for app_data in app_percentile_stats %}
                           <tr>
                               <td>{{ app_data.name }}</td>
-                              <td>{{ app_data.total|commify }}</td>
                               {% for p in percentiles_to_calculate %}
-                                  <td>{{ "%.3f"|format(app_data.percentiles[p]) }}</td>
+                                  <td>{{ app_data.percentiles[p]|int|commify }}</td>
                               {% endfor %}
                           </tr>
                           {% endfor %}

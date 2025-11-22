@@ -232,36 +232,36 @@ def index():
         for code, count in app_data['statuses'].items():
             app_counts_totals[code] += count
 
-    def calculate_percentiles(data, percentiles_to_calc):
-        if not data:
-            return {p: 0 for p in percentiles_to_calc}
-        data.sort()
-        n = len(data)
-        results = {}
-        for p in percentiles_to_calc:
-            idx = int((p / 100) * (n - 1))
-            results[p] = data[idx]
-        return results
+        def calculate_percentiles(data, percentiles_to_calc):
+            if not data:
+                return {p: 0 for p in percentiles_to_calc}
+            data.sort()
+            n = len(data)
+            results = {}
+            for p in percentiles_to_calc:
+                idx = int((p / 100) * (n - 1))
+                                results[p] = data[idx] * 1000
+            return results
 
-    percentiles_to_calculate = [75, 90, 95, 99]
-    app_percentile_stats = []
+        percentiles_to_calculate = [50, 75, 90, 95, 99]
+        app_percentile_stats = []
 
-    sorted_apps = sorted(selected_apps)
+        sorted_apps = sorted(selected_apps)
 
-    for app_name in sorted_apps:
-        response_times = app_response_times.get(app_name, [])
-        total_requests = sum(app_counts[app_name].values())
-        if not response_times:
-            # Still show the app, but with 0 stats
-            stats = {p: 0 for p in percentiles_to_calculate}
-        else:
-            stats = calculate_percentiles(response_times, percentiles_to_calculate)
+        for app_name in sorted_apps:
+            response_times = app_response_times.get(app_name, [])
+            total_requests = sum(app_counts[app_name].values())
+            if not response_times:
+                # Still show the app, but with 0 stats
+                stats = {p: 0 for p in percentiles_to_calculate}
+            else:
+                stats = calculate_percentiles(response_times, percentiles_to_calculate)
 
-        app_percentile_stats.append({
-            "name": app_name,
-            "total": total_requests,
-            "percentiles": stats
-        })
+            app_percentile_stats.append({
+                "name": app_name,
+                "total": total_requests,
+                "percentiles": stats
+            })
 
     return render_template(
         "index.html",
