@@ -61,8 +61,8 @@
     <hr>
         <div>
             <button onclick="set_view_mode_and_show('uptime')">Uptime</button>
-            <button onclick="set_view_mode_and_show('summary')">Summary</button>
-            <button onclick="set_view_mode_and_show('tail')">Tail</button>
+            <button onclick="set_view_mode_and_show('requests')">Requests</button>
+            <button onclick="set_view_mode_and_show('raw')">Raw</button>
         </div>
         <hr>
         <div id="loading_view" style="display: none;">
@@ -79,8 +79,8 @@
                 </div>
             {% endfor %}
         </div>
-        <div id="summary_view" style="display: none;">
-          <h2>Summary</h2>
+        <div id="requests_view" style="display: none;">
+          <h2>Requests</h2>
     
           <hr>
 
@@ -88,15 +88,15 @@
           <p>
               <strong>Filters active:</strong>
               {% if filter_ip %}
-                IP: {{ filter_ip }} <a href="{{ url_for('index', view_mode='summary', ua=filter_ua, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+                IP: {{ filter_ip }} <a href="{{ url_for('index', view_mode='requests', ua=filter_ua, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
               {% endif %}
               &nbsp;
               {% if filter_ua %}
-                UA: {{ filter_ua|truncate(30) }} <a href="{{ url_for('index', view_mode='summary', ip=filter_ip, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove UA filter">(x)</a>
+                UA: {{ filter_ua|truncate(30) }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove UA filter">(x)</a>
               {% endif %}
               &nbsp;
               {% if filter_status %}
-                Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='summary', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+                Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
               &nbsp;
               <a href="{{ url_for('index', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
@@ -146,18 +146,18 @@
                   <table class="table table-sm">
                       <thead>
                           <tr>
-                              <th>(filter summary)</th>
-                              <th>(filter tail)</th>
+                              <th>(filter requests)</th>
+                              <th>(filter raw)</th>
                           </tr>
                       </thead>
                       <tbody>
                           {% for status, count in status_counts %}
                           <tr>
                               <td>
-                                  <a href="{{ url_for('index', view_mode='summary', status=status, start_date=start_date, end_date=end_date, ip=filter_ip, ua=filter_ua) }}" title="Filter summary by status {{ status }}">{{ status }}</a>
+                                  <a href="{{ url_for('index', view_mode='requests', status=status, start_date=start_date, end_date=end_date, ip=filter_ip, ua=filter_ua) }}" title="Filter requests by status {{ status }}">{{ status }}</a>
                               </td>
                               <td>
-                                  <a href="{{ url_for('index', view_mode='tail', status=status, start_date=start_date, end_date=end_date) }}" title="Tail logs for status {{ status }}">{{ count|commify }}</a>
+                                  <a href="{{ url_for('index', view_mode='raw', status=status, start_date=start_date, end_date=end_date) }}" title="Raw logs for status {{ status }}">{{ count|commify }}</a>
                               </td>
                           </tr>
                           {% endfor %}
@@ -179,12 +179,12 @@
                       <tbody>
                       {% for item in ip_counts %}
                       <tr class="ip-row" data-ip="{{ item.ip }}">
-                          <td><a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
+                          <td><a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
                           <td>{{ item.count|commify }}</td>
                           <td class="geo-location">-</td>
                           <td>
                               {% for status, count in item.status_summary.items() %}
-                                  <a href="{{ url_for('index', view_mode='tail', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
+                                  <a href="{{ url_for('index', view_mode='raw', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
                               {% endfor %}
                           </td>
                       </tr>
@@ -209,8 +209,8 @@
               <br/>
           </div>
         </div>
-        <div id="tail_view" style="display: none;">
-          <h2>Tail logs</h2>
+        <div id="raw_view" style="display: none;">
+          <h2>Raw logs</h2>
     
           {% if tail_filter_ip or tail_filter_status %}
             <p>
@@ -218,19 +218,19 @@
               <strong>Filters active:</strong>
               {% if tail_filter_ip %}
                 IP: {{ tail_filter_ip }}
-                <a href="{{ url_for('index', view_mode='tail', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+                <a href="{{ url_for('index', view_mode='raw', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
               {% endif %}
               &nbsp;
               {% if tail_filter_status %}
                 Status: {{ tail_filter_status }}
-                <a href="{{ url_for('index', view_mode='tail', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+                <a href="{{ url_for('index', view_mode='raw', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
               &nbsp;
-              <a href="{{ url_for('index', view_mode='tail', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
+              <a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
             </p>
           {% else %}
             <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
-                <input type="hidden" name="view_mode" id="view_mode_tail_form" value="{{ view_mode }}">
+                <input type="hidden" name="view_mode" id="view_mode_raw_form" value="{{ view_mode }}">
                 <input type="hidden" name="start_date" value="{{ start_date }}">
                 <input type="hidden" name="end_date" value="{{ end_date }}">
                 <label for="num_lines">Number of lines:</label>

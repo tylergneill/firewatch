@@ -83,20 +83,20 @@ def index():
     # Save the latest valid top_n to the session
     session['top_n'] = top_n
 
-    # Determine the current view mode (summary or tail)
-    view_mode = request.args.get('view_mode', 'summary')
+    # Determine the current view mode (requests or raw)
+    view_mode = request.args.get('view_mode', 'requests')
 
-    # Filters for tail view
-    tail_filter_ip = request.args.get('ip') if view_mode == 'tail' else None
-    tail_filter_status = request.args.get('status') if view_mode == 'tail' else None
+    # Filters for raw view
+    tail_filter_ip = request.args.get('ip') if view_mode == 'raw' else None
+    tail_filter_status = request.args.get('status') if view_mode == 'raw' else None
 
     app_logs = {}
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
 
-        # If filtering, we read all lines for the date range. Otherwise, we just tail.
-        if view_mode == 'tail' and (tail_filter_ip or tail_filter_status):
-            # Filtering mode for "tail" view: read all lines and filter
+        # If filtering, we read all lines for the date range. Otherwise, we just raw.
+        if view_mode == 'raw' and (tail_filter_ip or tail_filter_status):
+            # Filtering mode for "raw" view: read all lines and filter
             filtered_lines = []
             for line_bytes in read_lines_from_files(log_files):
                 p = parse_line(line_bytes)
@@ -116,7 +116,7 @@ def index():
             text_lines = filtered_lines
 
         else:
-            # Original tail behavior: get last N lines
+            # Original raw behavior: get last N lines
             all_lines_bytes = []
             for log_file in log_files:
                 lines = tail_lines(log_file, num_lines)
@@ -129,10 +129,11 @@ def index():
 
         app_logs[app_name] = text_lines
 
-    # Summary view data (streaming, no big parsed_entries list)
-    filter_ip = request.args.get('ip') if view_mode == 'summary' else None
-    filter_ua = request.args.get('ua') if view_mode == 'summary' else None
-    filter_status = request.args.get('status') if view_mode == 'summary' else None
+    # Requests view data (streaming, no big parsed_entries list)
+    filter_ip = request.args.get('ip') if view_mode == 'requests' else None
+    filter_ua = request.args.get('ua') if view_mode == 'requests' else None
+    filter_status = request.args.get('status') if view_mode == 'requests' else None
+
 
     total = 0
     total_req_time = 0.0
@@ -305,7 +306,7 @@ def select_apps():
         # then fallback to parameters from the referrer's query string,
         # and finally to hardcoded defaults if neither is available.
         # This ensures view state and other filters are maintained across app selections.
-        redirect_args['view_mode'] = request.form.get('view_mode', redirect_args.get('view_mode', 'summary'))
+        redirect_args['view_mode'] = request.form.get('view_mode', redirect_args.get('view_mode', 'requests'))
         redirect_args['start_date'] = redirect_args.get('start_date', request.form.get('start_date', (datetime.date.today() - datetime.timedelta(days=7)).isoformat()))
         redirect_args['end_date'] = redirect_args.get('end_date', request.form.get('end_date', datetime.date.today().isoformat()))
         redirect_args['top_n'] = redirect_args.get('top_n', request.form.get('top_n', session.get('top_n', 20)))

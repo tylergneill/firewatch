@@ -7,17 +7,17 @@ function showLoading() {
   // Set a timeout to display the loading view after 200ms
   loadingTimeoutId = setTimeout(() => {
     document.getElementById('loading_view').style.display = 'block';
-    document.getElementById('summary_view').style.display = 'none';
-    document.getElementById('tail_view').style.display = 'none';
+    document.getElementById('requests_view').style.display = 'none';
+    document.getElementById('raw_view').style.display = 'none';
   }, 200);
 }
 
-// Activates the specified view (summary or tail) and hides others
+// Activates the specified view (requests or raw) and hides others
 function show_view(view_name) {
   clearTimeout(loadingTimeoutId); // Clear any pending loading timeouts
   document.getElementById('loading_view').style.display = 'none'; // Hide loading indicator
-  document.getElementById('summary_view').style.display = 'none'; // Hide summary view
-  document.getElementById('tail_view').style.display = 'none'; // Hide tail view
+  document.getElementById('requests_view').style.display = 'none'; // Hide requests view
+  document.getElementById('raw_view').style.display = 'none'; // Hide raw view
   document.getElementById('uptime_view').style.display = 'none'; // Hide uptime view
   document.getElementById(view_name + '_view').style.display = 'block'; // Display the selected view
 }
@@ -32,9 +32,9 @@ function set_view_mode_and_show(mode) {
     const dateFormInput = document.getElementById('view_mode_date_form');
     if (dateFormInput) dateFormInput.value = mode;
 
-    // Update the hidden view_mode input in the tail log form
-    const tailFormInput = document.getElementById('view_mode_tail_form');
-    if (tailFormInput) tailFormInput.value = mode;
+    // Update the hidden view_mode input in the raw log form
+    const rawFormInput = document.getElementById('view_mode_raw_form');
+    if (rawFormInput) rawFormInput.value = mode;
     
     // Activate the selected view
     show_view(mode);
