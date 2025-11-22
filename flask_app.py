@@ -83,76 +83,53 @@ def index():
     # Save the latest valid top_n to the session
     session['top_n'] = top_n
 
-    # Determine the current view mode (requests or raw)
-    view_mode = request.args.get('view_mode', 'requests')
+    # Determine the current view mode (uptime, requests, or raw)
+    view_mode = request.args.get('view_mode', 'uptime')
 
     # Filters for raw view
     tail_filter_ip = request.args.get('ip') if view_mode == 'raw' else None
     tail_filter_status = request.args.get('status') if view_mode == 'raw' else None
 
-    app_logs = {}
-    for app_name in selected_apps:
-        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+    filter_ip = request.args.get('ip')
+    filter_ua = request.args.get('ua')
+    filter_status = request.args.get('status')
 
-        # If filtering, we read all lines for the date range. Otherwise, we just raw.
-        if view_mode == 'raw' and (tail_filter_ip or tail_filter_status):
-            # Filtering mode for "raw" view: read all lines and filter
-            filtered_lines = []
-            for line_bytes in read_lines_from_files(log_files):
-                p = parse_line(line_bytes)
-                if not p:
-                    continue
-
-                # IP filter
-                if tail_filter_ip and p['ip'] != tail_filter_ip:
-                    continue
-
-                # Status filter
-                if tail_filter_status and p['status'] != tail_filter_status:
-                    continue
-
-                filtered_lines.append(line_bytes.decode("utf-8", errors="replace"))
-
-            text_lines = filtered_lines
-
-        else:
-            # Original raw behavior: get last N lines
-            all_lines_bytes = []
-            for log_file in log_files:
-                lines = tail_lines(log_file, num_lines)
-                all_lines_bytes.extend(lines)
-
-            if len(all_lines_bytes) > num_lines:
-                all_lines_bytes = all_lines_bytes[-num_lines:]
-
-            text_lines = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
-
-        app_logs[app_name] = text_lines
-
-    # Requests view data (streaming, no big parsed_entries list)
-    filter_ip = request.args.get('ip') if view_mode == 'requests' else None
-    filter_ua = request.args.get('ua') if view_mode == 'requests' else None
-    filter_status = request.args.get('status') if view_mode == 'requests' else None
-
-
+    # --- Data Processing ---
     total = 0
     total_req_time = 0.0
-
     ip_counts = Counter()
     ua_counts = Counter()
     status_counts = Counter()
     app_counts = defaultdict(Counter)
-    # Stores status code counts for each IP address
     ip_status_counts = defaultdict(Counter)
+    
+    # Initialize uptime data structures
+    uptime_data = {}
+    num_days = (end_date - start_date).days + 1
+    for app_name in selected_apps:
+        uptime_data[app_name] = {
+            (start_date + datetime.timedelta(days=i)): 'red' for i in range(num_days)
+        }
 
+    app_logs = {}
     for app_name in selected_apps:
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+        
+        # Raw view data
+        all_lines_bytes = []
+        for log_file in log_files:
+            all_lines_bytes.extend(tail_lines(log_file, num_lines))
+        if len(all_lines_bytes) > num_lines:
+            all_lines_bytes = all_lines_bytes[-num_lines:]
+        app_logs[app_name] = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
+
+        # Requests and Uptime data processing
         for line in read_lines_from_files(log_files):
             p = parse_line(line)
             if not p:
                 continue
-
-            # Apply filters for IP, User Agent, and Status
+            
+            # Apply filters for requests view
             if filter_ip and p["ip"] != filter_ip:
                 continue
             if filter_ua and p["ua"] != filter_ua:
@@ -160,19 +137,26 @@ def index():
             if filter_status and p["status"] != filter_status:
                 continue
 
+            # Uptime data
+            if p['time']:
+                log_date = p['time'].date()
+                if log_date in uptime_data.get(app_name, {}):
+                    if uptime_data[app_name][log_date] == 'red':
+                        uptime_data[app_name][log_date] = 'yellow'
+                    if p['status'] in ['200', '401']:
+                        uptime_data[app_name][log_date] = 'green'
+
+            # Requests data
             total += 1
             ip_counts[p["ip"]] += 1
             ua_counts[p["ua"]] += 1
             status_counts[p["status"]] += 1
             app_counts[app_name][p["status"]] += 1
-            # Increment status code count for the current IP
             ip_status_counts[p["ip"]][p["status"]] += 1
-
-            req_time = p["req_time"]
-            if req_time is not None:
-                total_req_time += req_time
-
-    # Prepare top IPs with their aggregated status code summaries
+            if p["req_time"] is not None:
+                total_req_time += p["req_time"]
+    
+    # --- Post-processing and Preparation for Render ---
     ip_counts_top = []
     for ip, count in ip_counts.most_common(top_n):
         ip_counts_top.append({
@@ -219,32 +203,7 @@ def index():
         for code, count in app_data['statuses'].items():
             app_counts_totals[code] += count
 
-    uptime_data = {}
-    if view_mode == 'uptime':
-        num_days = (end_date - start_date).days + 1
-        
-        for app_name in selected_apps:
-            # Initialize all days as 'red'
-            daily_status = { (start_date + datetime.timedelta(days=i)): 'red' for i in range(num_days) }
 
-            log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
-            
-            for line in read_lines_from_files(log_files):
-                p = parse_line(line)
-                if not p or not p['time']:
-                    continue
-                
-                log_date = p['time'].date()
-                if log_date in daily_status:
-                    # Upgrade to yellow if red
-                    if daily_status[log_date] == 'red':
-                        daily_status[log_date] = 'yellow'
-                    
-                    # Upgrade to green if 200 or 401
-                    if p['status'] in ['200', '401']:
-                        daily_status[log_date] = 'green'
-            
-            uptime_data[app_name] = daily_status
 
     return render_template(
         "index.html",
