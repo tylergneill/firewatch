@@ -144,12 +144,30 @@ def index():
         log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
         
         # Raw view data
-        all_lines_bytes = []
-        for log_file in log_files:
-            all_lines_bytes.extend(tail_lines(log_file, num_lines))
-        if len(all_lines_bytes) > num_lines:
-            all_lines_bytes = all_lines_bytes[-num_lines:]
-        app_logs[app_name] = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
+        if tail_filter_ip or tail_filter_status:
+            # When filtering, read all lines from the date range and filter them.
+            filtered_lines = []
+            for line_bytes in read_lines_from_files(log_files):
+                p = parse_line(line_bytes)
+                if not p:
+                    continue
+                
+                ip_match = (not tail_filter_ip) or (p['ip'] == tail_filter_ip)
+                status_match = (not tail_filter_status) or (p['status'] == tail_filter_status)
+
+                if ip_match and status_match:
+                    filtered_lines.append(line_bytes.decode("utf-8", errors="replace"))
+            
+            app_logs[app_name] = filtered_lines
+        else:
+            # Original behavior: tail the last num_lines when no filters are applied
+            raw_lines_to_fetch = num_lines
+            all_lines_bytes = []
+            for log_file in log_files:
+                all_lines_bytes.extend(tail_lines(log_file, raw_lines_to_fetch))
+            if len(all_lines_bytes) > raw_lines_to_fetch:
+                all_lines_bytes = all_lines_bytes[-raw_lines_to_fetch:]
+            app_logs[app_name] = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
 
         # Requests and Uptime data processing
         for line in read_lines_from_files(log_files):

@@ -96,8 +96,7 @@
               {% if filter_status %}
                 Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
-              &nbsp;
-              <a href="{{ url_for('index', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
+
           </p>
           {% endif %}
     
@@ -235,8 +234,7 @@
                 Status: {{ tail_filter_status }}
                 <a href="{{ url_for('index', view_mode='raw', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
-              &nbsp;
-              <a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date) }}" title="Clear all filters">(Clear All)</a>
+
             </p>
           {% else %}
             <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
