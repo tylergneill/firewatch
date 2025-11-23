@@ -54,6 +54,14 @@
         <label for="end_date">End:</label>
         <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
         <button type="submit">Go</button>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span class="quick-date-options">
+            <button type="button" onclick="setQuickDate('today')">Today</button>
+            <button type="button" onclick="setQuickDate('yesterday')">Yesterday</button>
+            <button type="button" onclick="setQuickDate('last_week')">Last Week</button>
+            <button type="button" onclick="setQuickDate('last_month')">Last Month</button>
+            <button type="button" onclick="setQuickDate('last_3_months')">Last 3 Months</button>
+        </span>
       </form>
     </div>
     <hr>

@@ -127,3 +127,42 @@ function toggle_ua_counts() {
         wrapper.style.display = "none";
     }
 }
+
+// New function to set quick date ranges
+function setQuickDate(option) {
+    const today = new Date();
+    let startDate = new Date(today);
+    let endDate = new Date(today);
+
+    switch (option) {
+        case 'today':
+            // start and end date are already today
+            break;
+        case 'yesterday':
+            startDate.setDate(today.getDate() - 1);
+            endDate.setDate(today.getDate() - 1);
+            break;
+        case 'last_week':
+            startDate.setDate(today.getDate() - 6); // Last 7 days including today
+            break;
+        case 'last_month':
+            startDate.setMonth(today.getMonth() - 1);
+            // endDate remains today
+            break;
+        case 'last_3_months':
+            startDate.setMonth(today.getMonth() - 3);
+            // endDate remains today
+            break;
+        default:
+            return;
+    }
+
+    // Format dates to YYYY-MM-DD for input fields
+    const formatDate = (date) => date.toISOString().split('T')[0];
+
+    document.getElementById('start_date').value = formatDate(startDate);
+    document.getElementById('end_date').value = formatDate(endDate);
+
+    // Automatically submit the form
+    document.getElementById('view_mode_date_form').closest('form').submit();
+}
