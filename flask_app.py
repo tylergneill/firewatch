@@ -131,6 +131,7 @@ def index():
     app_counts = defaultdict(Counter)
     ip_status_counts = defaultdict(Counter)
     app_response_times = defaultdict(list)
+    app_ip_sets = defaultdict(set)
     
     # Initialize uptime data structures
     uptime_data = {}
@@ -208,6 +209,7 @@ def index():
             status_counts[p["status"]] += 1
             app_counts[app_name][p["status"]] += 1
             ip_status_counts[p["ip"]][p["status"]] += 1
+            app_ip_sets[app_name].add(p['ip'])
             if p["req_time"] is not None:
                 total_req_time += p["req_time"]
                 app_response_times[app_name].append(p["req_time"])
@@ -337,6 +339,15 @@ def index():
             "percentiles": stats
         })
 
+    unique_visitor_counts = []
+    for app_name in selected_apps:
+        unique_visitor_counts.append({
+            "app": app_name,
+            "count": len(app_ip_sets[app_name])
+        })
+    
+    unique_visitor_counts.sort(key=lambda x: x['count'], reverse=True)
+
     uptime_color_explanations = {
         'no-activity': 'No activity',
         'red': 'Activity, but no 200s',
@@ -377,6 +388,7 @@ def index():
         tail_filter_status=tail_filter_status,
         uptime_data=uptime_data,
         app_percentile_stats=app_percentile_stats,
+        unique_visitor_counts=unique_visitor_counts,
         percentiles_to_calculate=percentiles_to_calculate,
         uptime_color_explanations=uptime_color_explanations,
     )

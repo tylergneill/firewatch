@@ -141,7 +141,7 @@
                       </tfoot>
                   </table>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                   <h3>By Response Time (ms)</h3>
                   <table class="table table-sm">
                       <thead>
@@ -159,6 +159,25 @@
                               {% for p in percentiles_to_calculate %}
                                   <td>{{ app_data.percentiles[p]|int|commify }}</td>
                               {% endfor %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              <div class="col-md-4">
+                  <h3>Unique Visitor Count</h3>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              <th>Unique Visitors</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for item in unique_visitor_counts %}
+                          <tr>
+                              <td>{{ item.app }}</td>
+                              <td>{{ item.count|commify }}</td>
                           </tr>
                           {% endfor %}
                       </tbody>
