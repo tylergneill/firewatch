@@ -126,6 +126,7 @@ def index():
     total_req_time = 0.0
     ip_counts = Counter()
     ua_counts = Counter()
+    route_app_counts = defaultdict(Counter)
     status_counts = Counter()
     app_counts = defaultdict(Counter)
     ip_status_counts = defaultdict(Counter)
@@ -202,6 +203,8 @@ def index():
             total += 1
             ip_counts[p["ip"]] += 1
             ua_counts[p["ua"]] += 1
+            route = p["path"].split('?')[0]
+            route_app_counts[route][app_name] += 1
             status_counts[p["status"]] += 1
             app_counts[app_name][p["status"]] += 1
             ip_status_counts[p["ip"]][p["status"]] += 1
@@ -285,6 +288,24 @@ def index():
         for code, count in app_data['statuses'].items():
             app_counts_totals[code] += count
 
+    total_route_counts = Counter()
+    for route, app_counts_for_route in route_app_counts.items():
+        total_route_counts[route] = sum(app_counts_for_route.values())
+    
+    top_routes_names = [route for route, count in total_route_counts.most_common(top_n)]
+
+    route_counts_list = []
+    for route_name in top_routes_names:
+        app_counts_for_route = route_app_counts[route_name]
+        for app_name, count in app_counts_for_route.items():
+            route_counts_list.append({
+                "route": route_name,
+                "app": app_name,
+                "count": count
+            })
+            
+    route_counts_list.sort(key=lambda x: (total_route_counts[x['route']], x['count']), reverse=True)
+
     def calculate_percentiles(data, percentiles_to_calc):
         if not data:
             return {p: 0 for p in percentiles_to_calc}
@@ -342,6 +363,7 @@ def index():
         total=total,
         ip_counts=ip_counts_top,
         ua_counts=ua_counts.most_common(top_n),
+        route_counts_list=route_counts_list,
         status_counts=status_counts.most_common(),
         app_counts=app_counts_table,
         app_counts_totals=app_counts_totals,

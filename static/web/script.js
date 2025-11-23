@@ -119,8 +119,8 @@ document.getElementById('find-locations-btn').addEventListener('click', function
     });
 });
 
-function toggle_ua_counts() {
-    var wrapper = document.getElementById("ua_counts_wrapper");
+function toggle_collapsible(elementId) {
+    var wrapper = document.getElementById(elementId);
     if (wrapper.style.display === "none") {
         wrapper.style.display = "block";
     } else {
@@ -165,4 +165,18 @@ function setQuickDate(option) {
 
     // Automatically submit the form
     document.getElementById('view_mode_date_form').closest('form').submit();
+}
+
+function show_bottom_view(view_name) {
+    // Hide all bottom views
+    const views = document.querySelectorAll('.bottom_view');
+    views.forEach(view => {
+        view.style.display = 'none';
+    });
+
+    // Show the selected one
+    const selected_view = document.getElementById('bottom_view_' + view_name);
+    if (selected_view) {
+        selected_view.style.display = 'block';
+    }
 }

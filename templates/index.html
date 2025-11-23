@@ -87,9 +87,7 @@
         </div>
         <div id="requests_view" style="display: none;">
           <h2>Requests</h2>
-    
           <hr>
-
           {% if filter_ip or filter_ua or filter_status %}
           <p>
               <strong>Filters active:</strong>
@@ -104,15 +102,12 @@
               {% if filter_status %}
                 Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
-
           </p>
           {% endif %}
     
-
-
-    
+          <!-- Top Section -->
           <div class="row">
-              <div class="col-md-3">
+              <div class="col-md-6">
                   <h3>By Status</h3>
                   <table class="table table-sm">
                       <thead>
@@ -146,7 +141,7 @@
                       </tfoot>
                   </table>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-6">
                   <h3>By Response Time (ms)</h3>
                   <table class="table table-sm">
                       <thead>
@@ -169,61 +164,91 @@
                       </tbody>
                   </table>
               </div>
-              <hr>
-              <div class="col-md-3">
-              <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
+          </div>
+          <hr>
+
+          <!-- Bottom Section (Top N controlled) -->
+          <div class="row">
+            <div class="col-md-12">
+                <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
                     <input type="hidden" name="start_date" value="{{ start_date }}">
                     <input type="hidden" name="end_date" value="{{ end_date }}">
                     <input type="hidden" name="view_mode" value="requests">
                     <label for="top_n">Top N:</label>
                     <input type="number" id="top_n" name="top_n" value="{{ top_n }}" min="1" max="1000">
                     <button type="submit">Update</button>
-                  </form>
-              </div>
-              <div class="col-md-3">
-                  <h3>By IP (Top {{ top_n }})</h3>
-
-                  <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
-                  <table class="table table-sm">
-                      <thead>
-                          <tr>
-                              <th>IP</th>
-                              <th>Count</th>
-                              <th>Location</th>
-                              <th>Status Summary</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      {% for item in ip_counts %}
-                      <tr class="ip-row" data-ip="{{ item.ip }}">
-                          <td><a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
-                          <td>{{ item.count|commify }}</td>
-                          <td class="geo-location">-</td>
-                          <td>
-                              {% for status, count in item.status_summary.items() %}
-                                  <a href="{{ url_for('index', view_mode='raw', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
-                              {% endfor %}
-                          </td>
-                      </tr>
-                      {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
-              <div class="col-md-3">
-                  <button onclick="toggle_ua_counts()">Show By User Agent</button>
-                  <div id="ua_counts_wrapper" style="display: none;">
-                    <h3>By User Agent (Top {{ top_n }})</h3>
-                    <table class="table table-sm">
-                        {% for ua, count in ua_counts %}
+                </form>
+            </div>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-12">
+                <button onclick="show_bottom_view('route')">By Route</button>
+                <button onclick="show_bottom_view('ip')">By IP</button>
+                <button onclick="show_bottom_view('ua')">By User Agent</button>
+            </div>
+          </div>
+            <div id="bottom_view_ip" class="bottom_view col-md-4" style="display: none;">
+                <h3>By IP (Top {{ top_n }})</h3>
+                <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
+                <table class="table table-sm">
+                    <thead>
                         <tr>
-                            <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}" onclick="showLoading()">{{ ua|truncate(30) }}</a></td>
-                            <td>{{ count|commify }}</td>
+                            <th>IP</th>
+                            <th>Count</th>
+                            <th>Location</th>
+                            <th>Status Summary</th>
                         </tr>
-                        {% endfor %}
-                    </table>
-                  </div>
-              </div>
-              <br/>
+                    </thead>
+                    <tbody>
+                    {% for item in ip_counts %}
+                    <tr class="ip-row" data-ip="{{ item.ip }}">
+                        <td><a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
+                        <td>{{ item.count|commify }}</td>
+                        <td class="geo-location">-</td>
+                        <td>
+                            {% for status, count in item.status_summary.items() %}
+                                <a href="{{ url_for('index', view_mode='raw', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+          <div class="row">
+            <div id="bottom_view_route" class="bottom_view col-md-4">
+                <h3>By Route (Top {{ top_n }})</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>App</th>
+                            <th>Route</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in route_counts_list %}
+                    <tr>
+                        <td>{{ item.app }}</td>
+                        <td title="{{ item.route }}">{{ item.route|truncate(30) }}</td>
+                        <td>{{ item.count|commify }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="bottom_view_ua" class="bottom_view col-md-4" style="display: none;">
+                <h3>By User Agent (Top {{ top_n }})</h3>
+                <table class="table table-sm">
+                    {% for ua, count in ua_counts %}
+                    <tr>
+                        <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}" onclick="showLoading()">{{ ua|truncate(30) }}</a></td>
+                        <td>{{ count|commify }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
           </div>
         </div>
         <div id="raw_view" style="display: none;">
@@ -282,6 +307,7 @@
         // On page load, set the initial view mode based on the value passed from the Flask backend
         document.addEventListener('DOMContentLoaded', function() {
             set_view_mode_and_show('{{ view_mode }}');
+            show_bottom_view('route'); // Set default bottom view
         });
     </script>
   </body>
