@@ -180,3 +180,134 @@ function show_bottom_view(view_name) {
         selected_view.style.display = 'block';
     }
 }
+
+// --- New Charting Logic for Total Requests by Day ---
+document.addEventListener('DOMContentLoaded', function() {
+    let chartCounter = 0;
+    const charts = {}; // To hold chart instances
+
+    // Function to fetch data and render the chart
+    function renderRequestsByDayChart(canvasId, selectedApp) {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+
+        fetch(`/api/requests_by_day?app=${selectedApp}&start_date=${startDate}&end_date=${endDate}`)
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                
+                if (charts[canvasId]) {
+                    charts[canvasId].destroy(); // Destroy previous chart instance
+                }
+
+                charts[canvasId] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: `Total Requests for ${selectedApp}`,
+                            data: data.values,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching requests by day data:', error));
+    }
+
+    function addChartEventListeners(chartContainer, chartId) {
+        const moveUpButton = chartContainer.querySelector('.move-up-btn');
+        const moveDownButton = chartContainer.querySelector('.move-down-btn');
+        const removeButton = chartContainer.querySelector('.remove-chart-btn');
+
+        moveUpButton.addEventListener('click', () => {
+            const parent = chartContainer.parentNode;
+            if (chartContainer.previousElementSibling) {
+                parent.insertBefore(chartContainer, chartContainer.previousElementSibling);
+            }
+        });
+
+        moveDownButton.addEventListener('click', () => {
+            const parent = chartContainer.parentNode;
+            if (chartContainer.nextElementSibling) {
+                parent.insertBefore(chartContainer.nextElementSibling, chartContainer);
+            }
+        });
+        
+        removeButton.addEventListener('click', () => {
+            if (charts[chartId]) {
+                charts[chartId].destroy(); // Destroy Chart.js instance
+                delete charts[chartId]; // Remove from charts object
+            }
+            chartContainer.remove(); // Remove the entire container from DOM
+        });
+    }
+
+    // Initial chart
+    const initialChartContainer = document.getElementById('chart-container-0');
+    const initialAppSelector = document.getElementById('requests_by_day_app_selector');
+    if (SELECTED_APPS.length > 0) {
+        SELECTED_APPS.forEach(app => {
+            const option = document.createElement('option');
+            option.value = app;
+            option.textContent = app;
+            initialAppSelector.appendChild(option);
+        });
+        renderRequestsByDayChart('requests_by_day_chart', SELECTED_APPS[0]);
+        initialAppSelector.addEventListener('change', (event) => {
+            renderRequestsByDayChart('requests_by_day_chart', event.target.value);
+        });
+        addChartEventListeners(initialChartContainer, 'requests_by_day_chart');
+    } else {
+        // If there are no selected apps, hide the initial chart container
+        initialChartContainer.style.display = 'none';
+    }
+
+
+    // "Compare another app" button
+    document.getElementById('add-comparison-chart-btn').addEventListener('click', () => {
+        chartCounter++;
+        const newChartId = `comparison_chart_${chartCounter}`;
+        const newSelectorId = `comparison_selector_${chartCounter}`;
+        
+        const newChartContainer = document.createElement('div');
+        newChartContainer.id = `chart-container-${chartCounter}`; // Add an ID to the container
+        newChartContainer.innerHTML = `
+            <label for="${newSelectorId}">Select App:</label>
+            <select id="${newSelectorId}"></select>
+            <div style="float: right;">
+                <button class="move-up-btn">Move Up</button>
+                <button class="move-down-btn">Move Down</button>
+                <button class="remove-chart-btn" data-chart-id="${newChartId}">Remove</button>
+            </div>
+            <canvas id="${newChartId}" width="400" height="100"></canvas>
+            <hr>
+        `;
+        
+        document.getElementById('comparison-charts-container').appendChild(newChartContainer);
+        
+        const newSelector = document.getElementById(newSelectorId);
+        if (SELECTED_APPS.length > 0) {
+            SELECTED_APPS.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app;
+                option.textContent = app;
+                newSelector.appendChild(option);
+            });
+            renderRequestsByDayChart(newChartId, SELECTED_APPS[0]);
+            newSelector.addEventListener('change', (event) => {
+                renderRequestsByDayChart(newChartId, event.target.value);
+            });
+            addChartEventListeners(newChartContainer, newChartId);
+        }
+    });
+});

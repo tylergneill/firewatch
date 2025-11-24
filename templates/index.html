@@ -5,6 +5,7 @@
     <title>firewatch</title>
     <link rel="icon" type="image/png" href="/static/web/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='web/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <div class="header-container">
@@ -141,8 +142,25 @@
                       </tfoot>
                   </table>
               </div>
+              <div class="col-md-12">
+                  <h3>Total Requests by Day</h3>
+                  <div id="comparison-charts-container">
+                      <div id="chart-container-0">
+                          <label for="requests_by_day_app_selector">Select App:</label>
+                          <select id="requests_by_day_app_selector"></select>
+                          <div style="float: right;">
+                              <button class="move-up-btn">Move Up</button>
+                              <button class="move-down-btn">Move Down</button>
+                              <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                          </div>
+                          <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
+                          <hr>
+                      </div>
+                  </div>
+                  <button id="add-comparison-chart-btn">Compare another app</button>
+              </div>
               <div class="col-md-4">
-                  <h3>By Response Time (ms)</h3>
+                  <h3>Response Time (ms)</h3>
                   <table class="table table-sm">
                       <thead>
                           <tr>
@@ -320,6 +338,7 @@
         const ALL_APPS = JSON.parse('{{ all_apps_json|safe }}');
         const PRD_APPS = JSON.parse('{{ prd_apps_json|safe }}');
         const STG_APPS = JSON.parse('{{ stg_apps_json|safe }}');
+        const SELECTED_APPS = JSON.parse('{{ selected_apps_json|safe }}');
     </script>
     <script src="{{ url_for('static', filename='web/script.js') }}"></script>
     <script>

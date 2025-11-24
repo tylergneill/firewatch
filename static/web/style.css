@@ -81,3 +81,10 @@ pre {
     background-color: #e9ecef; /* Medium-light gray for zero activity */
 }
 
+/* Style for chart canvases to reduce their height */
+canvas {
+    max-height: 200px;
+    width: 100% !important; /* Ensure canvas uses full width available */
+    height: auto !important; /* Maintain aspect ratio */
+}
+
