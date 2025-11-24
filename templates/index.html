@@ -50,19 +50,41 @@
       <hr>
       <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
         <input type="hidden" name="view_mode" id="view_mode_date_form" value="{{ view_mode }}">
-        <label for="start_date">Start:</label>
+        <span class="quick-date-options">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Day</th>
+                        <th style="text-align: center;" title="Sun–Sat">Week</th>
+                        <th style="text-align: center;" title="1st onward">Month</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_day')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('today')">Today</button>
+                            <button type="button" onclick="setQuickDate('next_day')">&gt;</button>
+                        </td>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_week')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('this_week')" title="hello">This Week</button>
+                            <button type="button" onclick="setQuickDate('next_week')">&gt;</button>
+                        </td>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_month')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('this_month')">This Month</button>
+                            <button type="button" onclick="setQuickDate('next_month')">&gt;</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </span>
+        <label for="start_date">Custom Start:</label>
         <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
         <label for="end_date">End:</label>
         <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
         <button type="submit">Go</button>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <span class="quick-date-options">
-            <button type="button" onclick="setQuickDate('today')">Today</button>
-            <button type="button" onclick="setQuickDate('yesterday')">Yesterday</button>
-            <button type="button" onclick="setQuickDate('last_week')">Last Week</button>
-            <button type="button" onclick="setQuickDate('last_month')">Last Month</button>
-            <button type="button" onclick="setQuickDate('last_3_months')">Last 3 Months</button>
-        </span>
       </form>
     </div>
     <hr>

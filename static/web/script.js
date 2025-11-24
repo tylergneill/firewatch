@@ -130,28 +130,64 @@ function toggle_collapsible(elementId) {
 
 // New function to set quick date ranges
 function setQuickDate(option) {
-    const today = new Date();
-    let startDate = new Date(today);
-    let endDate = new Date(today);
+    let today = new Date();
+    let startDate, endDate;
+
+    // Helper to parse YYYY-MM-DD in a timezone-safe way
+    const parseDate = (dateString) => {
+        const parts = dateString.split('-');
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+    };
+
+    // Use current start_date from the form to calculate next/prev day/week/month
+    let current_start_date = parseDate(document.getElementById('start_date').value);
+    let current_end_date = parseDate(document.getElementById('end_date').value);
 
     switch (option) {
         case 'today':
-            // start and end date are already today
+            startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             break;
-        case 'yesterday':
-            startDate.setDate(today.getDate() - 1);
-            endDate.setDate(today.getDate() - 1);
+        case 'previous_day':
+            current_start_date.setDate(current_start_date.getDate() - 1);
+            current_end_date.setDate(current_end_date.getDate() - 1);
+            startDate = current_start_date;
+            endDate = current_end_date;
             break;
-        case 'last_week':
-            startDate.setDate(today.getDate() - 6); // Last 7 days including today
+        case 'next_day':
+            current_start_date.setDate(current_start_date.getDate() + 1);
+            current_end_date.setDate(current_end_date.getDate() + 1);
+            startDate = current_start_date;
+            endDate = current_end_date;
             break;
-        case 'last_month':
-            startDate.setMonth(today.getMonth() - 1);
-            // endDate remains today
+        case 'this_week':
+            startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
             break;
-        case 'last_3_months':
-            startDate.setMonth(today.getMonth() - 3);
-            // endDate remains today
+        case 'previous_week':
+            current_start_date.setDate(current_start_date.getDate() - 7);
+            current_end_date.setDate(current_end_date.getDate() - 7);
+            startDate = current_start_date;
+            endDate = current_end_date;
+            break;
+        case 'next_week':
+            current_start_date.setDate(current_start_date.getDate() + 7);
+            current_end_date.setDate(current_end_date.getDate() + 7);
+            startDate = current_start_date;
+            endDate = current_end_date;
+            break;
+        case 'this_month':
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+        case 'previous_month':
+            startDate = new Date(current_start_date.getFullYear(), current_start_date.getMonth() - 1, 1);
+            endDate = new Date(current_start_date.getFullYear(), current_start_date.getMonth(), 0);
+            break;
+        case 'next_month':
+            startDate = new Date(current_start_date.getFullYear(), current_start_date.getMonth() + 1, 1);
+            endDate = new Date(current_start_date.getFullYear(), current_start_date.getMonth() + 2, 0);
             break;
         default:
             return;
