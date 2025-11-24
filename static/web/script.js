@@ -253,6 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             y: {
                                 beginAtZero: true
                             }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        animation: {
+                            duration: 0
                         }
                     }
                 });
