@@ -80,9 +80,9 @@
                 </tbody>
             </table>
         </span>
-        <label for="start_date">Custom Start:</label>
+        <label for="start_date">Custom Range:</label>
         <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
-        <label for="end_date">End:</label>
+        <label for="end_date"> – </label>
         <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
         <button type="submit">Go</button>
       </form>
@@ -312,6 +312,17 @@
         </div>
         <div id="logs_view" style="display: none;">
           <h2>Logs</h2>
+          <div class="toc">
+            <h4>Jump to app:</h4>
+            <ul>
+              {% for app_name in selected_apps %}
+                {% if app_name in app_logs %}
+                  <li><a href="#log-{{ app_name }}">{{ app_name }}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+          <hr>
     
           {% if tail_filter_ip or tail_filter_status %}
             <p>
@@ -341,7 +352,7 @@
     
           {% if app_logs %}
             {% for app_name, lines in app_logs.items() %}
-              <h3>{{ app_name }}</h3>
+              <h3 id="log-{{ app_name }}">{{ app_name }} ({{ lines|length }} lines)</h3>
               {% if lines %}
                 <pre>
           {% for line in lines %}

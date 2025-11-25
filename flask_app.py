@@ -82,6 +82,7 @@ def index():
     stg_app_names = sorted([name for name in app_names if name.endswith('-stg')])
 
     selected_apps = session.get('selected_apps') or default_prod_app_names
+    selected_apps.sort()
 
     # Tail log data
     try:
