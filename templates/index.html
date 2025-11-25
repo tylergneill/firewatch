@@ -91,7 +91,7 @@
         <div>
             <button onclick="set_view_mode_and_show('uptime')">Uptime</button>
             <button onclick="set_view_mode_and_show('requests')">Requests</button>
-            <button onclick="set_view_mode_and_show('raw')">Raw</button>
+            <button onclick="set_view_mode_and_show('logs')">Logs</button>
         </div>
         <hr>
         <div id="loading_view" style="display: none;">
@@ -158,7 +158,7 @@
                               <td><strong>Total</strong></td>
                               <td><strong>{{ app_counts_totals.total|commify }}</strong></td>
                               {% for code in all_status_codes %}
-                                  <td><strong><a href="{{ url_for('index', view_mode='raw', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
+                                  <td><strong><a href="{{ url_for('index', view_mode='logs', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
                               {% endfor %}
                           </tr>
                       </tfoot>
@@ -262,12 +262,12 @@
                     <tbody>
                     {% for item in ip_counts %}
                     <tr class="ip-row" data-ip="{{ item.ip }}">
-                        <td><a href="{{ url_for('index', view_mode='raw', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
+                        <td><a href="{{ url_for('index', view_mode='logs', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
                         <td>{{ item.count|commify }}</td>
                         <td class="geo-location">-</td>
                         <td>
                             {% for status, count in item.status_summary.items() %}
-                                <a href="{{ url_for('index', view_mode='raw', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
+                                <a href="{{ url_for('index', view_mode='logs', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
                             {% endfor %}
                         </td>
                     </tr>
@@ -310,8 +310,8 @@
             </div>
           </div>
         </div>
-        <div id="raw_view" style="display: none;">
-          <h2>Raw logs</h2>
+        <div id="logs_view" style="display: none;">
+          <h2>Logs</h2>
     
           {% if tail_filter_ip or tail_filter_status %}
             <p>
@@ -319,21 +319,21 @@
               <strong>Filters active:</strong>
               {% if tail_filter_ip %}
                 IP: {{ tail_filter_ip }}
-                <a href="{{ url_for('index', view_mode='raw', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+                <a href="{{ url_for('index', view_mode='logs', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
               {% endif %}
               &nbsp;
               {% if tail_filter_status %}
                 Status: {{ tail_filter_status }}
-                <a href="{{ url_for('index', view_mode='raw', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+                <a href="{{ url_for('index', view_mode='logs', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
               {% endif %}
 
             </p>
           {% else %}
             <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
-                <input type="hidden" name="view_mode" id="view_mode_raw_form" value="{{ view_mode }}">
+                <input type="hidden" name="view_mode" id="view_mode_logs_form" value="{{ view_mode }}">
                 <input type="hidden" name="start_date" value="{{ start_date }}">
                 <input type="hidden" name="end_date" value="{{ end_date }}">
-                <label for="num_lines">Number of lines:</label>
+                <label for="num_lines">Tail N:</label>
                 <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
                 <button type="submit">Update</button>
             </form>
@@ -341,7 +341,7 @@
     
           {% if app_logs %}
             {% for app_name, lines in app_logs.items() %}
-              <h3>{{ app_name }} ({{ lines|length }} lines)</h3>
+              <h3>{{ app_name }}</h3>
               {% if lines %}
                 <pre>
           {% for line in lines %}

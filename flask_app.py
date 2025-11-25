@@ -110,12 +110,12 @@ def index():
     # Save the latest valid top_n to the session
     session['top_n'] = top_n
 
-    # Determine the current view mode (uptime, requests, or raw)
+    # Determine the current view mode (uptime, requests, or logs)
     view_mode = request.args.get('view_mode', 'uptime')
 
-    # Filters for raw view
-    tail_filter_ip = request.args.get('ip') if view_mode == 'raw' else None
-    tail_filter_status = request.args.get('status') if view_mode == 'raw' else None
+    # Filters for logs view
+    tail_filter_ip = request.args.get('ip') if view_mode == 'logs' else None
+    tail_filter_status = request.args.get('status') if view_mode == 'logs' else None
 
     filter_ip = request.args.get('ip')
     filter_ua = request.args.get('ua')

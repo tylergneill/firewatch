@@ -8,7 +8,7 @@ function showLoading() {
   loadingTimeoutId = setTimeout(() => {
     document.getElementById('loading_view').style.display = 'block';
     document.getElementById('requests_view').style.display = 'none';
-    document.getElementById('raw_view').style.display = 'none';
+    document.getElementById('logs_view').style.display = 'none';
   }, 200);
 }
 
@@ -17,7 +17,7 @@ function show_view(view_name) {
   clearTimeout(loadingTimeoutId); // Clear any pending loading timeouts
   document.getElementById('loading_view').style.display = 'none'; // Hide loading indicator
   document.getElementById('requests_view').style.display = 'none'; // Hide requests view
-  document.getElementById('raw_view').style.display = 'none'; // Hide raw view
+  document.getElementById('logs_view').style.display = 'none'; // Hide raw view
   document.getElementById('uptime_view').style.display = 'none'; // Hide uptime view
   document.getElementById(view_name + '_view').style.display = 'block'; // Display the selected view
 }
@@ -33,8 +33,8 @@ function set_view_mode_and_show(mode) {
     if (dateFormInput) dateFormInput.value = mode;
 
     // Update the hidden view_mode input in the raw log form
-    const rawFormInput = document.getElementById('view_mode_raw_form');
-    if (rawFormInput) rawFormInput.value = mode;
+    const logsFormInput = document.getElementById('view_mode_logs_form');
+    if (logsFormInput) logsFormInput.value = mode;
     
     // Activate the selected view
     show_view(mode);
