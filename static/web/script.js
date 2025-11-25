@@ -222,6 +222,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let chartCounter = 0;
     const charts = {}; // To hold chart instances
 
+    const requests_by_day_labels = JSON.parse(document.getElementById('requests_by_day_labels').textContent);
+    const requests_by_day_data = JSON.parse(document.getElementById('requests_by_day_data').textContent);
+
     function updateChartControls() {
         const chartContainers = document.querySelectorAll('#comparison-charts-container [id^="chart-container-"]');
         const showControls = chartContainers.length > 1;
@@ -233,50 +236,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to fetch data and render the chart
+    // Function to render the chart
     function renderRequestsByDayChart(canvasId, selectedApp) {
-        const startDate = document.getElementById('start_date').value;
-        const endDate = document.getElementById('end_date').value;
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        
+        if (charts[canvasId]) {
+            charts[canvasId].destroy(); // Destroy previous chart instance
+        }
 
-        fetch(`/api/requests_by_day?app=${selectedApp}&start_date=${startDate}&end_date=${endDate}`)
-            .then(response => response.json())
-            .then(data => {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                
-                if (charts[canvasId]) {
-                    charts[canvasId].destroy(); // Destroy previous chart instance
-                }
-
-                charts[canvasId] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: `Total Requests for ${selectedApp}`,
-                            data: data.values,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        animation: {
-                            duration: 0
-                        }
+        charts[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: requests_by_day_labels,
+                datasets: [{
+                    label: `Total Requests for ${selectedApp}`,
+                    data: requests_by_day_data[selectedApp],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
-                });
-            })
-            .catch(error => console.error('Error fetching requests by day data:', error));
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                animation: {
+                    duration: 0
+                }
+            }
+        });
     }
 
     function addChartEventListeners(chartContainer, chartId) {

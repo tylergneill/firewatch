@@ -133,6 +133,7 @@ def index():
     ip_status_counts = defaultdict(Counter)
     app_response_times = defaultdict(list)
     app_ip_sets = defaultdict(set)
+    app_requests_by_day = defaultdict(lambda: defaultdict(int))
     
     # Initialize uptime data structures
     uptime_data = {}
@@ -189,6 +190,8 @@ def index():
             # Uptime data
             if p['time']:
                 log_date = p['time'].date()
+                if start_date <= log_date <= end_date:
+                    app_requests_by_day[app_name][log_date] += 1
                 if log_date in uptime_data.get(app_name, {}):
                     uptime_data[app_name][log_date]['total'] += 1
                     try:
@@ -216,6 +219,13 @@ def index():
                 app_response_times[app_name].append(p["req_time"])
     
     # --- Post-processing and Preparation for Render ---
+
+    # Prepare data for the Per App Per Day chart
+    all_dates = [start_date + datetime.timedelta(days=i) for i in range((end_date - start_date).days + 1)]
+    requests_by_day_labels = [date.strftime('%Y-%m-%d') for date in all_dates]
+    requests_by_day_data = {}
+    for app_name in selected_apps:
+        requests_by_day_data[app_name] = [app_requests_by_day[app_name].get(date, 0) for date in all_dates]
 
     # Finalize uptime data colors
     final_uptime_data = {}
@@ -393,41 +403,9 @@ def index():
         unique_visitor_counts=unique_visitor_counts,
         percentiles_to_calculate=percentiles_to_calculate,
         uptime_color_explanations=uptime_color_explanations,
+        requests_by_day_labels=json.dumps(requests_by_day_labels),
+        requests_by_day_data=json.dumps(requests_by_day_data),
     )
-
-
-@app.route('/api/requests_by_day')
-def requests_by_day():
-    app_name = request.args.get('app')
-    start_date_str = request.args.get('start_date')
-    end_date_str = request.args.get('end_date')
-
-    try:
-        start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
-        end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
-    except (ValueError, TypeError):
-        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
-
-    if not app_name:
-        return jsonify({"error": "App name not specified."}), 400
-
-    log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
-    
-    daily_counts = defaultdict(int)
-    for line in read_lines_from_files(log_files):
-        p = parse_line(line)
-        if p and p['time']:
-            log_date = p['time'].date()
-            if start_date <= log_date <= end_date:
-                daily_counts[log_date] += 1
-    
-    # Create a full list of dates for the range to ensure all days are represented
-    all_dates = [start_date + datetime.timedelta(days=i) for i in range((end_date - start_date).days + 1)]
-    
-    labels = [date.strftime('%Y-%m-%d') for date in all_dates]
-    values = [daily_counts.get(date, 0) for date in all_dates]
-
-    return jsonify(labels=labels, values=values)
 
 
 @app.route('/api/geo/<ip>')

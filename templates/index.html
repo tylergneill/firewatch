@@ -380,6 +380,8 @@
         const STG_APPS = JSON.parse('{{ stg_apps_json|safe }}');
         const SELECTED_APPS = JSON.parse('{{ selected_apps_json|safe }}');
     </script>
+    <script id="requests_by_day_labels" type="application/json">{{ requests_by_day_labels|safe }}</script>
+    <script id="requests_by_day_data" type="application/json">{{ requests_by_day_data|safe }}</script>
     <script src="{{ url_for('static', filename='web/script.js') }}"></script>
     <script>
         // On page load, set the initial view mode based on the value passed from the Flask backend
