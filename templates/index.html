@@ -10,6 +10,13 @@
   <body>
     <div class="header-container">
       <h1><a href="/">🔥&nbsp;&nbsp;firewatch</a></h1> <p>{{ app_version }}</p>
+      <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+          <input type="checkbox" id="checkbox" onclick="toggle_dark_mode()" />
+          <div class="slider"></div>
+        </label>
+        <span style="margin-left: 10px;">Dark</span>
+      </div>
     </div>
     <hr>
     <div class="control-panel">

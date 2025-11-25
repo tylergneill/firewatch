@@ -355,3 +355,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Dark mode toggle
+function toggle_dark_mode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    const isDarkMode = body.classList.contains('dark-mode');
+    localStorage.setItem('dark-mode', isDarkMode);
+    document.getElementById('checkbox').checked = isDarkMode;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const isDarkMode = localStorage.getItem('dark-mode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('checkbox').checked = true;
+    }
+});
