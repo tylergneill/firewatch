@@ -1,0 +1,394 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>firewatch</title>
+    <link rel="icon" type="image/png" href="/static/web/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='web/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="header-container">
+      <h1><a href="/">🔥&nbsp;&nbsp;firewatch</a></h1> <p>{{ app_version }}</p>
+      <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+          <input type="checkbox" id="checkbox" onclick="toggle_dark_mode()" />
+          <div class="slider"></div>
+        </label>
+        <span style="margin-left: 10px;">Dark</span>
+      </div>
+    </div>
+    <hr>
+    <div class="control-panel">
+      <form method="post" action="{{ url_for('select_apps') }}" id="select_apps_form" onsubmit="showLoading()">
+        <input type="hidden" name="view_mode" id="view_mode_apps_form" value="{{ view_mode }}">
+        <table class="app-selector-table" style="width: 100%;">
+            <tr>
+                <!-- Prod row -->
+                <td style="text-align: right;"><a href="#" onclick="select_all_prd(true); return false;">All prd</a> / <a href="#" onclick="select_all_prd(false); return false;">Clear</a></td>
+                {% for pair in app_pairs %}
+                <td>
+                    <input class="form-check-input app-checkbox app-prd" type="checkbox" name="apps" value="{{ pair.prd }}" id="app_{{ pair.prd }}" {% if pair.prd in selected_apps %}checked{% endif %}>
+                    <label class="form-check-label" for="app_{{ pair.prd }}" style="cursor: pointer;" onclick="select_single_app('{{ pair.prd }}')">{{ pair.prd }}</label>
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <!-- Stg row -->
+                <td style="text-align: right;"><a href="#" onclick="select_all_stg(true); return false;">All stg</a> / <a href="#" onclick="select_all_stg(false); return false;">Clear</a></td>
+                {% for pair in app_pairs %}
+                <td>
+                    {% if pair.stg %}
+                    <input class="form-check-input app-checkbox app-stg" type="checkbox" name="apps" value="{{ pair.stg }}" id="app_{{ pair.stg }}" {% if pair.stg in selected_apps %}checked{% endif %}>
+                    <label class="form-check-label" for="app_{{ pair.stg }}" style="cursor: pointer;" onclick="select_single_app('{{ pair.stg }}')">{{ pair.stg }}</label>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td colspan="{{ app_pairs|length + 1 }}" style="text-align: center;">
+                    <a href="#" onclick="select_all_apps(true); return false;">Select All</a> / <a href="#" onclick="select_all_apps(false); return false;">Clear All</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <button type="submit" class="btn btn-primary btn-sm">Apply multiple</button>
+                </td>
+            </tr>
+        </table>
+      </form>
+      <hr>
+      <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
+        <input type="hidden" name="view_mode" id="view_mode_date_form" value="{{ view_mode }}">
+        <span class="quick-date-options">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Day</th>
+                        <th style="text-align: center;" title="Sun–Sat">Week</th>
+                        <th style="text-align: center;" title="1st onward">Month</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_day')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('today')">Today</button>
+                            <button type="button" onclick="setQuickDate('next_day')">&gt;</button>
+                        </td>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_week')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('this_week')" title="hello">This Week</button>
+                            <button type="button" onclick="setQuickDate('next_week')">&gt;</button>
+                        </td>
+                        <td>
+                            <button type="button" onclick="setQuickDate('previous_month')">&lt;</button>
+                            <button type="button" onclick="setQuickDate('this_month')">This Month</button>
+                            <button type="button" onclick="setQuickDate('next_month')">&gt;</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </span>
+        <label for="start_date">Custom Range:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+        <label for="end_date"> – </label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        <button type="submit">Go</button>
+      </form>
+    </div>
+    <hr>
+        <div>
+            <button onclick="set_view_mode_and_show('uptime')">Uptime</button>
+            <button onclick="set_view_mode_and_show('requests')">Requests</button>
+            <button onclick="set_view_mode_and_show('logs')">Logs</button>
+        </div>
+        <hr>
+        <div id="loading_view" style="display: none;">
+            <p>Loading...</p>
+        </div>
+        <div id="uptime_view" style="display: none;">
+          <h2>Uptime</h2>
+            {% for app_name, daily_statuses in uptime_data.items() %}
+                <h3>{{ app_name }}</h3>
+                <div class="status-bar">
+                    {% for date, status in daily_statuses.items() %}
+                        <div class="status-day status-{{ status }}" title="{{ date.isoformat() }}: {{ uptime_color_explanations.get(status, status) }}"></div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        <div id="requests_view" style="display: none;">
+          <h2>Requests</h2>
+          <hr>
+          {% if filter_ip or filter_ua or filter_status %}
+          <p>
+              <strong>Filters active:</strong>
+              {% if filter_ip %}
+                IP: {{ filter_ip }} <a href="{{ url_for('index', view_mode='requests', ua=filter_ua, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if filter_ua %}
+                UA: {{ filter_ua|truncate(30) }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, status=filter_status, start_date=start_date, end_date=end_date) }}" title="Remove UA filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if filter_status %}
+                Status: {{ filter_status }} <a href="{{ url_for('index', view_mode='requests', ip=filter_ip, ua=filter_ua, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+              {% endif %}
+          </p>
+          {% endif %}
+    
+          <!-- Top Section -->
+          <div class="row">
+              <div class="col-md-6">
+                  <h3>By Status</h3>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              <th>Total</th>
+                              {% for code in all_status_codes %}
+                                  <th><a href="{{ url_for('index', view_mode='requests', status=code, start_date=start_date, end_date=end_date) }}" title="{{ http_status_codes.get(code, '') }}">{{ code }}</a></th>
+                              {% endfor %}
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for app_data in app_counts %}
+                          <tr>
+                              <td>{{ app_data.name }}</td>
+                              <td>{{ app_data.total|commify }}</td>
+                              {% for code in all_status_codes %}
+                                  <td>{{ app_data.statuses[code]|commify }}</td>
+                              {% endfor %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                      <tfoot>
+                          <tr>
+                              <td><strong>Total</strong></td>
+                              <td><strong>{{ app_counts_totals.total|commify }}</strong></td>
+                              {% for code in all_status_codes %}
+                                  <td><strong><a href="{{ url_for('index', view_mode='logs', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
+                              {% endfor %}
+                          </tr>
+                      </tfoot>
+                  </table>
+              </div>
+              <div class="col-md-12">
+                  <h3>Per App Per Day</h3>
+                  <div id="comparison-charts-container">
+                      <div id="chart-container-0">
+                          <label for="requests_by_day_app_selector">Select App:</label>
+                          <select id="requests_by_day_app_selector"></select>
+                          <div class="chart-controls" style="float: right;">
+                              <button class="move-up-btn">Move Up</button>
+                              <button class="move-down-btn">Move Down</button>
+                              <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                          </div>
+                          <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
+                          <hr>
+                      </div>
+                  </div>
+                  <button id="add-comparison-chart-btn">Compare another app</button>
+              </div>
+              <div class="col-md-4">
+                  <h3>Response Time (ms)</h3>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              {% for p in percentiles_to_calculate %}
+                                  <th>P{{ p }}</th>
+                              {% endfor %}
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for app_data in app_percentile_stats %}
+                          <tr>
+                              <td>{{ app_data.name }}</td>
+                              {% for p in percentiles_to_calculate %}
+                                  <td>{{ app_data.percentiles[p]|int|commify }}</td>
+                              {% endfor %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              <div class="col-md-4">
+                  <h3>Unique Visitor Count</h3>
+                  <table class="table table-sm">
+                      <thead>
+                          <tr>
+                              <th>App</th>
+                              <th>Unique Visitors</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for item in unique_visitor_counts %}
+                          <tr>
+                              <td>{{ item.app }}</td>
+                              <td>{{ item.count|commify }}</td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+          <hr>
+
+          <!-- Bottom Section (Top N controlled) -->
+          <div class="row">
+            <div class="col-md-12">
+                <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
+                    <input type="hidden" name="start_date" value="{{ start_date }}">
+                    <input type="hidden" name="end_date" value="{{ end_date }}">
+                    <input type="hidden" name="view_mode" value="requests">
+                    <label for="top_n">Top N:</label>
+                    <input type="number" id="top_n" name="top_n" value="{{ top_n }}" min="1" max="1000">
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-12">
+                <button onclick="show_bottom_view('route')">By Route</button>
+                <button onclick="show_bottom_view('ip')">By IP</button>
+                <button onclick="show_bottom_view('ua')">By User Agent</button>
+            </div>
+          </div>
+            <div id="bottom_view_ip" class="bottom_view col-md-4" style="display: none;">
+                <h3>By IP (Top {{ top_n }})</h3>
+                <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>Count</th>
+                            <th>Location</th>
+                            <th>Status Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in ip_counts %}
+                    <tr class="ip-row" data-ip="{{ item.ip }}">
+                        <td><a href="{{ url_for('index', view_mode='logs', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
+                        <td>{{ item.count|commify }}</td>
+                        <td class="geo-location">-</td>
+                        <td>
+                            {% for status, count in item.status_summary.items() %}
+                                <a href="{{ url_for('index', view_mode='logs', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+          <div class="row">
+            <div id="bottom_view_route" class="bottom_view col-md-4">
+                <h3>By Route (Top {{ top_n }})</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>App</th>
+                            <th>Route</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in route_counts_list %}
+                    <tr>
+                        <td>{{ item.app }}</td>
+                        <td title="{{ item.route }}">{{ item.route|truncate(30) }}</td>
+                        <td>{{ item.count|commify }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="bottom_view_ua" class="bottom_view col-md-4" style="display: none;">
+                <h3>By User Agent (Top {{ top_n }})</h3>
+                <table class="table table-sm">
+                    {% for ua, count in ua_counts %}
+                    <tr>
+                        <td title="{{ ua }}"><a href="{{ url_for('index', start_date=start_date, end_date=end_date, ip=filter_ip, ua=ua) }}" onclick="showLoading()">{{ ua|truncate(30) }}</a></td>
+                        <td>{{ count|commify }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+          </div>
+        </div>
+        <div id="logs_view" style="display: none;">
+          <h2>Logs</h2>
+          <div class="toc">
+            <h4>Jump to app:</h4>
+            <ul>
+              {% for app_name in selected_apps %}
+                {% if app_name in app_logs %}
+                  <li><a href="#log-{{ app_name }}">{{ app_name }}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+          <hr>
+    
+          {% if tail_filter_ip or tail_filter_status %}
+            <p>
+              Showing all matching lines.
+              <strong>Filters active:</strong>
+              {% if tail_filter_ip %}
+                IP: {{ tail_filter_ip }}
+                <a href="{{ url_for('index', view_mode='logs', status=tail_filter_status, start_date=start_date, end_date=end_date) }}" title="Remove IP filter">(x)</a>
+              {% endif %}
+              &nbsp;
+              {% if tail_filter_status %}
+                Status: {{ tail_filter_status }}
+                <a href="{{ url_for('index', view_mode='logs', ip=tail_filter_ip, start_date=start_date, end_date=end_date) }}" title="Remove Status filter">(x)</a>
+              {% endif %}
+
+            </p>
+          {% else %}
+            <form method="get" action="{{ url_for('index') }}" onsubmit="showLoading()">
+                <input type="hidden" name="view_mode" id="view_mode_logs_form" value="{{ view_mode }}">
+                <input type="hidden" name="start_date" value="{{ start_date }}">
+                <input type="hidden" name="end_date" value="{{ end_date }}">
+                <label for="num_lines">Tail N:</label>
+                <input type="number" id="num_lines" name="num_lines" value="{{ num_lines }}" min="1" max="10000">
+                <button type="submit">Update</button>
+            </form>
+          {% endif %}
+    
+          {% if app_logs %}
+            {% for app_name, lines in app_logs.items() %}
+              <h3 id="log-{{ app_name }}">{{ app_name }} ({{ lines|length }} lines)</h3>
+              {% if lines %}
+                <pre>
+          {% for line in lines %}
+          {{ line }}
+          {% endfor %}
+                </pre>
+              {% else %}
+                <p><em>No lines found for this log.</em></p>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <p><em>No log files configured.</em></p>
+          {% endif %}
+        </div>
+    <script>
+        const ALL_APPS = JSON.parse('{{ all_apps_json|safe }}');
+        const PRD_APPS = JSON.parse('{{ prd_apps_json|safe }}');
+        const STG_APPS = JSON.parse('{{ stg_apps_json|safe }}');
+        const SELECTED_APPS = JSON.parse('{{ selected_apps_json|safe }}');
+    </script>
+    <script id="requests_by_day_labels" type="application/json">{{ requests_by_day_labels|safe }}</script>
+    <script id="requests_by_day_data" type="application/json">{{ requests_by_day_data|safe }}</script>
+    <script src="{{ url_for('static', filename='web/script.js') }}"></script>
+    <script>
+        // On page load, set the initial view mode based on the value passed from the Flask backend
+        document.addEventListener('DOMContentLoaded', function() {
+            set_view_mode_and_show('{{ view_mode }}');
+            show_bottom_view('route'); // Set default bottom view
+        });
+    </script>
+  </body>
+</html>

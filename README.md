@@ -1,3 +1,5 @@
-# lookout-tower
+# firewatch
 
-A central monitoring dashboard for all Kalpataru Grove apps.
+A custom server observability dashboard.
+
+Designed for Kalpataru Grove apps with daily rotated Nginx logs.
