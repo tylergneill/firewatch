@@ -217,10 +217,21 @@ function show_bottom_view(view_name) {
     }
 }
 
-// --- New Charting Logic for Total Requests by Day ---
+// --- New Charting Logic for Per App Per Day ---
 document.addEventListener('DOMContentLoaded', function() {
     let chartCounter = 0;
     const charts = {}; // To hold chart instances
+
+    function updateChartControls() {
+        const chartContainers = document.querySelectorAll('#comparison-charts-container [id^="chart-container-"]');
+        const showControls = chartContainers.length > 1;
+        chartContainers.forEach(container => {
+            const controls = container.querySelector('.chart-controls');
+            if (controls) {
+                controls.style.display = showControls ? 'block' : 'none';
+            }
+        });
+    }
 
     // Function to fetch data and render the chart
     function renderRequestsByDayChart(canvasId, selectedApp) {
@@ -293,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete charts[chartId]; // Remove from charts object
             }
             chartContainer.remove(); // Remove the entire container from DOM
+            updateChartControls(); // Update controls after removing a chart
         });
     }
 
@@ -328,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         newChartContainer.innerHTML = `
             <label for="${newSelectorId}">Select App:</label>
             <select id="${newSelectorId}"></select>
-            <div style="float: right;">
+            <div class="chart-controls" style="float: right;">
                 <button class="move-up-btn">Move Up</button>
                 <button class="move-down-btn">Move Down</button>
                 <button class="remove-chart-btn" data-chart-id="${newChartId}">Remove</button>
@@ -353,7 +365,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             addChartEventListeners(newChartContainer, newChartId);
         }
+        updateChartControls(); // Update controls after adding a new chart
     });
+
+    updateChartControls(); // Initial check
 });
 
 // Dark mode toggle
