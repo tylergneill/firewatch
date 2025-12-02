@@ -18,6 +18,7 @@ BLOCKED_CIDRS = [
     "146.174.0.0/16",
     "202.76.0.0/16",
     "8.160.0.0/16",
+    "47.82.0.0/16",
 ]
 
 # --- Pre-compile networks for performance ---
