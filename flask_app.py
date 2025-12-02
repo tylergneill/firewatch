@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 import pathlib
 import datetime
 import json
+import re
 import shelve
 
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
@@ -160,14 +161,16 @@ def index():
             
             for log_file in log_files_for_app:
                 log_file_str = str(log_file.resolve())
-                file_is_present_day = today_str in log_file.name
+                # A log file is considered "current active" if its name doesn't end with a date suffix
+                # (e.g., "app-app.access.log" vs "app-app.access.log-2023-10-27")
+                is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
 
                 processed_file_data = None
-                if not file_is_present_day and log_file_str in cache:
+                if not is_current_active_log_file and log_file_str in cache:
                     processed_file_data = cache[log_file_str]
                 else:
                     processed_file_data = _process_single_log_file(log_file_str, app_names)
-                    if not file_is_present_day:
+                    if not is_current_active_log_file: # Only cache if it's not the current active log
                         cache[log_file_str] = processed_file_data
                 
                 if not processed_file_data:
