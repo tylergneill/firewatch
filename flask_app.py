@@ -159,7 +159,7 @@ def index():
             log_files_for_app = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
             
             for log_file in log_files_for_app:
-                log_file_str = str(log_file)
+                log_file_str = str(log_file.resolve())
                 file_is_present_day = today_str in log_file.name
 
                 processed_file_data = None

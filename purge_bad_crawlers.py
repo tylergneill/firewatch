@@ -2,16 +2,20 @@
 import argparse
 import ipaddress
 import pathlib
+import shelve
 import sys
 from collections import deque, defaultdict
 
-# Assuming utils.py is in the same directory or accessible
-try:
-    from utils import parse_line
-except ImportError:
-    print("Error: Could not import 'parse_line' from 'utils.py'.")
-    print("Please ensure 'utils.py' is in the same directory or in Python's path.")
-    sys.exit(1)
+from utils import parse_line
+
+"""
+Usage: python purge_bad_crawlers.py \
+  --data-dir ../firewatch-data \
+  --forbidden-dir ../firewatch-data-forbidden \
+  --cache-file static/cache/firewatch_cache.db
+"""
+
+
 
 # --- Configuration ---
 BLOCKED_CIDRS = [
@@ -94,7 +98,7 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
     return len(good_lines), len(forbidden_lines)
 
 
-def main(data_dir: str, forbidden_dir: str):
+def main(data_dir: str, forbidden_dir: str, cache_file: str):
     """
     Main function to find and process all log files.
     """
@@ -107,21 +111,31 @@ def main(data_dir: str, forbidden_dir: str):
 
     print(f"Starting crawler purge for directory: {data_path}")
     print(f"Forbidden logs will be written to: {forbidden_path}")
+    print(f"Purging cache entries from: {cache_file}")
 
     log_files = list(data_path.rglob('*.access.log*'))
     print(f"Found {len(log_files)} log files to process.\n")
 
     app_stats = defaultdict(lambda: {'good': 0, 'newly_forbidden': 0})
 
-    for log_file in log_files:
-        if log_file.is_file():
-            app_name_parts = log_file.name.split('-app.access.log')
-            app_name = app_name_parts[0] if app_name_parts else "unknown"
+    with shelve.open(cache_file) as cache:
+        for log_file in log_files:
+            if log_file.is_file():
+                app_name_parts = log_file.name.split('-app.access.log')
+                app_name = app_name_parts[0] if app_name_parts else "unknown"
 
-            good_count, forbidden_count = process_log_file(log_file, forbidden_path)
-            if good_count is not None:
-                app_stats[app_name]['good'] += good_count
-                app_stats[app_name]['newly_forbidden'] += forbidden_count
+                good_count, forbidden_count = process_log_file(log_file, forbidden_path)
+                if good_count is not None:
+                    app_stats[app_name]['good'] += good_count
+                    app_stats[app_name]['newly_forbidden'] += forbidden_count
+
+                    # If we purged lines, the cache is stale and must be deleted.
+                    if forbidden_count > 0:
+                        # Use the absolute path as the key, just like the web app does.
+                        log_file_key = str(log_file.resolve())
+                        if log_file_key in cache:
+                            print(f"    - Deleting stale cache entry for: {log_file.name}")
+                            del cache[log_file_key]
 
     # --- Start Final Report Calculation ---
     print("\nCalculating final totals...")
@@ -137,11 +151,11 @@ def main(data_dir: str, forbidden_dir: str):
                 total_forbidden_stats[app_name] += lines
     
     print("\n--- Purge Summary ---")
-    header = f"{'Application':<25} | {'Original Lines':>15} | {'Just Purged':>15} | {'Total Forbidden':>15} | {'% Purged (This Run)':>20}"
+    header = f"{'Application':<25} | {'Original Lines':>15} | {'Just Purged':>15} | {'Total Forbidden':>15} | {'% Purged (Overall)':>20}"
     print(header)
     print("-" * len(header))
 
-    grand_total_original = 0
+    grand_total_good = 0
     grand_total_newly_purged = 0
     grand_total_forbidden = 0
 
@@ -150,26 +164,28 @@ def main(data_dir: str, forbidden_dir: str):
 
     for app_name in all_app_names:
         stats = app_stats[app_name]
+        good_lines_in_run = stats['good']
         newly_purged = stats['newly_forbidden']
         
-        # Original lines in this run was the sum of good and newly purged
-        original_this_run = stats['good'] + newly_purged
-        
         total_in_forbidden_file = total_forbidden_stats[app_name]
+        
+        # As per user request: Original Lines = (Lines in purified file) + (Total lines in forbidden file)
+        # Note: 'good_lines_in_run' is the count *after* the current purge.
+        true_original_lines = good_lines_in_run + total_in_forbidden_file
 
-        grand_total_original += original_this_run
+        grand_total_good += good_lines_in_run
         grand_total_newly_purged += newly_purged
         
-        percent_purged = (newly_purged / original_this_run * 100) if original_this_run > 0 else 0
+        percent_purged_overall = (total_in_forbidden_file / true_original_lines * 100) if true_original_lines > 0 else 0
         
-        print(f"{app_name:<25} | {original_this_run:>15,d} | {newly_purged:>15,d} | {total_in_forbidden_file:>15,d} | {percent_purged:>19.2f}%")
+        print(f"{app_name:<25} | {true_original_lines:>15,d} | {newly_purged:>15,d} | {total_in_forbidden_file:>15,d} | {percent_purged_overall:>19.2f}%")
 
-    # Grand total for forbidden files is just the sum of the values
     grand_total_forbidden = sum(total_forbidden_stats.values())
+    grand_total_original_overall = grand_total_good + grand_total_forbidden
 
     print("-" * len(header))
-    total_percent_purged = (grand_total_newly_purged / grand_total_original * 100) if grand_total_original > 0 else 0
-    print(f"{'Total':<25} | {grand_total_original:>15,d} | {grand_total_newly_purged:>15,d} | {grand_total_forbidden:>15,d} | {total_percent_purged:>19.2f}%")
+    total_percent_purged_overall = (grand_total_forbidden / grand_total_original_overall * 100) if grand_total_original_overall > 0 else 0
+    print(f"{'Total':<25} | {grand_total_original_overall:>15,d} | {grand_total_newly_purged:>15,d} | {grand_total_forbidden:>15,d} | {total_percent_purged_overall:>19.2f}%")
     print("\nPurge complete.")
 
 
@@ -187,7 +203,12 @@ if __name__ == "__main__":
         default='../firewatch-data-forbidden',
         help="The output directory for forbidden log entries."
     )
+    parser.add_argument(
+        '--cache-file',
+        default='static/cache/firewatch_cache.db',
+        help="The path to the shelve cache file to purge."
+    )
     
     args = parser.parse_args()
     
-    main(args.data_dir, args.forbidden_dir)
+    main(args.data_dir, args.forbidden_dir, args.cache_file)
