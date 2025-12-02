@@ -1,4 +1,6 @@
 LOCAL_DATA_PATH = $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))../firewatch-data)
+LOCAL_CACHE_PATH = $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))../firewatch-data-cache)
+
 # (or export LOCAL_DATA_PATH env var if different from above)
 
 # for temporary local builds with full data
@@ -9,6 +11,7 @@ run:
 	  -it \
 	  -p 5071:5071 \
 	  -v $(LOCAL_DATA_PATH):/app/static/data \
+	  -v $(LOCAL_CACHE_PATH):/app/static/cache \
 	  --name firewatch-dev \
 	  firewatch-dev:debug
 
