@@ -23,4 +23,5 @@ run-official:
 	  -it \
 	  -p 5070:5070 \
 	  -v $(LOCAL_DATA_PATH):/app/static/data \
+	  -v $(LOCAL_CACHE_PATH):/app/static/cache \
 	  tylergneill/firewatch-app:$(VERSION)
