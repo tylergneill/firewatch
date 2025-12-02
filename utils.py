@@ -145,11 +145,6 @@ def get_log_sources_for_app(app_name, log_files_config, log_file_main_path, star
     Finds all relevant log files for a given app and date range,
     including archived files and the current log file.
     """
-    # Hard-coded limit for vatayana app to never allow more than 3 days
-    if app_name in ('vatayana', 'vatayana-stg'):
-        if (end_date - start_date).days > 2:
-            start_date = end_date - datetime.timedelta(days=2)
-
     archive_dir = log_files_config[app_name]
 
     log_files = set()
