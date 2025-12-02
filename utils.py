@@ -1,4 +1,5 @@
 import logging
+from collections import Counter, defaultdict
 import pathlib
 import re
 import requests
@@ -192,3 +193,90 @@ def get_dates_from_request_args(request_args):
         end_date = today
         start_date = today
     return start_date, end_date
+
+def _process_single_log_file(file_path_str: str, app_names: list):
+    """
+    Processes a single log file and returns aggregated data.
+    """
+    file_path = pathlib.Path(file_path_str)
+
+    # Initialize local counters for this file
+    file_total = 0
+    file_total_req_time = 0.0
+    file_ip_counts = Counter()
+    file_ua_counts = Counter()
+    file_route_app_counts = defaultdict(Counter)
+    file_status_counts = Counter()
+    file_app_counts = defaultdict(Counter)
+    file_ip_status_counts = defaultdict(Counter)
+    file_app_response_times = defaultdict(list)
+    file_app_ip_sets = defaultdict(set)
+    file_app_requests_by_day = defaultdict(lambda: defaultdict(int))
+    file_uptime_data = defaultdict(lambda: defaultdict(lambda: {'2xx': 0, '5xx': 0, 'total': 0}))
+
+    app_name = "unknown"
+    for name in app_names:
+        if name in file_path.name:
+            app_name = name
+            break
+    
+    # Process lines for this file
+    for line in read_lines_from_files([file_path]):
+        p = parse_line(line)
+        if not p:
+            continue
+
+        # Uptime data
+        if p['time']:
+            log_date = p['time'].date()
+            file_app_requests_by_day[app_name][log_date] += 1
+            file_uptime_data[app_name][log_date]['total'] += 1
+            try:
+                status_code = int(p['status'])
+                if 200 <= status_code < 300:
+                    file_uptime_data[app_name][log_date]['2xx'] += 1
+                elif 500 <= status_code < 600:
+                    file_uptime_data[app_name][log_date]['5xx'] += 1
+            except (ValueError, TypeError):
+                pass
+
+        # Requests data
+        file_total += 1
+        file_ip_counts[p["ip"]] += 1
+        file_ua_counts[p["ua"]] += 1
+        route = p["path"].split('?')[0]
+        file_route_app_counts[route][app_name] += 1
+        file_status_counts[p["status"]] += 1
+        file_app_counts[app_name][p["status"]] += 1
+        file_ip_status_counts[p["ip"]][p["status"]] += 1
+        file_app_ip_sets[app_name].add(p['ip'])
+        if p["req_time"] is not None:
+            file_total_req_time += p["req_time"]
+            file_app_response_times[app_name].append(p["req_time"])
+
+    # Convert sets to lists and datetimes to strings for serialization
+    serializable_app_ip_sets = {k: list(v) for k, v in file_app_ip_sets.items()}
+    serializable_app_requests_by_day = {
+        app: {date.isoformat(): count for date, count in daily_counts.items()}
+        for app, daily_counts in file_app_requests_by_day.items()
+    }
+    serializable_uptime_data = {
+        app: {date.isoformat(): counts for date, counts in daily_counts.items()}
+        for app, daily_counts in file_uptime_data.items()
+    }
+
+    return {
+        "app_name": app_name,
+        "total": file_total,
+        "total_req_time": file_total_req_time,
+        "ip_counts": file_ip_counts,
+        "ua_counts": file_ua_counts,
+        "route_app_counts": file_route_app_counts,
+        "status_counts": file_status_counts,
+        "app_counts": file_app_counts,
+        "ip_status_counts": file_ip_status_counts,
+        "app_response_times": file_app_response_times,
+        "app_ip_sets": serializable_app_ip_sets,
+        "app_requests_by_day": serializable_app_requests_by_day,
+        "uptime_data": serializable_uptime_data,
+    }
