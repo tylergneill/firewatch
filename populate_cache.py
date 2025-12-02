@@ -8,7 +8,7 @@ from flask_app import app_names, LOG_FILES, LOG_FILE_PATH
 from utils import get_log_sources_for_app, _process_single_log_file
 
 """
-Usage: nice -n 19 python populate_cache.py --start-date 2025-11-01 --end-date 2025-11-30
+Usage: nice -n 19 python populate_cache.py --start-date 2025-03-01 --end-date 2025-10-31
 """
 
 def populate_cache(start_date, end_date):
