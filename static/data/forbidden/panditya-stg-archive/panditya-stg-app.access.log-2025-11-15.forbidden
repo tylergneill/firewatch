@@ -1,0 +1,12 @@
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:52:54 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:52:54 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:52:54 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:52:54 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 46.101.1.225 - - [15/Nov/2025:20:52:56 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (l9scan/2.0.7343e24373e2039313e2634313; +https://leakix.net)" 0.002
+panditya-stg.duckdns.org 443 46.101.1.225 - - [15/Nov/2025:20:52:56 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (l9scan/2.0.7343e24373e2039313e2634313; +https://leakix.net)" 0.002
+panditya-stg.duckdns.org 443 46.101.1.225 - - [15/Nov/2025:20:52:57 +0000] "GET /info.php HTTP/1.1" 404 207 "-" "Mozilla/5.0 (l9scan/2.0.7343e24373e2039313e2634313; +https://leakix.net)" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:53:08 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:53:09 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.001
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:54:30 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 96.41.38.202 - - [15/Nov/2025:20:54:31 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0" 0.002
+panditya-stg.duckdns.org 443 45.148.10.242 - - [15/Nov/2025:20:57:23 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Fedora; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0" 0.002

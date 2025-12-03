@@ -1,0 +1,6 @@
+hansel-stg.duckdns.org 443 2.57.122.173 - - [14/Nov/2025:01:59:46 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Safari/605.1.15" 0.000
+hansel-stg.duckdns.org 443 213.209.157.81 - - [14/Nov/2025:06:49:55 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "Mozilla/5.0 (compatible; Konqueror/3.5; Linux 2.6.30-7.dmz.1-liquorix-686; X11) KHTML/3.5.10 (like Gecko) (Debian package 4:3.5.10.dfsg.1-1 b1)" 0.000
+hansel-stg.duckdns.org 443 178.128.102.90 - - [14/Nov/2025:10:40:58 +0000] "GET /wp-login.php HTTP/1.1" 401 179 "-" "Mozilla/5.0" 0.000
+hansel-stg.duckdns.org 443 13.208.226.1 - - [14/Nov/2025:16:10:05 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "python-httpx/0.27.0" 0.000
+hansel-stg.duckdns.org 443 18.183.209.147 - - [14/Nov/2025:23:27:07 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "python-httpx/0.28.1" 0.000
+hansel-stg.duckdns.org 443 18.183.209.147 - - [14/Nov/2025:23:28:17 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "python-httpx/0.28.1" 0.000

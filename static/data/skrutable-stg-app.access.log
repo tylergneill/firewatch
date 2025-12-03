@@ -1,6 +1,0 @@
-skrutable-stg.duckdns.org 443 44.193.254.10 - - [16/Nov/2025:12:40:36 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0" 0.003
-skrutable-stg.duckdns.org 443 44.193.254.10 - - [16/Nov/2025:12:40:36 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" 0.002
-skrutable-stg.duckdns.org 443 71.6.134.230 - - [16/Nov/2025:20:49:35 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" 0.003
-skrutable-stg.duckdns.org 443 71.6.134.230 - - [16/Nov/2025:21:09:11 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" 0.003
-skrutable-stg.duckdns.org 443 165.227.200.219 - - [17/Nov/2025:09:19:37 +0000] "GET / HTTP/1.1" 200 3360 "-" "Python/3.12 aiohttp/3.11.18" 0.003
-skrutable-stg.duckdns.org 443 45.82.78.114 - - [17/Nov/2025:10:07:25 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "https://skrutable-stg.duckdns.org/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0" 0.002

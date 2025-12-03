@@ -9,8 +9,8 @@ from collections import deque, defaultdict
 
 """
 Usage: python purge_bad_crawlers.py \
-  --data-dir ../firewatch-data \
-  --forbidden-dir ../firewatch-data-forbidden \
+  --data-dir static/data/access \
+  --forbidden-dir static/data/forbidden \
   --cache-file static/cache/firewatch_cache.db
 """
 
@@ -122,6 +122,8 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
         with final_forbidden_path.open('ab') as f:
             f.writelines(forbidden_lines)
         print(f"    - Wrote {len(forbidden_lines)} lines to {final_forbidden_path}")
+    else:
+        print(f"    - No forbidden lines found in {log_path.name}.")
 
     # --- Overwrite original with purified logs ---
     with log_path.open('wb') as f:
@@ -229,12 +231,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--data-dir',
-        default='../firewatch-data',
+        default='static/data/access',
         help="The input directory containing log files (e.g., ../firewatch-data)."
     )
     parser.add_argument(
         '--forbidden-dir',
-        default='../firewatch-data-forbidden',
+        default='static/data/forbidden',
         help="The output directory for forbidden log entries."
     )
     parser.add_argument(

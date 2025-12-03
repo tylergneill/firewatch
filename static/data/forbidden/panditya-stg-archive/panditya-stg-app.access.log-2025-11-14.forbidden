@@ -1,0 +1,3 @@
+panditya-stg.duckdns.org 443 162.243.15.109 - - [14/Nov/2025:19:25:30 +0000] "GET /.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4859.172 Safari/537.36" 0.001
+panditya-stg.duckdns.org 443 162.243.15.109 - - [14/Nov/2025:19:25:30 +0000] "POST /vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4859.172 Safari/537.36" 0.001
+panditya-stg.duckdns.org 443 162.243.15.109 - - [14/Nov/2025:19:25:30 +0000] "GET /.git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4859.172 Safari/537.36" 0.001
