@@ -99,9 +99,10 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
         robot_parsers[app_name] = parser
         print(f"  - Loaded rules for '{app_name}'")
 
+    # --- Step 3: Process all log files to build analytics ---
     print("Step 3: Processing all log files to build analytics...")
     analytics = {
-        "already_banned": defaultdict(Counter),
+        "already_banned": defaultdict(lambda: {'counts': Counter(), 'ips': set()}),
         "not_yet_banned": defaultdict(Counter)
     }
     
@@ -127,18 +128,34 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
                     category, key = get_ip_category_and_key(ip)
                     if not category:
                         continue
+                    
+                    # Get the correct dictionary to update
+                    if category == "already_banned":
+                        target_dict = analytics[category][key]['counts']
+                        analytics[category][key]['ips'].add(ip)
+                    else:
+                        target_dict = analytics[category][key]
 
-                    analytics[category][key]['total_request_count'] += 1
+                    target_dict['total_request_count'] += 1
                     if is_junk_probe(path):
-                        analytics[category][key]['junk_probe_count'] += 1
+                        target_dict['junk_probe_count'] += 1
                     if robot_parser and not robot_parser.can_fetch(ua, path):
-                        analytics[category][key]['restricted_path_count'] += 1
+                        target_dict['restricted_path_count'] += 1
 
     print("\n  - Log processing complete.")
 
+    # --- Step 4: Write analytics to shelve cache ---
     print(f"Step 4: Writing analytics to cache file: {cache_file}")
     with shelve.open(cache_file, 'c') as cache:
-        cache['already_banned'] = {k: dict(v) for k, v in analytics['already_banned'].items()}
+        # Convert defaultdicts and sets to plain dicts and lists for shelving
+        banned_cache_data = {}
+        for cidr, data in analytics['already_banned'].items():
+            banned_cache_data[cidr] = {
+                'counts': dict(data['counts']),
+                'ips': list(data['ips'])
+            }
+        cache['already_banned'] = banned_cache_data
+        
         cache['not_yet_banned'] = {k: dict(v) for k, v in analytics['not_yet_banned'].items()}
             
     print("Learn patterns script finished successfully.")
