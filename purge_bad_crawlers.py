@@ -2,11 +2,10 @@
 import argparse
 import ipaddress
 import pathlib
+import re
 import shelve
 import sys
 from collections import deque, defaultdict
-
-from utils import parse_line
 
 """
 Usage: python purge_bad_crawlers.py \
@@ -14,8 +13,6 @@ Usage: python purge_bad_crawlers.py \
   --forbidden-dir ../firewatch-data-forbidden \
   --cache-file static/cache/firewatch_cache.db
 """
-
-
 
 # --- Configuration ---
 BLOCKED_CIDRS = [
@@ -27,6 +24,30 @@ BLOCKED_CIDRS = [
 
 # --- Pre-compile networks for performance ---
 BLOCKED_NETWORKS = [ipaddress.ip_network(cidr) for cidr in BLOCKED_CIDRS]
+
+
+# --- New Configuration for Junk Probes ---
+JUNK_PROBE_PATTERNS = [
+    r"\.git(/|$)",
+    r"(^|/)\.env",
+    r"/(env|git|config|configs|conf|settings|production|app|home)\.zip$",
+    r"\.php$",
+    r"/cgi-bin/",
+]
+
+# --- Pre-compile junk regexes for performance ---
+JUNK_PROBE_REGEXES = [re.compile(p, re.IGNORECASE) for p in JUNK_PROBE_PATTERNS]
+
+
+def is_junk_probe(uri_str: str) -> bool:
+    """Checks if a given request URI is a junk/security probe."""
+    if not uri_str:
+        return False
+    for regex in JUNK_PROBE_REGEXES:
+        if regex.search(uri_str):
+            return True
+    return False
+
 
 def is_ip_blocked(ip_str: str) -> bool:
     """Checks if a given IP address string is in one of the blocked networks."""
@@ -42,10 +63,12 @@ def is_ip_blocked(ip_str: str) -> bool:
         return False
     return False
 
+
 def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
     """
-    Reads a log file, separates lines based on IP, overwrites the original
-    with clean lines, and writes blocked lines to the forbidden directory.
+    Reads a log file, separates lines based on IP or junk URI, overwrites
+    the original with clean lines, and writes blocked lines to the forbidden
+    directory.
     """
     print(f"  Processing: {log_path}...")
     good_lines = deque()
@@ -54,17 +77,28 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
     try:
         with log_path.open('rb') as f:
             for line_bytes in f:
-                # We need the raw bytes, but parse_line needs to decode it.
-                # Let's get the IP without fully depending on parse_line's success.
+                # We need the raw bytes, but our logic needs to decode parts of it.
+                # Let's get the required fields without fully depending on parse_line's success for performance.
                 try:
                     # Quick split to get IP, faster than full regex for every line
                     ip = line_bytes.split(b' ', 3)[2].decode('utf-8')
+
+                    # Also extract request URI for junk probing
+                    # It's usually in the form "VERB /path HTTP/ver"
+                    request_part = line_bytes.split(b'"', 2)
+                    if len(request_part) > 1:
+                        # e.g., 'GET /path HTTP/1.1'
+                        full_request = request_part[1].decode('utf-8', errors='ignore')
+                        # We only need the URI part
+                        uri = full_request.split(' ')[1] if len(full_request.split(' ')) > 1 else ''
+                    else:
+                        uri = ''
                 except (IndexError, UnicodeDecodeError):
                     # If line format is weird, treat as good and keep it
                     good_lines.append(line_bytes)
                     continue
 
-                if is_ip_blocked(ip):
+                if is_ip_blocked(ip) or is_junk_probe(uri):
                     forbidden_lines.append(line_bytes)
                 else:
                     good_lines.append(line_bytes)
@@ -78,7 +112,7 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
     # --- Write forbidden logs ---
     if forbidden_lines:
         # Construct the output path
-        relative_path = log_path.relative_to(log_path.parent.parent) # e.g., panditya-archive/log-file
+        relative_path = log_path.relative_to(log_path.parent.parent)  # e.g., panditya-archive/log-file
         forbidden_path = forbidden_dir / relative_path
         forbidden_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -113,7 +147,7 @@ def main(data_dir: str, forbidden_dir: str, cache_file: str):
     print(f"Forbidden logs will be written to: {forbidden_path}")
     print(f"Purging cache entries from: {cache_file}")
 
-    log_files = list(data_path.rglob('*.access.log*'))
+    log_files = sorted(data_path.rglob('*.access.log*'))
     print(f"Found {len(log_files)} log files to process.\n")
 
     app_stats = defaultdict(lambda: {'good': 0, 'newly_forbidden': 0})
