@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 import argparse
-import datetime
 import ipaddress
 import pathlib
 import re
 import shelve
-import sys
 from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
+from tqdm import tqdm
 
+from purge_bad_crawlers import BLOCKED_NETWORKS
 from utils import parse_line
 
-from purge_bad_crawlers import BLOCKED_CIDRS, BLOCKED_NETWORKS
+"""
+Usage: python learn_patterns.py \
+  --access-dir static/data/access \
+  --forbidden-dir static/data/forbidden \
+  --robots-dir static/data/robots \
+  --cache-file static/cache/analytics.db
+"""
 
 # --- Junk Probe Logic (from purge_bad_crawlers.py) ---
 JUNK_PROBE_PATTERNS = [
@@ -23,6 +29,7 @@ JUNK_PROBE_PATTERNS = [
 ]
 JUNK_PROBE_REGEXES = [re.compile(p, re.IGNORECASE) for p in JUNK_PROBE_PATTERNS]
 
+
 def is_junk_probe(uri_str: str) -> bool:
     """Checks if a given request URI is a junk/security probe."""
     if not uri_str:
@@ -31,6 +38,7 @@ def is_junk_probe(uri_str: str) -> bool:
         if regex.search(uri_str):
             return True
     return False
+
 
 def get_ip_category_and_key(ip_str: str):
     """
@@ -48,10 +56,12 @@ def get_ip_category_and_key(ip_str: str):
         return None, None
     return "not_yet_banned", ip_str
 
+
 def get_app_name_from_filename(filename: str) -> str:
     """Extracts the application name from a log file name."""
     parts = filename.split('-app.')
     return parts[0] if parts else "unknown"
+
 
 def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
     """
@@ -64,12 +74,17 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
     print("Step 1: Gathering unique IPs from forbidden logs...")
     forbidden_ips = set()
     forbidden_log_files = list(forbidden_path.rglob('*.log*'))
-    for log_file in forbidden_log_files:
-        with log_file.open('rb') as f:
-            for line in f:
-                p = parse_line(line)
-                if p and p.get('ip'):
-                    forbidden_ips.add(p['ip'])
+    
+    total_size = sum(f.stat().st_size for f in forbidden_log_files)
+    with tqdm(total=total_size, unit='B', unit_scale=True, desc="Gathering Forbidden IPs") as pbar:
+        for log_file in forbidden_log_files:
+            with log_file.open('rb') as f:
+                for line in f:
+                    p = parse_line(line)
+                    if p and p.get('ip'):
+                        forbidden_ips.add(p['ip'])
+                    pbar.update(len(line))
+
     print(f"  - Found {len(forbidden_ips)} unique IPs in forbidden logs.")
 
     print("Step 2: Loading robots.txt files...")
@@ -93,30 +108,31 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
     all_log_files = list(access_path.rglob('*.log*')) + forbidden_log_files
     print(f"  - Found {len(all_log_files)} total log files to process.")
 
-    for i, log_file in enumerate(all_log_files):
-        print(f"  - Processing file {i+1}/{len(all_log_files)}: {log_file.name}", end='\r')
-        app_name = get_app_name_from_filename(log_file.name)
-        robot_parser = robot_parsers.get(app_name)
+    total_size = sum(f.stat().st_size for f in all_log_files)
+    with tqdm(total=total_size, unit='B', unit_scale=True, desc="Processing All Logs") as pbar:
+        for log_file in all_log_files:
+            app_name = get_app_name_from_filename(log_file.name)
+            robot_parser = robot_parsers.get(app_name)
 
-        with log_file.open('rb') as f:
-            for line in f:
-                p = parse_line(line)
-                if not (p and p.get('ip') in forbidden_ips):
-                    continue
-                
-                ip = p['ip']
-                path = p.get('path', '')
-                ua = p.get('ua', '*')
+            with log_file.open('rb') as f:
+                for line in f:
+                    pbar.update(len(line))
+                    if not (p := parse_line(line)) or not (p.get('ip') in forbidden_ips):
+                        continue
+                    
+                    ip = p['ip']
+                    path = p.get('path', '')
+                    ua = p.get('ua', '*')
 
-                category, key = get_ip_category_and_key(ip)
-                if not category:
-                    continue
+                    category, key = get_ip_category_and_key(ip)
+                    if not category:
+                        continue
 
-                analytics[category][key]['total_request_count'] += 1
-                if is_junk_probe(path):
-                    analytics[category][key]['junk_probe_count'] += 1
-                if robot_parser and not robot_parser.can_fetch(ua, path):
-                    analytics[category][key]['restricted_path_count'] += 1
+                    analytics[category][key]['total_request_count'] += 1
+                    if is_junk_probe(path):
+                        analytics[category][key]['junk_probe_count'] += 1
+                    if robot_parser and not robot_parser.can_fetch(ua, path):
+                        analytics[category][key]['restricted_path_count'] += 1
 
     print("\n  - Log processing complete.")
 

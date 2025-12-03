@@ -30,6 +30,8 @@ packaging==25.0
     # via gunicorn
 requests==2.31.0
     # via -r requirements.in
+tqdm==4.67.1
+    # via -r requirements.in
 urllib3==2.5.0
     # via requests
 werkzeug==3.1.3
