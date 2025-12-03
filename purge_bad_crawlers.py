@@ -117,7 +117,7 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
         forbidden_path.parent.mkdir(parents=True, exist_ok=True)
         
         # Add .forbidden suffix
-        final_forbidden_path = forbidden_path.with_name(forbidden_path.name + ".forbidden")
+        final_forbidden_path = forbidden_path.with_name(forbidden_path.name.replace(".access.log", ".forbidden.log"))
 
         with final_forbidden_path.open('ab') as f:
             f.writelines(forbidden_lines)
