@@ -27,7 +27,7 @@ def get_sort_key(item):
         return 0
     return junk / total
 
-def main(cache_file_path: str, output_file_path: str):
+def main(cache_file_path: str, output_file_path: str, top_n_ips: int):
     """
     Reads analytics from a shelve cache, groups IPs by CIDR, sorts them,
     and writes the result to a JSON file.
@@ -73,6 +73,45 @@ def main(cache_file_path: str, output_file_path: str):
         else:
             ip, data = ips_in_group.popitem()
             final_not_yet_banned[ip] = data
+
+    # --- Top 10 Individual IPs by Total Requests (not_yet_banned) ---
+    all_individual_ips_data = []
+    for key, value in final_not_yet_banned.items():
+        if '_summary' in value:  # This is a CIDR group
+            for ip, data in value.items():
+                if ip != '_summary':
+                    data['ip'] = ip
+                    all_individual_ips_data.append(data)
+        else:  # This is a lone IP
+            value['ip'] = key
+            all_individual_ips_data.append(value)
+
+    all_individual_ips_data.sort(key=lambda x: x.get('total_request_count', 0), reverse=True)
+
+    print(f"\n--- Top {top_n_ips} Individual IPs by Total Requests (not_yet_banned) ---")
+    headers = ["IP Address", "IPs", "Total Reqs", "Junk Probes", "Restricted", "Junk Ratio"]
+    header_fmt = "{:<18} | {:>3} | {:>10} | {:>11} | {:>10} | {:>10}"
+    print(header_fmt.format(*headers))
+    print("-" * 85)
+
+    for data in all_individual_ips_data[:top_n_ips]:
+        ip = data.get('ip', 'N/A')
+        total_reqs = data.get('total_request_count', 0)
+        junk_probes = data.get('junk_probe_count', 0)
+        restricted = data.get('restricted_path_count', 0)
+        ratio = (junk_probes / total_reqs) if total_reqs > 0 else 0
+        
+        row_data = [
+            ip,
+            1,
+            f"{total_reqs:,}",
+            f"{junk_probes:,}",
+            f"{restricted:,}",
+            f"{ratio:.2%}"
+        ]
+        print(header_fmt.format(*row_data))
+    print("-" * 85)
+    # --- End Top 10 Individual IPs ---
 
     # --- Sorting Logic ---
     sorted_items = sorted(final_not_yet_banned.items(), key=get_sort_key, reverse=True)
@@ -132,5 +171,11 @@ if __name__ == "__main__":
         default='analytics_output.json',
         help="The path for the output JSON file."
     )
+    parser.add_argument(
+        '--top-n-ips',
+        type=int,
+        default=10,
+        help="The number of top individual IPs to display (defaults to 10)."
+    )
     args = parser.parse_args()
-    main(args.cache_file, args.output_file)
+    main(args.cache_file, args.output_file, args.top_n_ips)

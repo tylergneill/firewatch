@@ -17,11 +17,13 @@
     "204.76.203.0/24": {
       "204.76.203.25": {
         "total_request_count": 5,
-        "junk_probe_count": 5
+        "junk_probe_count": 5,
+        "ip": "204.76.203.25"
       },
       "204.76.203.30": {
         "total_request_count": 4,
-        "junk_probe_count": 4
+        "junk_probe_count": 4,
+        "ip": "204.76.203.30"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -32,15 +34,18 @@
     "173.244.42.0/24": {
       "173.244.42.168": {
         "total_request_count": 2,
-        "junk_probe_count": 2
+        "junk_probe_count": 2,
+        "ip": "173.244.42.168"
       },
       "173.244.42.171": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "173.244.42.171"
       },
       "173.244.42.160": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "173.244.42.160"
       },
       "_summary": {
         "individual_ip_count": 3,
@@ -50,36 +55,44 @@
     },
     "45.88.97.68": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "45.88.97.68"
     },
     "181.214.173.113": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "181.214.173.113"
     },
     "176.107.152.196": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "176.107.152.196"
     },
     "14.139.60.4": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "14.139.60.4"
     },
     "45.94.31.37": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "45.94.31.37"
     },
     "158.173.154.160": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "158.173.154.160"
     },
     "89.187.162.0/24": {
       "89.187.162.181": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "89.187.162.181"
       },
       "89.187.162.180": {
         "total_request_count": 2,
-        "junk_probe_count": 2
+        "junk_probe_count": 2,
+        "ip": "89.187.162.180"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -89,28 +102,34 @@
     },
     "136.115.208.241": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "136.115.208.241"
     },
     "172.202.1.208": {
       "total_request_count": 81,
-      "junk_probe_count": 81
+      "junk_probe_count": 81,
+      "ip": "172.202.1.208"
     },
     "4.205.179.237": {
       "total_request_count": 100,
-      "junk_probe_count": 100
+      "junk_probe_count": 100,
+      "ip": "4.205.179.237"
     },
     "152.59.223.86": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "152.59.223.86"
     },
     "45.95.214.0/24": {
       "45.95.214.147": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "45.95.214.147"
       },
       "45.95.214.139": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "45.95.214.139"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -120,92 +139,114 @@
     },
     "191.178.172.162": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "191.178.172.162"
     },
     "4.236.126.109": {
       "total_request_count": 50,
-      "junk_probe_count": 50
+      "junk_probe_count": 50,
+      "ip": "4.236.126.109"
     },
     "138.199.39.176": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "138.199.39.176"
     },
     "122.2.105.78": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "122.2.105.78"
     },
     "45.134.225.130": {
       "total_request_count": 4,
-      "junk_probe_count": 4
+      "junk_probe_count": 4,
+      "ip": "45.134.225.130"
     },
     "34.10.234.31": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "34.10.234.31"
     },
     "150.228.189.58": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "150.228.189.58"
     },
     "103.161.55.208": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "103.161.55.208"
     },
     "194.26.192.153": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "194.26.192.153"
     },
     "2.57.122.173": {
       "total_request_count": 2,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "2.57.122.173"
     },
     "20.40.61.170": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "20.40.61.170"
     },
     "172.71.164.232": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.71.164.232"
     },
     "172.69.195.181": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.69.195.181"
     },
     "172.69.224.204": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.69.224.204"
     },
     "172.69.194.76": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.69.194.76"
     },
     "141.255.164.26": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "141.255.164.26"
     },
     "176.65.149.253": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "176.65.149.253"
     },
     "39.48.178.30": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "39.48.178.30"
     },
     "106.51.171.150": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "106.51.171.150"
     },
     "139.59.18.96": {
       "total_request_count": 4,
-      "junk_probe_count": 4
+      "junk_probe_count": 4,
+      "ip": "139.59.18.96"
     },
     "172.70.242.0/24": {
       "172.70.242.146": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "172.70.242.146"
       },
       "172.70.242.147": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "172.70.242.147"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -215,20 +256,24 @@
     },
     "172.70.162.187": {
       "total_request_count": 3,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "172.70.162.187"
     },
     "172.70.247.60": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.70.247.60"
     },
     "172.71.178.0/24": {
       "172.71.178.91": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "172.71.178.91"
       },
       "172.71.178.90": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "172.71.178.90"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -238,28 +283,34 @@
     },
     "43.252.231.122": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "43.252.231.122"
     },
     "146.190.254.186": {
       "total_request_count": 4,
-      "junk_probe_count": 4
+      "junk_probe_count": 4,
+      "ip": "146.190.254.186"
     },
     "45.144.212.58": {
       "total_request_count": 2,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "45.144.212.58"
     },
     "80.94.92.138": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "80.94.92.138"
     },
     "208.84.101.0/24": {
       "208.84.101.66": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "208.84.101.66"
       },
       "208.84.101.230": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "208.84.101.230"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -269,16 +320,19 @@
     },
     "172.71.246.77": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.71.246.77"
     },
     "162.158.94.0/24": {
       "162.158.94.173": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "162.158.94.173"
       },
       "162.158.94.172": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "162.158.94.172"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -288,173 +342,215 @@
     },
     "162.158.87.159": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "162.158.87.159"
     },
     "195.154.83.112": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "195.154.83.112"
     },
     "139.59.32.114": {
       "total_request_count": 2,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "139.59.32.114"
     },
     "45.153.34.41": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "45.153.34.41"
     },
     "5.189.136.242": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "5.189.136.242"
     },
     "162.158.111.32": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "162.158.111.32"
     },
     "172.70.248.46": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.70.248.46"
     },
     "165.22.25.213": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "165.22.25.213"
     },
     "64.94.84.15": {
       "total_request_count": 3,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "64.94.84.15"
     },
     "151.241.108.225": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "151.241.108.225"
     },
     "49.150.248.3": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "49.150.248.3"
     },
     "106.222.218.117": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "106.222.218.117"
     },
     "47.74.10.156": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "47.74.10.156"
     },
     "170.64.143.165": {
       "total_request_count": 4,
-      "junk_probe_count": 4
+      "junk_probe_count": 4,
+      "ip": "170.64.143.165"
     },
     "172.70.240.126": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.70.240.126"
     },
     "172.70.251.115": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "172.70.251.115"
     },
     "34.148.158.168": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "34.148.158.168"
     },
     "187.45.55.63": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "187.45.55.63"
     },
     "200.219.27.3": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "200.219.27.3"
     },
     "136.119.95.133": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "136.119.95.133"
     },
     "103.87.143.170": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "103.87.143.170"
     },
     "35.231.232.75": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "35.231.232.75"
     },
     "178.128.102.90": {
       "total_request_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "178.128.102.90"
     },
     "20.222.232.51": {
       "total_request_count": 310,
-      "junk_probe_count": 308
+      "junk_probe_count": 308,
+      "ip": "20.222.232.51"
     },
     "20.196.107.56": {
       "total_request_count": 155,
-      "junk_probe_count": 154
+      "junk_probe_count": 154,
+      "ip": "20.196.107.56"
     },
     "52.138.205.19": {
       "total_request_count": 92,
-      "junk_probe_count": 91
+      "junk_probe_count": 91,
+      "ip": "52.138.205.19"
     },
     "20.222.117.51": {
       "total_request_count": 145,
-      "junk_probe_count": 143
+      "junk_probe_count": 143,
+      "ip": "20.222.117.51"
     },
     "4.206.94.204": {
       "total_request_count": 63,
-      "junk_probe_count": 62
+      "junk_probe_count": 62,
+      "ip": "4.206.94.204"
     },
     "172.190.142.176": {
       "total_request_count": 313,
-      "junk_probe_count": 308
+      "junk_probe_count": 308,
+      "ip": "172.190.142.176"
     },
     "20.48.160.218": {
       "total_request_count": 189,
-      "junk_probe_count": 185
+      "junk_probe_count": 185,
+      "ip": "20.48.160.218"
     },
     "4.206.159.110": {
       "total_request_count": 189,
-      "junk_probe_count": 185
+      "junk_probe_count": 185,
+      "ip": "4.206.159.110"
     },
     "52.184.159.184": {
       "total_request_count": 189,
-      "junk_probe_count": 185
+      "junk_probe_count": 185,
+      "ip": "52.184.159.184"
     },
     "4.205.254.11": {
       "total_request_count": 189,
-      "junk_probe_count": 185
+      "junk_probe_count": 185,
+      "ip": "4.205.254.11"
     },
     "20.119.226.250": {
       "total_request_count": 189,
-      "junk_probe_count": 185
+      "junk_probe_count": 185,
+      "ip": "20.119.226.250"
     },
     "93.123.109.152": {
       "total_request_count": 150,
       "junk_probe_count": 144,
-      "restricted_path_count": 1
+      "restricted_path_count": 1,
+      "ip": "93.123.109.152"
     },
     "4.217.221.207": {
       "total_request_count": 141,
-      "junk_probe_count": 130
+      "junk_probe_count": 130,
+      "ip": "4.217.221.207"
     },
     "172.207.123.72": {
       "total_request_count": 140,
-      "junk_probe_count": 126
+      "junk_probe_count": 126,
+      "ip": "172.207.123.72"
     },
     "52.169.206.229": {
       "total_request_count": 126,
-      "junk_probe_count": 113
+      "junk_probe_count": 113,
+      "ip": "52.169.206.229"
     },
     "40.122.173.152": {
       "total_request_count": 107,
-      "junk_probe_count": 94
+      "junk_probe_count": 94,
+      "ip": "40.122.173.152"
     },
     "213.209.157.0/24": {
       "213.209.157.24": {
         "total_request_count": 7,
-        "junk_probe_count": 6
+        "junk_probe_count": 6,
+        "ip": "213.209.157.24"
       },
       "213.209.157.81": {
         "total_request_count": 4,
-        "junk_probe_count": 2
+        "junk_probe_count": 2,
+        "ip": "213.209.157.81"
       },
       "213.209.157.218": {
         "total_request_count": 4,
-        "junk_probe_count": 4
+        "junk_probe_count": 4,
+        "ip": "213.209.157.218"
       },
       "_summary": {
         "individual_ip_count": 3,
@@ -464,76 +560,94 @@
     },
     "4.196.100.43": {
       "total_request_count": 42,
-      "junk_probe_count": 33
+      "junk_probe_count": 33,
+      "ip": "4.196.100.43"
     },
     "20.171.103.96": {
       "total_request_count": 42,
-      "junk_probe_count": 33
+      "junk_probe_count": 33,
+      "ip": "20.171.103.96"
     },
     "13.79.87.25": {
       "total_request_count": 152,
-      "junk_probe_count": 113
+      "junk_probe_count": 113,
+      "ip": "13.79.87.25"
     },
     "54.153.203.13": {
       "total_request_count": 185,
-      "junk_probe_count": 128
+      "junk_probe_count": 128,
+      "ip": "54.153.203.13"
     },
     "91.232.238.153": {
       "total_request_count": 3,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "91.232.238.153"
     },
     "51.89.242.36": {
       "total_request_count": 3,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "51.89.242.36"
     },
     "196.127.22.62": {
       "total_request_count": 3,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "196.127.22.62"
     },
     "195.178.110.48": {
       "total_request_count": 31,
-      "junk_probe_count": 20
+      "junk_probe_count": 20,
+      "ip": "195.178.110.48"
     },
     "78.153.140.0/24": {
       "78.153.140.203": {
         "total_request_count": 6,
-        "junk_probe_count": 3
+        "junk_probe_count": 3,
+        "ip": "78.153.140.203"
       },
       "78.153.140.218": {
         "total_request_count": 45,
-        "junk_probe_count": 27
+        "junk_probe_count": 27,
+        "ip": "78.153.140.218"
       },
       "78.153.140.171": {
         "total_request_count": 2,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "78.153.140.171"
       },
       "78.153.140.195": {
         "total_request_count": 19,
-        "junk_probe_count": 9
+        "junk_probe_count": 9,
+        "ip": "78.153.140.195"
       },
       "78.153.140.224": {
         "total_request_count": 31,
-        "junk_probe_count": 29
+        "junk_probe_count": 29,
+        "ip": "78.153.140.224"
       },
       "78.153.140.176": {
         "total_request_count": 7,
-        "junk_probe_count": 6
+        "junk_probe_count": 6,
+        "ip": "78.153.140.176"
       },
       "78.153.140.179": {
         "total_request_count": 35,
-        "junk_probe_count": 25
+        "junk_probe_count": 25,
+        "ip": "78.153.140.179"
       },
       "78.153.140.178": {
         "total_request_count": 17,
-        "junk_probe_count": 11
+        "junk_probe_count": 11,
+        "ip": "78.153.140.178"
       },
       "78.153.140.128": {
         "total_request_count": 24,
-        "junk_probe_count": 11
+        "junk_probe_count": 11,
+        "ip": "78.153.140.128"
       },
       "78.153.140.222": {
         "total_request_count": 23,
-        "junk_probe_count": 12
+        "junk_probe_count": 12,
+        "ip": "78.153.140.222"
       },
       "_summary": {
         "individual_ip_count": 10,
@@ -544,11 +658,13 @@
     "62.60.131.0/24": {
       "62.60.131.204": {
         "total_request_count": 206,
-        "junk_probe_count": 127
+        "junk_probe_count": 127,
+        "ip": "62.60.131.204"
       },
       "62.60.131.138": {
         "total_request_count": 28,
-        "junk_probe_count": 18
+        "junk_probe_count": 18,
+        "ip": "62.60.131.138"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -559,19 +675,23 @@
     "45.148.10.0/24": {
       "45.148.10.244": {
         "total_request_count": 231,
-        "junk_probe_count": 109
+        "junk_probe_count": 109,
+        "ip": "45.148.10.244"
       },
       "45.148.10.242": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "45.148.10.242"
       },
       "45.148.10.248": {
         "total_request_count": 1,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "45.148.10.248"
       },
       "45.148.10.246": {
         "total_request_count": 12,
-        "junk_probe_count": 12
+        "junk_probe_count": 12,
+        "ip": "45.148.10.246"
       },
       "_summary": {
         "individual_ip_count": 4,
@@ -581,72 +701,89 @@
     },
     "34.245.21.225": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "34.245.21.225"
     },
     "13.125.122.236": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "13.125.122.236"
     },
     "131.196.48.84": {
       "total_request_count": 4,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "131.196.48.84"
     },
     "194.163.129.51": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "194.163.129.51"
     },
     "16.171.47.119": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "16.171.47.119"
     },
     "103.145.254.207": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "103.145.254.207"
     },
     "54.64.159.167": {
       "total_request_count": 4,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "54.64.159.167"
     },
     "103.151.125.117": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "103.151.125.117"
     },
     "13.208.226.1": {
       "total_request_count": 2,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "13.208.226.1"
     },
     "18.183.209.147": {
       "total_request_count": 4,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "18.183.209.147"
     },
     "20.165.250.133": {
       "total_request_count": 3,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "20.165.250.133"
     },
     "49.248.192.204": {
       "total_request_count": 3,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "49.248.192.204"
     },
     "64.227.151.89": {
       "total_request_count": 22,
-      "junk_probe_count": 6
+      "junk_probe_count": 6,
+      "ip": "64.227.151.89"
     },
     "162.243.15.109": {
       "total_request_count": 11,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "162.243.15.109"
     },
     "96.41.38.202": {
       "total_request_count": 32,
-      "junk_probe_count": 8
+      "junk_probe_count": 8,
+      "ip": "96.41.38.202"
     },
     "64.62.197.0/24": {
       "64.62.197.227": {
         "total_request_count": 4,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "64.62.197.227"
       },
       "64.62.197.212": {
         "total_request_count": 4,
-        "junk_probe_count": 1
+        "junk_probe_count": 1,
+        "ip": "64.62.197.212"
       },
       "_summary": {
         "individual_ip_count": 2,
@@ -656,49 +793,60 @@
     },
     "64.62.156.202": {
       "total_request_count": 5,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "64.62.156.202"
     },
     "47.130.1.73": {
       "total_request_count": 5,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "47.130.1.73"
     },
     "37.46.196.22": {
       "total_request_count": 7,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "37.46.196.22"
     },
     "157.230.116.90": {
       "total_request_count": 9,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "157.230.116.90"
     },
     "159.89.127.165": {
       "total_request_count": 31,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "159.89.127.165"
     },
     "46.101.1.225": {
       "total_request_count": 36,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "46.101.1.225"
     },
     "64.227.70.2": {
       "total_request_count": 36,
-      "junk_probe_count": 3
+      "junk_probe_count": 3,
+      "ip": "64.227.70.2"
     },
     "216.180.246.73": {
       "total_request_count": 30,
-      "junk_probe_count": 2
+      "junk_probe_count": 2,
+      "ip": "216.180.246.73"
     },
     "209.105.242.139": {
       "total_request_count": 23,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "209.105.242.139"
     },
     "45.119.85.39": {
       "total_request_count": 23,
       "restricted_path_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "45.119.85.39"
     },
     "79.132.192.233": {
       "total_request_count": 23,
       "restricted_path_count": 1,
-      "junk_probe_count": 1
+      "junk_probe_count": 1,
+      "ip": "79.132.192.233"
     }
   }
 }
