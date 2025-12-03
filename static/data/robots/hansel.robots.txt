@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /static/data/texts/transforms/html/plain
+Disallow: /static/data/texts/project_editions
+Disallow: /static/data/metadata/markdown
+Disallow: /static/data/texts/original_submissions
+Disallow: /static/data/video
