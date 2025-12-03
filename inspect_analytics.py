@@ -9,7 +9,6 @@ from collections import defaultdict, Counter
 """
 Usage: python inspect_analytics.py \
     --cache-file static/cache/analytics.db \
-    --output-file analytics_output.json \
     --top-n-ips 10
 """
 
