@@ -12,7 +12,7 @@ from purge_bad_crawlers import BLOCKED_NETWORKS
 from utils import parse_line
 
 """
-Usage: python learn_analytics.py \
+Usage: python generate_analytics.py \
   --access-dir static/data/access \
   --forbidden-dir static/data/forbidden \
   --robots-dir static/data/robots \
