@@ -6,10 +6,18 @@ import argparse
 import ipaddress
 from collections import defaultdict, Counter
 
+"""
+Usage: python inspect_analytics.py \
+    --cache-file static/cache/analytics.db \
+    --output-file analytics_output.json \
+    --top-n-ips 10
+"""
+
+
 def get_sort_key(item):
     """
-    Helper function to calculate the sort key (ratio) for an item in the
-    'not_yet_banned' dictionary. It handles both CIDR groups and lone IPs.
+    Helper function to calculate the sort key (combined violations) for an item.
+    It handles both CIDR groups and lone IPs.
     """
     key, value = item
     
@@ -20,12 +28,9 @@ def get_sort_key(item):
     else:
         counts = value
 
-    total = counts.get('total_request_count', 0)
     junk = counts.get('junk_probe_count', 0)
-
-    if total == 0:
-        return 0
-    return junk / total
+    restricted = counts.get('restricted_path_count', 0)
+    return junk + restricted
 
 def main(cache_file_path: str, output_file_path: str, top_n_ips: int):
     """
@@ -60,94 +65,91 @@ def main(cache_file_path: str, output_file_path: str, top_n_ips: int):
         except ValueError:
             temp_grouped_by_cidr["invalid_ips"][ip_str] = counts
 
-    final_not_yet_banned = {}
+    # --- Separate into CIDR groups and Lone IPs ---
+    cidr_groups_dict = {}
+    lone_ips_dict = {}
     for cidr, ips_in_group in temp_grouped_by_cidr.items():
         if len(ips_in_group) > 1:
             summary_counts = Counter()
-            # Add the count of unique IPs in the group to the summary
             summary_counts['individual_ip_count'] = len(ips_in_group)
             for ip, data in ips_in_group.items():
                 summary_counts.update(data)
             ips_in_group['_summary'] = dict(summary_counts)
-            final_not_yet_banned[cidr] = ips_in_group
+            cidr_groups_dict[cidr] = ips_in_group
         else:
             ip, data = ips_in_group.popitem()
-            final_not_yet_banned[ip] = data
+            lone_ips_dict[ip] = data
 
-    # --- Top 10 Individual IPs by Total Requests (not_yet_banned) ---
-    all_individual_ips_data = []
-    for key, value in final_not_yet_banned.items():
-        if '_summary' in value:  # This is a CIDR group
-            for ip, data in value.items():
-                if ip != '_summary':
-                    data['ip'] = ip
-                    all_individual_ips_data.append(data)
-        else:  # This is a lone IP
-            value['ip'] = key
-            all_individual_ips_data.append(value)
+    # --- Sort Each Category Independently ---
+    sorted_cidr_groups = sorted(cidr_groups_dict.items(), key=get_sort_key, reverse=True)
+    sorted_lone_ips = sorted(lone_ips_dict.items(), key=get_sort_key, reverse=True)
 
-    all_individual_ips_data.sort(key=lambda x: x.get('total_request_count', 0), reverse=True)
+    # --- Print Top N LONE IPs Table ---
+    print(f"\n--- Top {top_n_ips} Individual IPs by Combined Violations (not_yet_banned) ---")
+    headers_individual = ["IP Address", "Total Reqs", "Junk Probes", "Restricted", "Combined Violations", "Junk Ratio"]
+    header_fmt_individual = "{:<18} | {:>10} | {:>11} | {:>10} | {:>19} | {:>10}"
+    print(header_fmt_individual.format(*headers_individual))
+    print("-" * 100)
 
-    print(f"\n--- Top {top_n_ips} Individual IPs by Total Requests (not_yet_banned) ---")
-    headers = ["IP Address", "IPs", "Total Reqs", "Junk Probes", "Restricted", "Junk Ratio"]
-    header_fmt = "{:<18} | {:>3} | {:>10} | {:>11} | {:>10} | {:>10}"
-    print(header_fmt.format(*headers))
-    print("-" * 85)
-
-    for data in all_individual_ips_data[:top_n_ips]:
-        ip = data.get('ip', 'N/A')
+    for ip, data in sorted_lone_ips[:top_n_ips]:
         total_reqs = data.get('total_request_count', 0)
         junk_probes = data.get('junk_probe_count', 0)
         restricted = data.get('restricted_path_count', 0)
+        combined_violations = junk_probes + restricted
         ratio = (junk_probes / total_reqs) if total_reqs > 0 else 0
         
         row_data = [
             ip,
-            1,
             f"{total_reqs:,}",
             f"{junk_probes:,}",
             f"{restricted:,}",
+            f"{combined_violations:,}",
             f"{ratio:.2%}"
         ]
-        print(header_fmt.format(*row_data))
-    print("-" * 85)
-    # --- End Top 10 Individual IPs ---
+        print(header_fmt_individual.format(*row_data))
+    print("-" * 100)
+    print(f"\nDisplayed top {len(sorted_lone_ips[:top_n_ips])} of {len(sorted_lone_ips)} total lone IPs.")
+    # --- End Top N Individual IPs ---
 
-    # --- Sorting Logic ---
-    sorted_items = sorted(final_not_yet_banned.items(), key=get_sort_key, reverse=True)
-    sorted_not_yet_banned = dict(sorted_items)
-    all_analytics['not_yet_banned'] = sorted_not_yet_banned
-    # --- End Sorting ---
-
-    # --- Print Summary Table to Console ---
+    # --- Print Top N CIDR Group Summary Table ---
     print("\n--- CIDR Group Summary (not_yet_banned) ---")
-    headers = ["CIDR Block", "IPs", "Total Reqs", "Junk Probes", "Restricted", "Junk Ratio"]
-    header_fmt = "{:<18} | {:>5} | {:>10} | {:>11} | {:>10} | {:>10}"
-    print(header_fmt.format(*headers))
-    print("-" * 85)
+    headers_cidr = ["CIDR Block", "IPs", "Total Reqs", "Junk Probes", "Restricted", "Combined Violations", "Avg Violations/IP", "Junk Ratio"]
+    header_fmt_cidr = "{:<18} | {:>5} | {:>10} | {:>11} | {:>10} | {:>19} | {:>17} | {:>10}"
+    print(header_fmt_cidr.format(*headers_cidr))
+    print("-" * 120)
 
-    for key, value in sorted_not_yet_banned.items():
-        if '_summary' in value:
-            summary = value['_summary']
-            cidr = key
-            ip_count = summary.get('individual_ip_count', 0)
-            total_reqs = summary.get('total_request_count', 0)
-            junk_probes = summary.get('junk_probe_count', 0)
-            restricted = summary.get('restricted_path_count', 0)
-            ratio = (junk_probes / total_reqs) if total_reqs > 0 else 0
-            
-            row_data = [
-                cidr,
-                ip_count,
-                f"{total_reqs:,}",
-                f"{junk_probes:,}",
-                f"{restricted:,}",
-                f"{ratio:.2%}"
-            ]
-            print(header_fmt.format(*row_data))
+    total_ips_in_displayed_cidrs = 0
+    for cidr, value in sorted_cidr_groups[:top_n_ips]:
+        summary = value['_summary']
+        ip_count = summary.get('individual_ip_count', 0)
+        total_reqs = summary.get('total_request_count', 0)
+        junk_probes = summary.get('junk_probe_count', 0)
+        restricted = summary.get('restricted_path_count', 0)
+        combined_violations = junk_probes + restricted
+        avg_violations_per_ip = (combined_violations / ip_count) if ip_count > 0 else 0
+        ratio = (junk_probes / total_reqs) if total_reqs > 0 else 0
+        
+        row_data = [
+            cidr,
+            ip_count,
+            f"{total_reqs:,}",
+            f"{junk_probes:,}",
+            f"{restricted:,}",
+            f"{combined_violations:,}",
+            f"{avg_violations_per_ip:.2f}",
+            f"{ratio:.2%}"
+        ]
+        print(header_fmt_cidr.format(*row_data))
+        total_ips_in_displayed_cidrs += ip_count
     
-    print("-" * 85)
+    print("-" * 120)
+    print(f"\nDisplayed top {len(sorted_cidr_groups[:top_n_ips])} of {len(sorted_cidr_groups)} total CIDR blocks, comprising {total_ips_in_displayed_cidrs:,} individual IPs.")
     # --- End Summary Table ---
+
+    # --- Final JSON Output ---
+    # Combine sorted lists back for a comprehensive, sorted JSON output
+    all_sorted_items = sorted(list(cidr_groups_dict.items()) + list(lone_ips_dict.items()), key=get_sort_key, reverse=True)
+    all_analytics['not_yet_banned'] = dict(all_sorted_items)
 
     try:
         with open(output_file_path, 'w') as f:
