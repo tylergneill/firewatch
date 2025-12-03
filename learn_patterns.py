@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import argparse
 import datetime
+import ipaddress
 import pathlib
 import re
 import shelve
 import sys
-from collections import defaultdict
+from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 
 from utils import parse_line
+
+from purge_bad_crawlers import BLOCKED_CIDRS, BLOCKED_NETWORKS
 
 # --- Junk Probe Logic (from purge_bad_crawlers.py) ---
 JUNK_PROBE_PATTERNS = [
@@ -29,9 +32,24 @@ def is_junk_probe(uri_str: str) -> bool:
             return True
     return False
 
+def get_ip_category_and_key(ip_str: str):
+    """
+    Categorizes an IP as 'already_banned' or 'not_yet_banned' and
+    returns the appropriate key (CIDR for banned, IP for not banned).
+    """
+    if not ip_str:
+        return None, None
+    try:
+        ip_addr = ipaddress.ip_address(ip_str)
+        for network in BLOCKED_NETWORKS:
+            if ip_addr in network:
+                return "already_banned", str(network)
+    except ValueError:
+        return None, None
+    return "not_yet_banned", ip_str
+
 def get_app_name_from_filename(filename: str) -> str:
     """Extracts the application name from a log file name."""
-    # Covers names like 'hansel-app.access.log-DATE' or 'panditya-stg-app.forbidden.log'
     parts = filename.split('-app.')
     return parts[0] if parts else "unknown"
 
@@ -43,7 +61,6 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
     forbidden_path = pathlib.Path(forbidden_dir)
     robots_path = pathlib.Path(robots_dir)
 
-    # --- Step 1: Gather all unique IPs from forbidden logs ---
     print("Step 1: Gathering unique IPs from forbidden logs...")
     forbidden_ips = set()
     forbidden_log_files = list(forbidden_path.rglob('*.log*'))
@@ -55,23 +72,23 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
                     forbidden_ips.add(p['ip'])
     print(f"  - Found {len(forbidden_ips)} unique IPs in forbidden logs.")
 
-    # --- Step 2: Load robots.txt files ---
     print("Step 2: Loading robots.txt files...")
     robot_parsers = {}
     robot_files = list(robots_path.glob('*.robots.txt'))
     for robot_file in robot_files:
         app_name = robot_file.stem.replace('.robots', '')
         parser = RobotFileParser()
-        parser.set_url(f"http://{app_name}.com/robots.txt") # Base URL is arbitrary
+        parser.set_url(f"http://{app_name}.com/robots.txt")
         with robot_file.open('r') as f:
             parser.parse(f.readlines())
         robot_parsers[app_name] = parser
         print(f"  - Loaded rules for '{app_name}'")
 
-    # --- Step 3: Process all logs to build analytics ---
     print("Step 3: Processing all log files to build analytics...")
-    # Structure: {ip: {date: {counter: value}}}
-    analytics = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    analytics = {
+        "already_banned": defaultdict(Counter),
+        "not_yet_banned": defaultdict(Counter)
+    }
     
     all_log_files = list(access_path.rglob('*.log*')) + forbidden_log_files
     print(f"  - Found {len(all_log_files)} total log files to process.")
@@ -84,39 +101,29 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
         with log_file.open('rb') as f:
             for line in f:
                 p = parse_line(line)
-                if not (p and p.get('ip') in forbidden_ips and p.get('time')):
+                if not (p and p.get('ip') in forbidden_ips):
                     continue
                 
                 ip = p['ip']
-                datestamp = p['time'].date().isoformat()
                 path = p.get('path', '')
                 ua = p.get('ua', '*')
 
-                # Increment total requests
-                analytics[ip][datestamp]['total_request_count'] += 1
+                category, key = get_ip_category_and_key(ip)
+                if not category:
+                    continue
 
-                # Increment junk probe count
+                analytics[category][key]['total_request_count'] += 1
                 if is_junk_probe(path):
-                    analytics[ip][datestamp]['junk_probe_count'] += 1
-                
-                # Increment restricted path count
+                    analytics[category][key]['junk_probe_count'] += 1
                 if robot_parser and not robot_parser.can_fetch(ua, path):
-                    analytics[ip][datestamp]['restricted_path_count'] += 1
+                    analytics[category][key]['restricted_path_count'] += 1
 
     print("\n  - Log processing complete.")
 
-    # --- Step 4: Write analytics to shelve cache ---
     print(f"Step 4: Writing analytics to cache file: {cache_file}")
     with shelve.open(cache_file, 'c') as cache:
-        for ip, date_data in analytics.items():
-            if ip not in cache:
-                cache[ip] = {}
-            
-            # shelve requires assigning a modified object back to the key
-            ip_cache_data = cache[ip]
-            for datestamp, counts in date_data.items():
-                ip_cache_data[datestamp] = dict(counts)
-            cache[ip] = ip_cache_data
+        cache['already_banned'] = {k: dict(v) for k, v in analytics['already_banned'].items()}
+        cache['not_yet_banned'] = {k: dict(v) for k, v in analytics['not_yet_banned'].items()}
             
     print("Learn patterns script finished successfully.")
 
