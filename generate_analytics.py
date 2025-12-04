@@ -6,6 +6,7 @@ import re
 import shelve
 import sys
 import datetime
+import json
 from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
@@ -169,11 +170,14 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
             'ips': list(data['ips'])
         }
 
+    # Brute-force sanitization with a JSON cycle to ensure no complex objects remain
+    sanitized_analytics = json.loads(json.dumps(final_analytics))
+
     try:
         with shelve.open(cache_file, 'c') as cache:
-            cache['already_banned'] = final_analytics['already_banned']
-            cache['not_yet_banned'] = final_analytics['not_yet_banned']
-            cache['access_only'] = final_analytics['access_only']
+            cache['already_banned'] = sanitized_analytics['already_banned']
+            cache['not_yet_banned'] = sanitized_analytics['not_yet_banned']
+            cache['access_only'] = sanitized_analytics['access_only']
         print("Analytics generation finished successfully.")
     except Exception as e:
         print(f"Error writing to cache: {e}", file=sys.stderr)
