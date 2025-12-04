@@ -4,6 +4,8 @@ import ipaddress
 import pathlib
 import re
 import shelve
+import sys
+import datetime
 from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
@@ -154,20 +156,28 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
 
     # --- Step 4: Write analytics to shelve cache ---
     print(f"Step 4: Writing analytics to cache file: {cache_file}")
-    with shelve.open(cache_file, 'c') as cache:
-        # Convert defaultdicts and sets to plain dicts and lists for shelving
-        banned_cache_data = {}
-        for cidr, data in analytics['already_banned'].items():
-            banned_cache_data[cidr] = {
-                'counts': dict(data['counts']),
-                'ips': list(data['ips'])
-            }
-        cache['already_banned'] = banned_cache_data
-        
-        cache['not_yet_banned'] = {k: dict(v) for k, v in analytics['not_yet_banned'].items()}
-        cache['access_only'] = {k: dict(v) for k, v in analytics['access_only'].items()}
-            
-    print("Learn patterns script finished successfully.")
+
+    # Explicitly convert all complex types to basic types before shelving
+    final_analytics = {
+        'not_yet_banned': {k: dict(v) for k, v in analytics['not_yet_banned'].items()},
+        'access_only': {k: dict(v) for k, v in analytics['access_only'].items()},
+        'already_banned': {}
+    }
+    for cidr, data in analytics['already_banned'].items():
+        final_analytics['already_banned'][cidr] = {
+            'counts': dict(data['counts']),
+            'ips': list(data['ips'])
+        }
+
+    try:
+        with shelve.open(cache_file, 'c') as cache:
+            cache['already_banned'] = final_analytics['already_banned']
+            cache['not_yet_banned'] = final_analytics['not_yet_banned']
+            cache['access_only'] = final_analytics['access_only']
+        print("Analytics generation finished successfully.")
+    except Exception as e:
+        print(f"Error writing to cache: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
