@@ -103,7 +103,8 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
     print("Step 3: Processing all log files to build analytics...")
     analytics = {
         "already_banned": defaultdict(lambda: {'counts': Counter(), 'ips': set()}),
-        "not_yet_banned": defaultdict(Counter)
+        "not_yet_banned": defaultdict(Counter),
+        "access_only": defaultdict(Counter)
     }
     
     all_log_files = list(access_path.rglob('*.log*')) + forbidden_log_files
@@ -114,28 +115,35 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
         for log_file in all_log_files:
             app_name = get_app_name_from_filename(log_file.name)
             robot_parser = robot_parsers.get(app_name)
+            is_in_access_dir = log_file.is_relative_to(access_path)
 
             with log_file.open('rb') as f:
                 for line in f:
                     pbar.update(len(line))
-                    if not (p := parse_line(line)) or not (p.get('ip') in forbidden_ips):
+                    if not (p := parse_line(line)):
                         continue
                     
                     ip = p['ip']
                     path = p.get('path', '')
                     ua = p.get('ua', '*')
 
-                    category, key = get_ip_category_and_key(ip)
-                    if not category:
-                        continue
-                    
-                    # Get the correct dictionary to update
-                    if category == "already_banned":
-                        target_dict = analytics[category][key]['counts']
-                        analytics[category][key]['ips'].add(ip)
-                    else:
+                    # Determine category and process
+                    if ip in forbidden_ips:
+                        category, key = get_ip_category_and_key(ip)
+                        if not category: continue
+                        
+                        if category == "already_banned":
+                            target_dict = analytics[category][key]['counts']
+                            analytics[category][key]['ips'].add(ip)
+                        else: # not_yet_banned
+                            target_dict = analytics[category][key]
+                    elif is_in_access_dir:
+                        category = "access_only"
+                        key = ip
                         target_dict = analytics[category][key]
-
+                    else:
+                        continue # Skip lines from forbidden dir whose IP wasn't in the initial set for some reason
+                    
                     target_dict['total_request_count'] += 1
                     if is_junk_probe(path):
                         target_dict['junk_probe_count'] += 1
@@ -157,6 +165,7 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
         cache['already_banned'] = banned_cache_data
         
         cache['not_yet_banned'] = {k: dict(v) for k, v in analytics['not_yet_banned'].items()}
+        cache['access_only'] = {k: dict(v) for k, v in analytics['access_only'].items()}
             
     print("Learn patterns script finished successfully.")
 
