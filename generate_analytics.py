@@ -11,36 +11,16 @@ from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
 
-from purge_bad_crawlers import BLOCKED_NETWORKS
+from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils import parse_line
 
 """
 Usage: python generate_analytics.py \
   --access-dir static/data/access \
-  --forbidden-dir static/data/forbidden \
+  --junk-dir static/data/junk \
   --robots-dir static/data/robots \
   --cache-file static/cache/analytics.db
 """
-
-# --- Junk Probe Logic (from purge_bad_crawlers.py) ---
-JUNK_PROBE_PATTERNS = [
-    r"\.git(/|$)",
-    r"(^|/)\.env",
-    r"/(env|git|config|configs|conf|settings|production|app|home)\.zip$",
-    r"\.php$",
-    r"/cgi-bin/",
-]
-JUNK_PROBE_REGEXES = [re.compile(p, re.IGNORECASE) for p in JUNK_PROBE_PATTERNS]
-
-
-def is_junk_probe(uri_str: str) -> bool:
-    """Checks if a given request URI is a junk/security probe."""
-    if not uri_str:
-        return False
-    for regex in JUNK_PROBE_REGEXES:
-        if regex.search(uri_str):
-            return True
-    return False
 
 
 def get_ip_category_and_key(ip_str: str):
@@ -66,29 +46,29 @@ def get_app_name_from_filename(filename: str) -> str:
     return parts[0] if parts else "unknown"
 
 
-def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
+def main(access_dir: str, junk_dir: str, robots_dir: str, cache_file: str):
     """
-    Analyzes log files to learn patterns about IPs found in forbidden logs.
+    Analyzes log files to learn patterns about IPs found in junk logs.
     """
     access_path = pathlib.Path(access_dir)
-    forbidden_path = pathlib.Path(forbidden_dir)
+    junk_path = pathlib.Path(junk_dir)
     robots_path = pathlib.Path(robots_dir)
 
-    print("Step 1: Gathering unique IPs from forbidden logs...")
-    forbidden_ips = set()
-    forbidden_log_files = list(forbidden_path.rglob('*.log*'))
+    print("Step 1: Gathering unique IPs from junk logs...")
+    junk_ips = set()
+    junk_log_files = list(junk_path.rglob('*.log*'))
     
-    total_size = sum(f.stat().st_size for f in forbidden_log_files)
-    with tqdm(total=total_size, unit='B', unit_scale=True, desc="Gathering Forbidden IPs") as pbar:
-        for log_file in forbidden_log_files:
+    total_size = sum(f.stat().st_size for f in junk_log_files)
+    with tqdm(total=total_size, unit='B', unit_scale=True, desc="Gathering Junk IPs") as pbar:
+        for log_file in junk_log_files:
             with log_file.open('rb') as f:
                 for line in f:
                     p = parse_line(line)
                     if p and p.get('ip'):
-                        forbidden_ips.add(p['ip'])
+                        junk_ips.add(p['ip'])
                     pbar.update(len(line))
 
-    print(f"  - Found {len(forbidden_ips)} unique IPs in forbidden logs.")
+    print(f"  - Found {len(junk_ips)} unique IPs in junk logs.")
 
     print("Step 2: Loading robots.txt files...")
     robot_parsers = {}
@@ -110,7 +90,7 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
         "access_only": defaultdict(Counter)
     }
     
-    all_log_files = list(access_path.rglob('*.log*')) + forbidden_log_files
+    all_log_files = list(access_path.rglob('*.log*')) + junk_log_files
     print(f"  - Found {len(all_log_files)} total log files to process.")
 
     total_size = sum(f.stat().st_size for f in all_log_files)
@@ -131,7 +111,7 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
                     ua = p.get('ua', '*')
 
                     # Determine category and process
-                    if ip in forbidden_ips:
+                    if ip in junk_ips:
                         category, key = get_ip_category_and_key(ip)
                         if not category: continue
                         
@@ -145,7 +125,7 @@ def main(access_dir: str, forbidden_dir: str, robots_dir: str, cache_file: str):
                         key = ip
                         target_dict = analytics[category][key]
                     else:
-                        continue # Skip lines from forbidden dir whose IP wasn't in the initial set for some reason
+                        continue # Skip lines from junk dir whose IP wasn't in the initial set for some reason
                     
                     target_dict['total_request_count'] += 1
                     if is_junk_probe(path):
@@ -194,9 +174,9 @@ if __name__ == "__main__":
         help="The input directory containing access log files."
     )
     parser.add_argument(
-        '--forbidden-dir',
-        default='static/data/forbidden',
-        help="The input directory containing forbidden log files."
+        '--junk-dir',
+        default='static/data/junk',
+        help="The input directory containing junk log files."
     )
     parser.add_argument(
         '--robots-dir',

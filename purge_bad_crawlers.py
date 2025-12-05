@@ -1,52 +1,20 @@
 #!/usr/bin/env python3
 import argparse
-import ipaddress
 import pathlib
 import re
 import shelve
 import sys
 from collections import deque, defaultdict
 
+from utils import parse_line
+from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
+
 """
 Usage: python purge_bad_crawlers.py \
   --data-dir static/data/access \
-  --forbidden-dir static/data/forbidden \
+  --junk-dir static/data/junk \
   --cache-file static/cache/firewatch_cache.db
 """
-
-# --- Configuration ---
-BLOCKED_CIDRS = [
-    "146.174.0.0/16",
-    "202.76.0.0/16",
-    "8.160.0.0/16",
-    "47.82.0.0/16",
-]
-
-# --- Pre-compile networks for performance ---
-BLOCKED_NETWORKS = [ipaddress.ip_network(cidr) for cidr in BLOCKED_CIDRS]
-
-
-# --- New Configuration for Junk Probes ---
-JUNK_PROBE_PATTERNS = [
-    r"\.git(/|$)",
-    r"(^|/)\.env",
-    r"/(env|git|config|configs|conf|settings|production|app|home)\.zip$",
-    r"\.php$",
-    r"/cgi-bin/",
-]
-
-# --- Pre-compile junk regexes for performance ---
-JUNK_PROBE_REGEXES = [re.compile(p, re.IGNORECASE) for p in JUNK_PROBE_PATTERNS]
-
-
-def is_junk_probe(uri_str: str) -> bool:
-    """Checks if a given request URI is a junk/security probe."""
-    if not uri_str:
-        return False
-    for regex in JUNK_PROBE_REGEXES:
-        if regex.search(uri_str):
-            return True
-    return False
 
 
 def is_ip_blocked(ip_str: str) -> bool:
@@ -64,15 +32,15 @@ def is_ip_blocked(ip_str: str) -> bool:
     return False
 
 
-def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
+def process_log_file(log_path: pathlib.Path, junk_dir: pathlib.Path):
     """
     Reads a log file, separates lines based on IP or junk URI, overwrites
-    the original with clean lines, and writes blocked lines to the forbidden
+    the original with clean lines, and writes blocked lines to the junk
     directory.
     """
     print(f"  Processing: {log_path}...")
     good_lines = deque()
-    forbidden_lines = deque()
+    junk_lines = deque()
 
     try:
         with log_path.open('rb') as f:
@@ -99,7 +67,7 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
                     continue
 
                 if is_ip_blocked(ip) or is_junk_probe(uri):
-                    forbidden_lines.append(line_bytes)
+                    junk_lines.append(line_bytes)
                 else:
                     good_lines.append(line_bytes)
     except FileNotFoundError:
@@ -109,21 +77,21 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
         print(f"    - Error reading file {log_path}: {e}")
         return None, None
     
-    # --- Write forbidden logs ---
-    if forbidden_lines:
+    # --- Write junk logs ---
+    if junk_lines:
         # Construct the output path
         relative_path = log_path.relative_to(log_path.parent.parent)  # e.g., panditya-archive/log-file
-        forbidden_path = forbidden_dir / relative_path
-        forbidden_path.parent.mkdir(parents=True, exist_ok=True)
+        junk_path = junk_dir / relative_path
+        junk_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Add .forbidden suffix
-        final_forbidden_path = forbidden_path.with_name(forbidden_path.name.replace(".access.log", ".forbidden.log"))
+        # Add .junk suffix
+        final_junk_path = junk_path.with_name(junk_path.name.replace(".access.log", ".junk.log"))
 
-        with final_forbidden_path.open('ab') as f:
-            f.writelines(forbidden_lines)
-        print(f"    - Wrote {len(forbidden_lines)} lines to {final_forbidden_path}")
+        with final_junk_path.open('ab') as f:
+            f.writelines(junk_lines)
+        print(f"    - Wrote {len(junk_lines)} lines to {final_junk_path}")
     else:
-        print(f"    - No forbidden lines found in {log_path.name}.")
+        print(f"    - No junk lines found in {log_path.name}.")
 
     # --- Overwrite original with purified logs ---
     with log_path.open('wb') as f:
@@ -131,28 +99,28 @@ def process_log_file(log_path: pathlib.Path, forbidden_dir: pathlib.Path):
     
     print(f"    - Rewrote original file with {len(good_lines)} lines.")
     
-    return len(good_lines), len(forbidden_lines)
+    return len(good_lines), len(junk_lines)
 
 
-def main(data_dir: str, forbidden_dir: str, cache_file: str):
+def main(data_dir: str, junk_dir: str, cache_file: str):
     """
     Main function to find and process all log files.
     """
     data_path = pathlib.Path(data_dir)
-    forbidden_path = pathlib.Path(forbidden_dir)
+    junk_path = pathlib.Path(junk_dir)
 
     if not data_path.is_dir():
         print(f"Error: Data directory not found at '{data_dir}'")
         sys.exit(1)
 
     print(f"Starting crawler purge for directory: {data_path}")
-    print(f"Forbidden logs will be written to: {forbidden_path}")
+    print(f"Junk logs will be written to: {junk_path}")
     print(f"Purging cache entries from: {cache_file}")
 
     log_files = sorted(data_path.rglob('*.access.log*'))
     print(f"Found {len(log_files)} log files to process.\n")
 
-    app_stats = defaultdict(lambda: {'good': 0, 'newly_forbidden': 0})
+    app_stats = defaultdict(lambda: {'good': 0, 'newly_junk': 0})
 
     with shelve.open(cache_file) as cache:
         for log_file in log_files:
@@ -160,13 +128,13 @@ def main(data_dir: str, forbidden_dir: str, cache_file: str):
                 app_name_parts = log_file.name.split('-app.access.log')
                 app_name = app_name_parts[0] if app_name_parts else "unknown"
 
-                good_count, forbidden_count = process_log_file(log_file, forbidden_path)
+                good_count, junk_count = process_log_file(log_file, junk_path)
                 if good_count is not None:
                     app_stats[app_name]['good'] += good_count
-                    app_stats[app_name]['newly_forbidden'] += forbidden_count
+                    app_stats[app_name]['newly_junk'] += junk_count
 
                     # If we purged lines, the cache is stale and must be deleted.
-                    if forbidden_count > 0:
+                    if junk_count > 0:
                         # Use the absolute path as the key, just like the web app does.
                         log_file_key = str(log_file.resolve())
                         if log_file_key in cache:
@@ -175,53 +143,53 @@ def main(data_dir: str, forbidden_dir: str, cache_file: str):
 
     # --- Start Final Report Calculation ---
     print("\nCalculating final totals...")
-    total_forbidden_stats = defaultdict(int)
-    if forbidden_path.is_dir():
-        forbidden_files = list(forbidden_path.rglob('*.forbidden'))
-        for f_file in forbidden_files:
-            app_name_parts = f_file.name.split('-app.access.log')
+    total_junk_stats = defaultdict(int)
+    if junk_path.is_dir():
+        junk_files = list(junk_path.rglob('*.junk'))
+        for j_file in junk_files:
+            app_name_parts = j_file.name.split('-app.access.log')
             app_name = app_name_parts[0] if app_name_parts else "unknown"
-            with f_file.open('rb') as f:
+            with j_file.open('rb') as f:
                 # Fast line counting
                 lines = sum(1 for _ in f)
-                total_forbidden_stats[app_name] += lines
+                total_junk_stats[app_name] += lines
     
     print("\n--- Purge Summary ---")
-    header = f"{'Application':<25} | {'Original Lines':>15} | {'Just Purged':>15} | {'Total Forbidden':>15} | {'% Purged (Overall)':>20}"
+    header = f"{'Application':<25} | {'Original Lines':>15} | {'Just Purged':>15} | {'Total Junk':>15} | {'% Purged (Overall)':>20}"
     print(header)
     print("-" * len(header))
 
     grand_total_good = 0
     grand_total_newly_purged = 0
-    grand_total_forbidden = 0
+    grand_total_junk = 0
 
     # Combine keys from both stats dicts to not miss any app
-    all_app_names = sorted(list(set(app_stats.keys()) | set(total_forbidden_stats.keys())))
+    all_app_names = sorted(list(set(app_stats.keys()) | set(total_junk_stats.keys())))
 
     for app_name in all_app_names:
         stats = app_stats[app_name]
         good_lines_in_run = stats['good']
-        newly_purged = stats['newly_forbidden']
+        newly_purged = stats['newly_junk']
         
-        total_in_forbidden_file = total_forbidden_stats[app_name]
+        total_in_junk_file = total_junk_stats[app_name]
         
-        # As per user request: Original Lines = (Lines in purified file) + (Total lines in forbidden file)
+        # As per user request: Original Lines = (Lines in purified file) + (Total lines in junk file)
         # Note: 'good_lines_in_run' is the count *after* the current purge.
-        true_original_lines = good_lines_in_run + total_in_forbidden_file
+        true_original_lines = good_lines_in_run + total_in_junk_file
 
         grand_total_good += good_lines_in_run
         grand_total_newly_purged += newly_purged
         
-        percent_purged_overall = (total_in_forbidden_file / true_original_lines * 100) if true_original_lines > 0 else 0
+        percent_purged_overall = (total_in_junk_file / true_original_lines * 100) if true_original_lines > 0 else 0
         
-        print(f"{app_name:<25} | {true_original_lines:>15,d} | {newly_purged:>15,d} | {total_in_forbidden_file:>15,d} | {percent_purged_overall:>19.2f}%")
+        print(f"{app_name:<25} | {true_original_lines:>15,d} | {newly_purged:>15,d} | {total_in_junk_file:>15,d} | {percent_purged_overall:>19.2f}%")
 
-    grand_total_forbidden = sum(total_forbidden_stats.values())
-    grand_total_original_overall = grand_total_good + grand_total_forbidden
+    grand_total_junk = sum(total_junk_stats.values())
+    grand_total_original_overall = grand_total_good + grand_total_junk
 
     print("-" * len(header))
-    total_percent_purged_overall = (grand_total_forbidden / grand_total_original_overall * 100) if grand_total_original_overall > 0 else 0
-    print(f"{'Total':<25} | {grand_total_original_overall:>15,d} | {grand_total_newly_purged:>15,d} | {grand_total_forbidden:>15,d} | {total_percent_purged_overall:>19.2f}%")
+    total_percent_purged_overall = (grand_total_junk / grand_total_original_overall * 100) if grand_total_original_overall > 0 else 0
+    print(f"{'Total':<25} | {grand_total_original_overall:>15,d} | {grand_total_newly_purged:>15,d} | {grand_total_junk:>15,d} | {total_percent_purged_overall:>19.2f}%")
     print("\nPurge complete.")
 
 
@@ -235,9 +203,9 @@ if __name__ == "__main__":
         help="The input directory containing log files (e.g., ../firewatch-data)."
     )
     parser.add_argument(
-        '--forbidden-dir',
-        default='static/data/forbidden',
-        help="The output directory for forbidden log entries."
+        '--junk-dir',
+        default='static/data/junk',
+        help="The output directory for junk log entries."
     )
     parser.add_argument(
         '--cache-file',
@@ -247,4 +215,4 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    main(args.data_dir, args.forbidden_dir, args.cache_file)
+    main(args.data_dir, args.junk_dir, args.cache_file)
