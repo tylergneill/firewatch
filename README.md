@@ -22,8 +22,8 @@ Taken together, Firewatch removes the most obvious and voluminous garbage at the
 
 *   **Web UI (`flask_app.py`)**: The main interface for viewing and analyzing log data from the cache.
 *   **Offline Analytics Scripts**: A suite of tools for processing and analyzing logs offline.
-    *   `purge_bad_crawlers.py`: Retroactively sorts log entries into `access` and `junk` directories based on an evolving set of rules (e.g., junk probes, banned CIDRs).
-    *   `generate_analytics.py`: Processes all access and junk logs to build a detailed analytics database, identifying patterns of abuse.
+    *   `reclassify_past_junk.py`: Retroactively sorts log entries into `access` and `junk` directories based on an evolving set of rules (e.g., junk probes, banned CIDRs).
+    *   `recognize_junk_in_access.py`: Processes all access and junk logs to build a detailed analytics database, identifying patterns of abuse.
     *   `inspect_analytics.py`: Reads the analytics database to produce a human-readable summary report in the console and an optional JSON output file.
 
 ## Setup and Installation
@@ -71,16 +71,16 @@ There are two ways to run the web application:
 
 The core analysis is performed by a series of Python scripts. They should generally be run in the following order.
 
-1.  **Purge Bad Crawlers:**
+1.  **Reclassify Past Abuse:**
     This script moves requests from known bad IPs or matching junk patterns from the `access` logs to the `junk` logs. It's safe to run this multiple times.
     ```bash
-    python purge_bad_crawlers.py
+    python reclassify_past_junk.py
     ```
 
-2.  **Generate Analytics Cache:**
+2.  **Recognize Unblocked Abuse:**
     After cleaning the logs, run this script to process all logs and build the analytics cache.
     ```bash
-    python generate_analytics.py
+    python recognize_junk_in_access.py
     ```
 
 3.  **Inspect Analytics:**
