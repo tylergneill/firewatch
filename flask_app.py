@@ -38,11 +38,6 @@ app_names += [
     if app_name != "splitter-server"
 ]
 
-LOG_FILES = {
-    app_name: LOG_FILE_PATH / f"{app_name}-archive"
-    for app_name in app_names
-}
-
 HTTP_STATUS_CODES = {
     '200': 'OK',
     '201': 'Created',
@@ -157,7 +152,7 @@ def index():
 
     with shelve.open(CACHE_FILE) as cache:
         for app_name in selected_apps:
-            log_files_for_app = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+            log_files_for_app = get_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
             
             for log_file in log_files_for_app:
                 log_file_str = str(log_file.resolve())

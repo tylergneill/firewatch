@@ -140,12 +140,12 @@ def find_archived_logs_for_daterange(dir_path, start_date, end_date):
     return sorted(list(log_files))
 
 
-def get_log_sources_for_app(app_name, log_files_config, log_file_main_path, start_date, end_date):
+def get_log_sources_for_app(app_name, data_dir, start_date, end_date):
     """
     Finds all relevant log files for a given app and date range,
     including archived files and the current log file.
     """
-    archive_dir = log_files_config[app_name]
+    archive_dir = data_dir / f"{app_name}-archive" / "access"
 
     log_files = set()
     delta = end_date - start_date
@@ -159,7 +159,7 @@ def get_log_sources_for_app(app_name, log_files_config, log_file_main_path, star
     # Add the current log if the selected date range includes today.
     today = datetime.date.today()
     if start_date <= today and today <= end_date:
-        current_log_path = log_file_main_path / f"{app_name}-app.access.log"
+        current_log_path = data_dir / f"{app_name}-app.access.log"
         if current_log_path.is_file():
             log_files.add(current_log_path)
 

@@ -15,9 +15,9 @@ from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils import parse_line
 
 """
-Usage: python generate_analytics.py \
-  --access-dir static/data/access \
-  --junk-dir static/data/junk \
+Usage: python recognize_junk_in_access.py \
+  --access-dir static/data \
+  --junk-dir static/data \
   --robots-dir static/data/robots \
   --cache-file static/cache/analytics.db
 """
@@ -46,17 +46,18 @@ def get_app_name_from_filename(filename: str) -> str:
     return parts[0] if parts else "unknown"
 
 
-def main(access_dir: str, junk_dir: str, robots_dir: str, cache_file: str):
+def main(data_dir: str, robots_dir: str, cache_file: str):
     """
     Analyzes log files to learn patterns about IPs found in junk logs.
     """
-    access_path = pathlib.Path(access_dir)
-    junk_path = pathlib.Path(junk_dir)
+    data_path = pathlib.Path(data_dir)
     robots_path = pathlib.Path(robots_dir)
+
+    all_log_files = list(data_path.rglob('*.log*'))
+    junk_log_files = [f for f in all_log_files if '.junk.' in f.name]
 
     print("Step 1: Gathering unique IPs from junk logs...")
     junk_ips = set()
-    junk_log_files = list(junk_path.rglob('*.log*'))
     
     total_size = sum(f.stat().st_size for f in junk_log_files)
     with tqdm(total=total_size, unit='B', unit_scale=True, desc="Gathering Junk IPs") as pbar:
@@ -90,7 +91,6 @@ def main(access_dir: str, junk_dir: str, robots_dir: str, cache_file: str):
         "access_only": defaultdict(Counter)
     }
     
-    all_log_files = list(access_path.rglob('*.log*')) + junk_log_files
     print(f"  - Found {len(all_log_files)} total log files to process.")
 
     total_size = sum(f.stat().st_size for f in all_log_files)
@@ -98,7 +98,7 @@ def main(access_dir: str, junk_dir: str, robots_dir: str, cache_file: str):
         for log_file in all_log_files:
             app_name = get_app_name_from_filename(log_file.name)
             robot_parser = robot_parsers.get(app_name)
-            is_in_access_dir = log_file.is_relative_to(access_path)
+            is_access_log = '.access.' in log_file.name
 
             with log_file.open('rb') as f:
                 for line in f:
@@ -120,7 +120,7 @@ def main(access_dir: str, junk_dir: str, robots_dir: str, cache_file: str):
                             analytics[category][key]['ips'].add(ip)
                         else: # not_yet_banned
                             target_dict = analytics[category][key]
-                    elif is_in_access_dir:
+                    elif is_access_log:
                         category = "access_only"
                         key = ip
                         target_dict = analytics[category][key]
@@ -169,14 +169,9 @@ if __name__ == "__main__":
         description="Analyze log files to learn patterns and build an analytics cache."
     )
     parser.add_argument(
-        '--access-dir',
-        default='static/data/access',
-        help="The input directory containing access log files."
-    )
-    parser.add_argument(
-        '--junk-dir',
-        default='static/data/junk',
-        help="The input directory containing junk log files."
+        '--data-dir',
+        default='static/data',
+        help="The input directory containing log files."
     )
     parser.add_argument(
         '--robots-dir',
@@ -190,4 +185,4 @@ if __name__ == "__main__":
     )
     
     args = parser.parse_args()
-    main(args.access_dir, args.forbidden_dir, args.robots_dir, args.cache_file)
+    main(args.data_dir, args.robots_dir, args.cache_file)

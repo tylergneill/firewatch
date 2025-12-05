@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import ipaddress
 import pathlib
 import re
 import shelve
@@ -10,9 +11,9 @@ from utils import parse_line
 from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 
 """
-Usage: python purge_bad_crawlers.py \
-  --data-dir static/data/access \
-  --junk-dir static/data/junk \
+Usage: python reclassify_past_junk.py \
+  --data-dir static/data \
+  --junk-dir static/data \
   --cache-file static/cache/firewatch_cache.db
 """
 
@@ -199,12 +200,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--data-dir',
-        default='static/data/access',
+        default='static/data',
         help="The input directory containing log files (e.g., ../firewatch-data)."
     )
     parser.add_argument(
         '--junk-dir',
-        default='static/data/junk',
+        default='static/data',
         help="The output directory for junk log entries."
     )
     parser.add_argument(
