@@ -35,6 +35,9 @@ def process_and_display_category(category_name: str, flat_data: dict, inspection
     """
     Groups, sorts, and prints summary tables for a given data category.
     """
+
+    print(category_name.upper(), "\n")
+
     # --- Grouping Logic ---
     temp_grouped_by_cidr = defaultdict(dict)
     for ip_str, counts in tqdm(flat_data.items(), desc=f"Grouping {category_name} CIDRs", unit=" IP"):
@@ -133,6 +136,9 @@ def process_and_display_category(category_name: str, flat_data: dict, inspection
     print(header_fmt.format(*grand_total_row))
     print(f"\nDisplayed top {printed_cidr_count} of {len(sorted_cidr_groups)} total CIDR blocks.")
     all_sorted_items = sorted(list(cidr_groups_dict.items()) + list(lone_ips_dict.items()), key=get_sort_key, reverse=True)
+
+    print("\n", "-" * 130, "\n")
+
     return dict(all_sorted_items)
 
 
@@ -274,10 +280,13 @@ def main(args):
     # --- Standard Inspection Report ---
     headers = ["Entity", "IPs", "Total Reqs", "Junk Probes", "Restricted", "Combined Violations", "Avg Violations/IP", "Violation Ratio"]
     header_fmt = "{:<18} | {:>5} | {:>10} | {:>11} | {:>10} | {:>19} | {:>17} | {:>15}"
+    print("\n", "Already Banned".upper())
     print("\n--- Already Banned Summary ---")
     print(header_fmt.format(*headers))
+    print("-" * 130)
     # already_banned table
     sorted_already_banned = sorted(banned_data_from_db.items(), key=lambda item: item[1]['counts'].get('junk_probe_count', 0) + item[1]['counts'].get('restricted_path_count', 0), reverse=True)
+    disp_banned_ips, disp_banned_reqs, disp_banned_junk, disp_banned_restricted, printed_banned_count = 0, 0, 0, 0, 0
     for key, data in sorted_already_banned[:args.inspection_table_top_n]:
         counts = data['counts']
         ip_count = len(data.get('ips', []))
@@ -293,6 +302,21 @@ def main(args):
             f"{violation_ratio:.2%}"
         ]
         print(header_fmt.format(*row_data))
+        disp_banned_ips += ip_count
+        disp_banned_reqs += total_reqs
+        disp_banned_junk += junk_probes
+        disp_banned_restricted += restricted
+        printed_banned_count += 1
+    print("-" * 130)
+    disp_banned_combined = disp_banned_junk + disp_banned_restricted
+    disp_banned_avg_viol = (disp_banned_combined / disp_banned_ips) if disp_banned_ips > 0 else 0
+    disp_banned_viol_ratio = (disp_banned_combined / disp_banned_reqs) if disp_banned_reqs > 0 else 0
+    displayed_total_row = ["Total", f"{disp_banned_ips:,}", f"{disp_banned_reqs:,}", f"{disp_banned_junk:,}", f"{disp_banned_restricted:,}", f"{disp_banned_combined:,}", f"{disp_banned_avg_viol:.2f}", f"{disp_banned_viol_ratio:.2%}"]
+    print(header_fmt.format(*displayed_total_row))
+    print(f"\nDisplayed top {printed_banned_count} of {len(sorted_already_banned)} total already banned entries.")
+
+    print("\n", "-" * 130, "\n")
+
     all_analytics = {'already_banned': banned_data_from_db}
     all_analytics['not_yet_banned'] = process_and_display_category("Not Yet Banned", not_yet_banned_flat, args.inspection_table_top_n, headers, header_fmt)
     all_analytics['access_only'] = process_and_display_category("Access Only", access_only_flat, args.inspection_table_top_n, headers, header_fmt)
