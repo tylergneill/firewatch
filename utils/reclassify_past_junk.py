@@ -153,9 +153,9 @@ def main(data_dir: str, junk_dir: str, cache_file: str):
     print("\nCalculating final totals...")
     total_junk_stats = defaultdict(int)
     if junk_path.is_dir():
-        junk_files = list(junk_path.rglob('*.junk'))
+        junk_files = list(junk_path.rglob('*junk.log*'))
         for j_file in junk_files:
-            app_name_parts = j_file.name.split('-app.access.log')
+            app_name_parts = j_file.name.split('-app.junk.log')
             app_name = app_name_parts[0] if app_name_parts else "unknown"
             with j_file.open('rb') as f:
                 # Fast line counting
