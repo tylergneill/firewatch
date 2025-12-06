@@ -2,10 +2,8 @@
 import argparse
 import ipaddress
 import pathlib
-import re
 import shelve
 import sys
-import datetime
 import json
 from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser

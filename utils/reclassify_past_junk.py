@@ -2,13 +2,11 @@
 import argparse
 import ipaddress
 import pathlib
-import re
 import shelve
 import sys
 from collections import deque, defaultdict
 
 from junk_definitions import BLOCKED_NETWORKS, is_junk_probe
-from utils import parse_line
 
 """
 Usage: python reclassify_past_junk.py \
