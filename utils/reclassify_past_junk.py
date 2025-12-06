@@ -33,7 +33,7 @@ def is_ip_blocked(ip_str: str) -> bool:
     return False
 
 
-def process_log_file(log_path: pathlib.Path, junk_dir: pathlib.Path):
+def process_log_file(log_path: pathlib.Path):
     """
     Reads a log file, separates lines based on IP or junk URI, overwrites
     the original with clean lines, and writes blocked lines to the junk
@@ -80,7 +80,6 @@ def process_log_file(log_path: pathlib.Path, junk_dir: pathlib.Path):
     
     # --- Write junk logs ---
     if junk_lines:
-        # Construct the output path.
         # For a path like .../{archive}/access/{logfile}, we want to write to .../{archive}/junk/{junkfile}
         if log_path.parent.name == 'access':
             junk_target_dir = log_path.parent.parent / 'junk'
@@ -110,19 +109,17 @@ def process_log_file(log_path: pathlib.Path, junk_dir: pathlib.Path):
     return len(good_lines), len(junk_lines)
 
 
-def main(data_dir: str, junk_dir: str, cache_file: str):
+def main(data_dir: str, cache_file: str):
     """
     Main function to find and process all log files.
     """
     data_path = pathlib.Path(data_dir)
-    junk_path = pathlib.Path(junk_dir)
 
     if not data_path.is_dir():
         print(f"Error: Data directory not found at '{data_dir}'")
         sys.exit(1)
 
     print(f"Starting crawler purge for directory: {data_path}")
-    print(f"Junk logs will be written to: {junk_path}")
     print(f"Purging cache entries from: {cache_file}")
 
     log_files = sorted(data_path.rglob('*.access.log*'))
@@ -136,7 +133,7 @@ def main(data_dir: str, junk_dir: str, cache_file: str):
                 app_name_parts = log_file.name.split('-app.access.log')
                 app_name = app_name_parts[0] if app_name_parts else "unknown"
 
-                good_count, junk_count = process_log_file(log_file, junk_path)
+                good_count, junk_count = process_log_file(log_file)
                 if good_count is not None:
                     app_stats[app_name]['good'] += good_count
                     app_stats[app_name]['newly_junk'] += junk_count
@@ -152,8 +149,8 @@ def main(data_dir: str, junk_dir: str, cache_file: str):
     # --- Start Final Report Calculation ---
     print("\nCalculating final totals...")
     total_junk_stats = defaultdict(int)
-    if junk_path.is_dir():
-        junk_files = list(junk_path.rglob('*junk.log*'))
+    if data_path.is_dir():
+        junk_files = list(data_path.rglob('*junk.log*'))
         for j_file in junk_files:
             app_name_parts = j_file.name.split('-app.junk.log')
             app_name = app_name_parts[0] if app_name_parts else "unknown"
@@ -211,16 +208,9 @@ if __name__ == "__main__":
         help="The input directory containing log files (e.g., ../firewatch-data)."
     )
     parser.add_argument(
-        '--junk-dir',
-        default='static/data',
-        help="The output directory for junk log entries."
-    )
-    parser.add_argument(
         '--cache-file',
         default='static/cache/firewatch_cache.db',
         help="The path to the shelve cache file to purge."
     )
-    
     args = parser.parse_args()
-    
-    main(args.data_dir, args.junk_dir, args.cache_file)
+    main(args.data_dir, args.cache_file)
