@@ -9,11 +9,11 @@ from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
 
-from junk_definitions import BLOCKED_NETWORKS, is_junk_probe
+from primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils import parse_line
 
 """
-Usage: python recognize_junk_in_access.py \
+Usage: python generate_traffic_analytics.py \
   --access-dir static/data \
   --junk-dir static/data \
   --robots-dir static/data/robots \
@@ -44,7 +44,7 @@ def get_app_name_from_filename(filename: str) -> str:
     return parts[0] if parts else "unknown"
 
 
-def main(data_dir: str, robots_dir: str, cache_file: str):
+def main(data_dir: str, robots_dir: str, db_file: str):
     """
     Analyzes log files to learn patterns about IPs found in junk logs.
     """
@@ -133,8 +133,8 @@ def main(data_dir: str, robots_dir: str, cache_file: str):
 
     print("\n  - Log processing complete.")
 
-    # --- Step 4: Write analytics to shelve cache ---
-    print(f"Step 4: Writing analytics to cache file: {cache_file}")
+    # --- Step 4: Write analytics to shelve db ---
+    print(f"Step 4: Writing analytics to db file: {db_file}")
 
     # Explicitly convert all complex types to basic types before shelving
     final_analytics = {
@@ -152,19 +152,19 @@ def main(data_dir: str, robots_dir: str, cache_file: str):
     sanitized_analytics = json.loads(json.dumps(final_analytics))
 
     try:
-        with shelve.open(cache_file, 'c') as cache:
-            cache['already_banned'] = sanitized_analytics['already_banned']
-            cache['not_yet_banned'] = sanitized_analytics['not_yet_banned']
-            cache['access_only'] = sanitized_analytics['access_only']
+        with shelve.open(db_file, 'c') as db:
+            db['already_banned'] = sanitized_analytics['already_banned']
+            db['not_yet_banned'] = sanitized_analytics['not_yet_banned']
+            db['access_only'] = sanitized_analytics['access_only']
         print("Analytics generation finished successfully.")
     except Exception as e:
-        print(f"Error writing to cache: {e}", file=sys.stderr)
+        print(f"Error writing to db: {e}", file=sys.stderr)
         sys.exit(1)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Analyze log files to learn patterns and build an analytics cache."
+        description="Analyze log files to learn patterns and build an analytics db."
     )
     parser.add_argument(
         '--data-dir',
@@ -177,10 +177,10 @@ if __name__ == "__main__":
         help="The directory containing robots.txt files."
     )
     parser.add_argument(
-        '--cache-file',
-        default='static/cache/analytics.db',
-        help="The path to the shelve cache file for analytics."
+        '--db-file',
+        default='static/cache/traffic_analytics.db',
+        help="The path to the shelve db file for traffic analytics."
     )
     
     args = parser.parse_args()
-    main(args.data_dir, args.robots_dir, args.cache_file)
+    main(args.data_dir, args.robots_dir, args.db_file)

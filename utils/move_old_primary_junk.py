@@ -6,10 +6,10 @@ import shelve
 import sys
 from collections import deque, defaultdict
 
-from junk_definitions import BLOCKED_NETWORKS, is_junk_probe
+from primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 
 """
-Usage: python reclassify_past_junk.py \
+Usage: python move_old_primary_junk.py \
   --data-dir static/data \
   --junk-dir static/data \
   --cache-file static/cache/firewatch_cache.db
