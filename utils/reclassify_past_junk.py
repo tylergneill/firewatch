@@ -7,8 +7,8 @@ import shelve
 import sys
 from collections import deque, defaultdict
 
+from junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils import parse_line
-from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 
 """
 Usage: python reclassify_past_junk.py \
@@ -80,13 +80,20 @@ def process_log_file(log_path: pathlib.Path, junk_dir: pathlib.Path):
     
     # --- Write junk logs ---
     if junk_lines:
-        # Construct the output path
-        relative_path = log_path.relative_to(log_path.parent.parent)  # e.g., panditya-archive/log-file
-        junk_path = junk_dir / relative_path
-        junk_path.parent.mkdir(parents=True, exist_ok=True)
+        # Construct the output path.
+        # For a path like .../{archive}/access/{logfile}, we want to write to .../{archive}/junk/{junkfile}
+        if log_path.parent.name == 'access':
+            junk_target_dir = log_path.parent.parent / 'junk'
+        else:
+            # Fallback for logs not in an 'access' directory.
+            # Create a 'junk' subdirectory in the log's parent directory.
+            junk_target_dir = log_path.parent / 'junk'
+
+        junk_target_dir.mkdir(parents=True, exist_ok=True)
         
         # Add .junk suffix
-        final_junk_path = junk_path.with_name(junk_path.name.replace(".access.log", ".junk.log"))
+        junk_filename = log_path.name.replace(".access.log", ".junk.log")
+        final_junk_path = junk_target_dir / junk_filename
 
         with final_junk_path.open('ab') as f:
             f.writelines(junk_lines)

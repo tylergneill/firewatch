@@ -128,7 +128,6 @@ panditya.info 443 4.206.130.92 - - [16/Nov/2025:22:51:09 +0000] "GET /wp-include
 panditya.info 443 4.206.130.92 - - [16/Nov/2025:22:51:09 +0000] "GET /wp-includes/widgets/ HTTP/1.1" 404 207 "-" "-" 0.002
 panditya.info 443 1.194.141.2 - - [16/Nov/2025:23:18:53 +0000] "GET / HTTP/1.1" 200 1521 "https://panditya.info/" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36" 0.002
 panditya.info 443 173.252.70.8 - - [16/Nov/2025:23:53:13 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" 0.003
-www.panditya.info 443 47.79.51.147 - - [17/Nov/2025:00:21:45 +0000] "GET /tutorials HTTP/1.1" 200 542 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36" 0.005
 panditya.info 443 198.235.24.41 - - [17/Nov/2025:00:34:57 +0000] "GET / HTTP/1.1" 200 3964 "-" "-" 0.003
 panditya.info 443 43.130.74.193 - - [17/Nov/2025:01:21:47 +0000] "GET / HTTP/1.1" 200 1521 "http://panditya.info" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.002
 panditya.info 443 43.159.132.207 - - [17/Nov/2025:01:34:48 +0000] "GET / HTTP/1.1" 200 1521 "http://www.panditya.info" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.002

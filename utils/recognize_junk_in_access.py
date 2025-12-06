@@ -11,7 +11,7 @@ from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
 
-from utils.junk_definitions import BLOCKED_NETWORKS, is_junk_probe
+from junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils import parse_line
 
 """

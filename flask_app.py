@@ -9,7 +9,7 @@ import shelve
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from urllib.parse import urlparse, parse_qs
 
-from utils import (
+from utils.utils import (
     find_app_version, parse_line, get_geo_for_ip,
     get_log_sources_for_app,
     read_lines_from_files, get_dates_from_request_args, tail_lines,

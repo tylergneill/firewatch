@@ -3,6 +3,12 @@ import datetime
 import shelve
 import os
 import time
+import sys
+from pathlib import Path
+
+# Add project root to path to allow importing from flask_app
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from flask_app import app_names, LOG_FILES, LOG_FILE_PATH
 from utils import get_log_sources_for_app, _process_single_log_file
@@ -17,7 +23,7 @@ def populate_cache(start_date, end_date):
     """
     print(f"Populating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
 
-    CACHE_DIR = "static/cache"
+    CACHE_DIR = "../static/cache"
     os.makedirs(CACHE_DIR, exist_ok=True)
     CACHE_FILE = os.path.join(CACHE_DIR, "firewatch_cache.db")
 
