@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 import sys
+import re
 from pathlib import Path
-from datetime import datetime, timezone, timedelta
-
-if len(sys.argv) < 2:
-    print("Usage: python shard_logs.py /path/to/log [days_per_shard]", file=sys.stderr)
-    sys.exit(1)
-
-log_path = Path(sys.argv[1])
-days_per_shard = int(sys.argv[2]) if len(sys.argv) >= 3 else 1
+from datetime import datetime, timezone
+from collections import defaultdict
+import shutil
+import argparse # Import argparse
 
 # Nginx $time_local format: [15/Nov/2025:13:51:02 +0000]
 TIME_FMT = "%d/%b/%Y:%H:%M:%S %z"
+
 
 def parse_time_from_line(line):
     # Find the stuff between '[' and ']'
@@ -25,67 +23,153 @@ def parse_time_from_line(line):
     except Exception:
         return None
 
-def main():
-    if not log_path.exists():
-        print(f"Log file not found: {log_path}", file=sys.stderr)
-        sys.exit(1)
 
-    # First pass: find the earliest timestamp to define shard 0
-    first_ts = None
-    with log_path.open("r", encoding="utf-8", errors="replace") as f:
-        for line in f:
-            ts = parse_time_from_line(line)
-            if ts is not None:
-                first_ts = ts
-                break
+def get_log_parts(path, root):
+    if not path.is_file():
+        return None, None
 
-    if first_ts is None:
-        print("Could not find any valid timestamps in log.", file=sys.stderr)
-        sys.exit(1)
+    try:
+        relative_path = path.relative_to(root)
+    except ValueError:
+        return None, None
 
-    # Normalize start to midnight for nicer shard boundaries
-    first_ts = first_ts.astimezone(timezone.utc)
-    first_ts = first_ts.replace(hour=0, minute=0, second=0, microsecond=0)
+    parts = relative_path.parts
+    filename = parts[-1]
 
-    print(f"First timestamp: {first_ts.isoformat()}", file=sys.stderr)
+    # an already sharded log can be identified by the date suffix
+    m = re.match(r'(.+\.(?:access|junk)\.log)-(\d{4}-\d{2}-\d{2}|unparsable)$', filename)
+    if m:
+        base_filename = m.group(1)
+    elif filename.endswith('.access.log') or filename.endswith('.junk.log'):
+        base_filename = filename
+    else:
+        # Not a log file we recognize
+        return None, None
 
-    # Open output file handles as needed
-    out_files = {}
-
-    def get_shard_file(ts):
-        # Compute shard index
-        delta_days = (ts - first_ts).days
-        shard_index = delta_days // days_per_shard
-        shard_start = first_ts + timedelta(days=shard_index * days_per_shard)
-        shard_end = shard_start + timedelta(days=days_per_shard - 1)
-
-        # e.g. foo.log-2025-11-01-2025-11-14
-        base = log_path.name
-        if shard_start.date() != shard_end.date():
-            shard_name = f"{base}-{shard_start.date()}-{shard_end.date()}"
+    # Now determine archive_dir
+    if len(parts) == 1:  # Top-level log
+        app_name_part = base_filename.split('.')[0]
+        if '.junk.' in base_filename:
+            log_type = 'junk'
         else:
-            shard_name = f"{base}-{shard_start.date()}"
-        shard_path = log_path.parent / shard_name
-        if shard_path not in out_files:
-            out_files[shard_path] = shard_path.open("a", encoding="utf-8")
-        return out_files[shard_path]
+            log_type = 'access'
+        archive_name = app_name_part.replace('-app', '') + '-archive'
+        archive_dir = root / archive_name / log_type
+    elif 'archive' in parts[0] and len(parts) > 1:  # Archived log
+        archive_dir = path.parent
+    else:
+        return None, None
 
-    # Second pass: assign lines to shards
-    with log_path.open("r", encoding="utf-8", errors="replace") as f:
-        for line in f:
-            ts = parse_time_from_line(line)
-            if ts is None:
-                # If unparsable, you can either skip or dump into a "misc" file
-                # Here we just skip.
-                continue
-            ts = ts.astimezone(timezone.utc)
-            outf = get_shard_file(ts)
-            outf.write(line)
+    return archive_dir, base_filename
 
-    for fh in out_files.values():
-        fh.close()
+
+def main():
+    parser = argparse.ArgumentParser(description="Shard log files by timestamp.")
+    parser.add_argument("log_root_dir", nargs="?", default="static/data",
+                        help="Path to the root directory containing log files. Defaults to 'static/data'.")
+    args = parser.parse_args()
+
+    log_root_dir = Path(args.log_root_dir).resolve()
+    if not log_root_dir.is_dir():
+        print(f"Log directory not found: {log_root_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    all_files = [p for p in log_root_dir.rglob('*') if p.is_file()]
+    
+    # Identify all potential shard paths first and clear them to ensure a clean run
+    all_shard_paths = set()
+    for file_path in all_files:
+        archive_dir, base_filename = get_log_parts(file_path, log_root_dir)
+        if archive_dir:
+            # This doesn't know the date, so we can't know the exact shard path.
+            # Deleting all files in the archive dir is too risky.
+            # A better approach is to write to temp files and then move.
+            pass
+    
+    # For simplicity and to avoid deleting wrong files, we will build new files
+    # and then replace old ones. We'll collect all data in memory first. This
+    # is a rollback of the no-buffering idea, but with the *correct* logic.
+
+    files_to_process = sorted([p for p in all_files if get_log_parts(p, log_root_dir)[0] is not None])
+    
+    shards = defaultdict(list)
+    today = datetime.now(timezone.utc).date()
+
+    # --- Pass 1: Read all logs and organize them into daily lists, preserving order ---
+    for file_path in files_to_process:
+        print(f"Reading {file_path.relative_to(log_root_dir)}", file=sys.stderr)
+        try:
+            with file_path.open("r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    ts = parse_time_from_line(line)
+                    shard_date = ts.astimezone(timezone.utc).date() if ts else None
+                    
+                    archive_dir, base_filename = get_log_parts(file_path, log_root_dir)
+                    if not archive_dir: continue
+
+                    if shard_date:
+                        shard_path = archive_dir / f"{base_filename}-{shard_date.isoformat()}"
+                    else:
+                        shard_path = archive_dir / f"{base_filename}-unparsable"
+                    
+                    shards[shard_path].append(line)
+
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}", file=sys.stderr)
+
+    # --- Pass 2: Write out all shards, preserving original collected order ---
+    written_shards = set()
+    for shard_path, lines in shards.items():
+        if not lines:
+            continue
+        print(f"Writing shard {shard_path.relative_to(log_root_dir)}", file=sys.stderr)
+        shard_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Use temp file to avoid race conditions or corruption
+        temp_path = shard_path.with_suffix(shard_path.suffix + '.tmp')
+        try:
+            with temp_path.open("w", encoding="utf-8") as f:
+                f.writelines(lines)
+            shutil.move(temp_path, shard_path)
+            written_shards.add(shard_path)
+        except Exception as e:
+            print(f"Error writing to {shard_path}: {e}", file=sys.stderr)
+        finally:
+            if temp_path.exists():
+                temp_path.unlink()
+
+    # --- Pass 3: Clean up original files ---
+    for file_path in files_to_process:
+        is_top_level = file_path.parent == log_root_dir
+        
+        if is_top_level:
+            todays_lines = []
+            with file_path.open("r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    ts = parse_time_from_line(line)
+                    if ts and ts.astimezone(timezone.utc).date() == today:
+                        todays_lines.append(line)
+
+            if todays_lines:
+                print(f"Updating top-level log: {file_path.name}", file=sys.stderr)
+                file_path.write_text("".join(todays_lines))
+            else:
+                print(f"Deleting empty top-level log: {file_path.name}", file=sys.stderr)
+                file_path.unlink()
+        else: # It's an archived file that was processed
+            # Delete it only if it wasn't one of the final written shards
+            if file_path not in written_shards:
+                print(f"Deleting original archived log: {file_path.relative_to(log_root_dir)}", file=sys.stderr)
+                try:
+                    file_path.unlink()
+                except FileNotFoundError:
+                    pass
+                except Exception as e:
+                    print(f"Error deleting {file_path}: {e}", file=sys.stderr)
+
 
     print("Sharding complete.", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
