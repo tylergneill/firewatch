@@ -9,7 +9,12 @@ from functools import lru_cache
 
 
 def find_app_version():
-    app_version_filepath = '../VERSION'
+    # Construct an absolute path to the VERSION file
+    # __file__ is the path to the current script (utils/utils.py)
+    # os.path.dirname(__file__) is the directory of the current script (utils/)
+    # os.path.join(..., '..') goes up one level to the project root (/app)
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    app_version_filepath = os.path.join(project_root, 'VERSION')
     with open(app_version_filepath, 'r', encoding='utf8') as file:
         # Assuming the __version__ line is the first line
         return file.readline().strip().split('=')[1].strip().replace("'", "").replace('"', '')
