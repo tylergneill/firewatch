@@ -10,8 +10,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from flask_app import app_names, LOG_FILES, LOG_FILE_PATH
-from utils import get_log_sources_for_app, _process_single_log_file
+from utils.constants import app_names, LOG_FILE_PATH
+from utils.utils import get_log_sources_for_app, _process_single_log_file
 
 """
 Usage: nice -n 19 python populate_cache.py --start-date 2025-03-01 --end-date 2025-10-31
@@ -30,7 +30,7 @@ def populate_cache(start_date, end_date):
     with shelve.open(CACHE_FILE) as cache:
         for app_name in app_names:
             print(f"  Processing app: {app_name}")
-            log_files_for_app = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
+            log_files_for_app = get_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
             
             if not log_files_for_app:
                 print(f"    No log files found for this date range.")

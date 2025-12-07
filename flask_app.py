@@ -15,50 +15,14 @@ from utils.utils import (
     read_lines_from_files, get_dates_from_request_args, tail_lines,
     _process_single_log_file
 )
+from utils.constants import app_names, LOG_FILE_PATH, HTTP_STATUS_CODES
 
 # Detect debug mode from environment
 DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
 
-LOG_FILE_PATH = pathlib.Path("static/data")
 
-app_names = [
-    "skrutable",
-    "splitter-server",
-    "vatayana",
-    "panditya",
-    "hansel",
-    "firewatch",
-    "kalpataru-grove",
-]
-app_names += [
-    app_name + '-stg'
-    for app_name in app_names
-    if app_name != "splitter-server"
-]
-
-HTTP_STATUS_CODES = {
-    '200': 'OK',
-    '201': 'Created',
-    '202': 'Accepted',
-    '204': 'No Content',
-    '206': 'Partial Content',
-    '301': 'Moved Permanently',
-    '302': 'Found',
-    '304': 'Not Modified',
-    '400': 'Bad Request',
-    '401': 'Unauthorized',
-    '403': 'Forbidden',
-    '404': 'Not Found',
-    '405': 'Method Not Allowed',
-    '444': 'No Response',
-    '499': 'Client Closed Request',
-    '500': 'Internal Server Error',
-    '502': 'Bad Gateway',
-    '503': 'Service Unavailable',
-    '504': 'Gateway Timeout',
-}
 
 MAX_LINES_PER_FILE = 20
 
