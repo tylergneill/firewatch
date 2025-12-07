@@ -12,7 +12,7 @@ from tqdm import tqdm
 """
 Usage: python summarize_traffic_analytics.py --db-file <path> [options]
 
-A tool to inspect the traffic analytics db, generate reports, and create banlists.
+A tool to inspect the traffic analytics db, generate reports, and create secondary junk tags.
 """
 
 
@@ -31,7 +31,13 @@ def get_sort_key(item):
     return junk + restricted
 
 
-def process_and_display_category(category_name: str, flat_data: dict, inspection_table_top_n: int, headers: list, header_fmt: str):
+def process_and_display_category(
+    category_name: str, 
+    flat_data: dict, 
+    inspection_table_top_n: int, 
+    headers: list, 
+    header_fmt: str,
+):
     """
     Groups, sorts, and prints summary tables for a given data category.
     """
@@ -204,7 +210,7 @@ def group_ips_into_cidrs(ip_list: list) -> list:
 
 
 def write_secondary_junk_tag_file(filename: str, header: str, ban_list: list):
-    """Writes the ban list and its metadata header to a file."""
+    """Writes the junk tags and their metadata header to a file."""
     try:
         with open(filename, 'w') as f:
             f.write(header)
@@ -214,8 +220,13 @@ def write_secondary_junk_tag_file(filename: str, header: str, ban_list: list):
         print(f"\nError writing to output file {filename}: {e}", file=sys.stderr)
 
 
-def generate_secondary_junk_tags(not_yet_banned_flat: dict, access_only_flat: dict, threshold: float, junk_output_file: str,
-                      restricted_output_file: str):
+def generate_secondary_junk_tags(
+    not_yet_banned_flat: dict, 
+    access_only_flat: dict, 
+    threshold: float, 
+    junk_probe_junk_tags_output_file: str,
+    restricted_path_junk_tags_output_file: str,
+):
     """
     Generates secondary junk tags from the traffic analytics db data.
     """
@@ -232,7 +243,11 @@ def generate_secondary_junk_tags(not_yet_banned_flat: dict, access_only_flat: di
             f"# Total associated requests: {total_requests:,}\n"
             f"# Compressed to {len(compressed_list):,} entries.\n#\n"
         )
-        write_secondary_junk_tag_file(junk_output_file, header, compressed_list)
+        write_secondary_junk_tag_file(
+            junk_probe_junk_tags_output_file,
+            header,
+            compressed_list,
+        )
     else:
         print("\nNo 'not_yet_banned' data found, skipping junk prober secondary junk tags.")
 
@@ -252,7 +267,11 @@ def generate_secondary_junk_tags(not_yet_banned_flat: dict, access_only_flat: di
             f"# Total associated requests: {total_requests:,}\n"
             f"# Compressed to {len(compressed_list):,} entries.\n#\n"
         )
-        write_secondary_junk_tag_file(restricted_output_file, header, compressed_list)
+        write_secondary_junk_tag_file(
+            restricted_path_junk_tags_output_file,
+            header,
+            compressed_list,
+        )
     else:
         print("\nNo 'access_only' data found, skipping restricted path violator secondary junk tags.")
 
@@ -318,11 +337,23 @@ def main(args):
     print("\n", "-" * 130, "\n")
 
     all_analytics = {'already_banned': banned_data_from_db}
-    all_analytics['not_yet_banned'] = process_and_display_category("Not Yet Banned", not_yet_banned_flat, args.inspection_table_top_n, headers, header_fmt)
-    all_analytics['access_only'] = process_and_display_category("Access Only", access_only_flat, args.inspection_table_top_n, headers, header_fmt)
+    all_analytics['not_yet_banned'] = process_and_display_category(
+        "Not Yet Banned",
+        not_yet_banned_flat,
+        args.inspection_table_top_n,
+        headers,
+        header_fmt,
+    )
+    all_analytics['access_only'] = process_and_display_category(
+        "Access Only",
+        access_only_flat,
+        args.inspection_table_top_n,
+        headers,
+        header_fmt,
+    )
     if args.inspection_json_file:
         try:
-            with open(args.output_fileinspection_json_file, 'w') as f:
+            with open(args.inspection_json_file, 'w') as f:
                 json.dump(all_analytics, f, indent=2)
             print(f"\nSuccessfully wrote full grouped analytics to {args.inspection_json_file}")
         except Exception as e:
@@ -332,12 +363,18 @@ def main(args):
     if args.analyze_ratios:
         analyze_and_print_ratios(access_only_flat)
     if args.generate_secondary_junk_tags:
-        generate_secondary_junk_tags(not_yet_banned_flat, access_only_flat, args.threshold, args.output_junk_file, args.output_restricted_file)
+        generate_secondary_junk_tags(
+            not_yet_banned_flat,
+            access_only_flat,
+            args.restricted_path_violation_threshold,
+            args.junk_prober_junk_tag_output_file,
+            args.restricted_path_violator_junk_tags_output_file,
+        )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Inspect traffic analytics db, generate reports, analyze ratios, and create banlists.",
+        description="Inspect traffic analytics db, generate reports, analyze ratios, and create secondary junk tags.",
         formatter_class=argparse.RawTextHelpFormatter
     )
     # General arguments
@@ -352,8 +389,8 @@ if __name__ == "__main__":
     # Banlist generation arguments
     banlist_group = parser.add_argument_group('Banlist Generation')
     banlist_group.add_argument('--generate-secondary-junk-tags', action='store_true', help="Generate secondary junk tags based on the analysis.")
-    banlist_group.add_argument('--threshold', type=float, default=0.8, help="Violation ratio threshold for banning IPs from 'access_only' data.")
-    banlist_group.add_argument('--output-junk-file', default='junk_probers_banlist.txt', help="Output file for the junk probers ban list.")
-    banlist_group.add_argument('--output-restricted-file', default='restricted_violators_banlist.txt', help="Output file for the restricted path violators ban list.")
+    banlist_group.add_argument('--restricted-path-violation-threshold', type=float, default=0.8, help="Violation ratio threshold for banning IPs from 'access_only' data.")
+    banlist_group.add_argument('--junk-prober-junk-tag-output-file', default='junk_prober_junk_tags.txt', help="Output file for the junk prober junk tags.")
+    banlist_group.add_argument('--restricted-path-violator-junk-tags-output-file', default='restricted_path_violator_junk_tags.txt', help="Output file for the restricted path violator junk tags.")
     args = parser.parse_args()
     main(args)
