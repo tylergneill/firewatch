@@ -14,16 +14,96 @@ Usage: python move_old_primary_junk.py \
   --cache-file static/cache/firewatch_cache.db
 """
 
+# Globals to hold loaded secondary junk
+SECONDARY_BLOCKED_IPS = set()
+SECONDARY_BLOCKED_PREFIXES_24 = set()
+SECONDARY_BLOCKED_NETWORKS = []
+
+
+def load_secondary_junk_tags(filenames):
+    """
+    Loads junk tags from provided files into global sets/lists for fast lookup.
+    """
+    global SECONDARY_BLOCKED_IPS, SECONDARY_BLOCKED_PREFIXES_24, SECONDARY_BLOCKED_NETWORKS
+    
+    count_ips = 0
+    count_cidrs = 0
+    
+    for filename in filenames:
+        path = pathlib.Path(filename)
+        if not path.exists():
+            print(f"Warning: Secondary junk tag file not found: {filename}")
+            continue
+            
+        print(f"Loading secondary junk tags from: {filename}")
+        try:
+            with path.open('r') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    
+                    if '/' in line:
+                        # It's a CIDR
+                        if line.endswith('/24') and '.' in line:
+                            # Optimize /24 IPv4
+                            # 192.168.1.0/24 -> 192.168.1
+                            parts = line.split('/')
+                            ip_part = parts[0]
+                            prefix = ip_part.rsplit('.', 1)[0]
+                            SECONDARY_BLOCKED_PREFIXES_24.add(prefix)
+                            count_cidrs += 1
+                        else:
+                            # Complex CIDR
+                            try:
+                                network = ipaddress.ip_network(line, strict=False)
+                                SECONDARY_BLOCKED_NETWORKS.append(network)
+                                count_cidrs += 1
+                            except ValueError:
+                                pass
+                    else:
+                        # It's an IP
+                        SECONDARY_BLOCKED_IPS.add(line)
+                        count_ips += 1
+        except Exception as e:
+            print(f"Error reading {filename}: {e}")
+
+    print(f"Loaded {count_ips} IPs, {len(SECONDARY_BLOCKED_PREFIXES_24)} /24 prefixes, and {len(SECONDARY_BLOCKED_NETWORKS)} other CIDRs.")
+
 
 def is_ip_blocked(ip_str: str) -> bool:
     """Checks if a given IP address string is in one of the blocked networks."""
     if not ip_str:
         return False
+
+    # 1. Check Secondary Exact IPs (O(1))
+    if ip_str in SECONDARY_BLOCKED_IPS:
+        return True
+        
+    # 2. Check Secondary /24 prefixes (Fast string check)
+    # Assumes IPv4 string format like X.X.X.X
+    if '.' in ip_str:
+        try:
+            prefix = ip_str.rsplit('.', 1)[0]
+            if prefix in SECONDARY_BLOCKED_PREFIXES_24:
+                return True
+        except IndexError:
+            pass
+
+    # 3. Expensive checks (IP object creation)
     try:
         ip_addr = ipaddress.ip_address(ip_str)
+        
+        # Check primary blocked networks
         for network in BLOCKED_NETWORKS:
             if ip_addr in network:
                 return True
+        
+        # Check secondary complex networks
+        for network in SECONDARY_BLOCKED_NETWORKS:
+            if ip_addr in network:
+                return True
+
     except ValueError:
         # Ignore lines where the IP address is invalid
         return False
@@ -116,6 +196,9 @@ def main(args):
         print(f"Error: Data directory not found at '{args.data_dir}'")
         sys.exit(1)
 
+    if args.use_secondary_junk_tags:
+        load_secondary_junk_tags([args.junk_prober_tags, args.restricted_path_tags])
+
     print(f"Starting crawler purge for directory: {data_path}")
     print(f"Purging cache entries from: {args.cache_file}")
 
@@ -151,10 +234,19 @@ def main(args):
         for j_file in junk_files:
             app_name_parts = j_file.name.split('-app.junk.log')
             app_name = app_name_parts[0] if app_name_parts else "unknown"
-            with j_file.open('rb') as f:
+            
+            # Use fast counting if filename has date
+            date_match = False
+            # We can reuse the logic implicitly by just reading lines or optimizing here too.
+            # But the user asked for optimization in _process_single_junk_log_file (utils.py).
+            # Here we just want to count lines quickly for the report.
+            try:
                 # Fast line counting
-                lines = sum(1 for _ in f)
+                with j_file.open('rb') as f:
+                    lines = sum(1 for _ in f)
                 total_junk_stats[app_name] += lines
+            except Exception:
+                pass
     
     print("\n--- Purge Summary ---")
     header = f"{'Application':<25} | {'Original Lines':>15} | {'Just Purged':>15} | {'Total Junk':>15} | {'% Purged (Overall)':>20}"
@@ -208,6 +300,21 @@ if __name__ == "__main__":
         '--cache-file',
         default='static/cache/firewatch_cache.db',
         help="The path to the shelve cache file to purge."
+    )
+    parser.add_argument(
+        '--use-secondary-junk-tags',
+        action='store_true',
+        help="Whether to use the secondary junk tag files generated by summarize_traffic_analytics.py"
+    )
+    parser.add_argument(
+        '--junk-prober-tags',
+        default='junk_prober_junk_tags.txt',
+        help="File containing junk prober tags"
+    )
+    parser.add_argument(
+        '--restricted-path-tags',
+        default='restricted_path_violator_junk_tags.txt',
+        help="File containing restricted path violator tags"
     )
     args = parser.parse_args()
     main(args)
