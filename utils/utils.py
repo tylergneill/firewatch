@@ -354,14 +354,47 @@ def _process_single_junk_log_file(file_path_str: str, app_names: list):
             app_name = name
             break
             
-    for line in read_lines_from_files([file_path]):
-        p = parse_junk_line(line)
-        if not p:
-            continue
+    # Check for date pattern in filename (YYYY-MM-DD)
+    # If present, we assume the file contains logs only for that day.
+    # This allows for a much faster processing (simple line count).
+    date_match = re.search(r'(\d{4}-\d{2}-\d{2})', file_path.name)
+    
+    if date_match:
+        try:
+            log_date_str = date_match.group(1)
+            log_date = datetime.date.fromisoformat(log_date_str)
             
-        if p['time']:
-            log_date = p['time'].date()
-            file_junk_requests_by_day[app_name][log_date] += 1
+            # Fast counting
+            count = 0
+            try:
+                with file_path.open('rb') as f:
+                    for _ in f:
+                        count += 1
+            except FileNotFoundError:
+                pass
+            
+            if count > 0:
+                file_junk_requests_by_day[app_name][log_date] = count
+                
+        except ValueError:
+            # Fallback if date parsing fails
+            for line in read_lines_from_files([file_path]):
+                p = parse_junk_line(line)
+                if not p:
+                    continue
+                    
+                if p['time']:
+                    log_date = p['time'].date()
+                    file_junk_requests_by_day[app_name][log_date] += 1
+    else:
+        for line in read_lines_from_files([file_path]):
+            p = parse_junk_line(line)
+            if not p:
+                continue
+                
+            if p['time']:
+                log_date = p['time'].date()
+                file_junk_requests_by_day[app_name][log_date] += 1
             
     serializable_junk_requests_by_day = {
         app: {date.isoformat(): count for date, count in daily_counts.items()}
