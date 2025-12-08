@@ -154,13 +154,3 @@
 2018emnlp-sanskrit-splitter-server.dharma.cl 443 16.52.95.243 - - [16/Nov/2025:21:35:45 +0000] "GET /site/info.php.save HTTP/1.1" 404 232 "-" "python-httpx/0.24.1" 0.002
 2018emnlp-sanskrit-splitter-server.dharma.cl 443 16.52.95.243 - - [16/Nov/2025:21:35:45 +0000] "GET /web/phpinfo.php.save HTTP/1.1" 404 232 "-" "python-httpx/0.24.1" 0.001
 2018emnlp-sanskrit-splitter-server.dharma.cl 443 16.52.95.243 - - [16/Nov/2025:21:35:45 +0000] "GET /public/info.php.save HTTP/1.1" 404 232 "-" "python-httpx/0.24.1" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 51.68.111.219 - - [17/Nov/2025:07:26:14 +0000] "GET /robots.txt HTTP/1.1" 404 232 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 51.68.111.219 - - [17/Nov/2025:07:26:14 +0000] "GET / HTTP/1.1" 200 1227 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 43.135.145.73 - - [17/Nov/2025:07:56:06 +0000] "GET / HTTP/1.1" 200 1227 "http://2018emnlp-sanskrit-splitter-server.dharma.cl" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.003
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 51.68.236.87 - - [17/Nov/2025:08:16:55 +0000] "GET /robots.txt HTTP/1.1" 404 232 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 51.68.236.87 - - [17/Nov/2025:08:16:55 +0000] "GET / HTTP/1.1" 200 1227 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.003
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 172.190.142.176 - - [17/Nov/2025:09:45:17 +0000] "GET /wp-admin/js/wp-conflg.php?p= HTTP/1.1" 404 232 "-" "-" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 172.190.142.176 - - [17/Nov/2025:09:45:17 +0000] "GET /wp-admin/wp-conflg.php?p= HTTP/1.1" 404 232 "-" "-" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 172.190.142.176 - - [17/Nov/2025:09:45:19 +0000] "GET /classwithtostring.php?p= HTTP/1.1" 404 232 "-" "-" 0.002
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 98.93.2.183 - - [17/Nov/2025:09:52:37 +0000] "POST /api/split/ HTTP/1.1" 200 34 "-" "python-requests/2.32.4" 3.298
-2018emnlp-sanskrit-splitter-server.dharma.cl 443 43.166.142.76 - - [17/Nov/2025:16:08:05 +0000] "GET / HTTP/1.1" 200 1227 "http://2018emnlp-sanskrit-splitter-server.dharma.cl" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.003
