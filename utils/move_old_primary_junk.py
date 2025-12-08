@@ -162,8 +162,8 @@ def process_log_file(log_path: pathlib.Path):
             junk_target_dir = log_path.parent.parent / 'junk'
         else:
             # Fallback for logs not in an 'access' directory.
-            # Create a 'junk' subdirectory in the log's parent directory.
-            junk_target_dir = log_path.parent / 'junk'
+            # Write directly to the same directory
+            junk_target_dir = log_path.parent
 
         junk_target_dir.mkdir(parents=True, exist_ok=True)
         
