@@ -242,6 +242,14 @@ def index():
     
     uptime_data = final_uptime_data
 
+    # Calculate junk totals per app
+    junk_counts = {}
+    total_junk_count = 0
+    for app_name in selected_apps:
+        count = sum(junk_requests_by_day[app_name].values())
+        junk_counts[app_name] = count
+        total_junk_count += count
+
     ip_counts_top = []
     for ip, count in ip_counts.most_common(top_n):
         ip_counts_top.append({
@@ -393,6 +401,8 @@ def index():
         requests_by_day_labels=json.dumps(requests_by_day_labels),
         requests_by_day_data=json.dumps(requests_by_day_data),
         junk_requests_by_day_data=json.dumps(junk_requests_by_day_data),
+        junk_counts=junk_counts,
+        total_junk_count=total_junk_count,
     )
 
 

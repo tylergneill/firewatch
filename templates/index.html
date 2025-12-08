@@ -147,6 +147,7 @@
                               {% for code in all_status_codes %}
                                   <th><a href="{{ url_for('index', view_mode='requests', status=code, start_date=start_date, end_date=end_date) }}" title="{{ http_status_codes.get(code, '') }}">{{ code }}</a></th>
                               {% endfor %}
+                              <th style="border-left: 5px solid #444; padding-left: 10px;">Junk</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -157,6 +158,13 @@
                               {% for code in all_status_codes %}
                                   <td>{{ app_data.statuses[code]|commify }}</td>
                               {% endfor %}
+                              {% set junk_c = junk_counts.get(app_data.name, 0) %}
+                              {% set grand_total = app_data.total + junk_c %}
+                              {% set pct = (junk_c / grand_total * 100) if grand_total > 0 else 0 %}
+                              <td style="border-left: 5px solid #444; padding-left: 10px;">
+                                  {{ junk_c|commify }}
+                                  <small class="text-muted">({{ "%.1f"|format(pct) }}%)</small>
+                              </td>
                           </tr>
                           {% endfor %}
                       </tbody>
@@ -167,47 +175,41 @@
                               {% for code in all_status_codes %}
                                   <td><strong><a href="{{ url_for('index', view_mode='logs', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
                               {% endfor %}
+                              {% set grand_junk_total = total_junk_count + app_counts_totals.total %}
+                              {% set total_pct = (total_junk_count / grand_junk_total * 100) if grand_junk_total > 0 else 0 %}
+                              <td style="border-left: 5px solid #444; padding-left: 10px;">
+                                  <strong>{{ total_junk_count|commify }}</strong>
+                                  <small class="text-muted">({{ "%.1f"|format(total_pct) }}%)</small>
+                              </td>
                           </tr>
                       </tfoot>
                   </table>
               </div>
               <div class="col-md-12">
                   <h3>Per App Per Day</h3>
-                  <div class="row">
-                      <div class="col-md-6">
-                          <div id="comparison-charts-container">
-                              <div id="chart-container-0">
+                  <div id="comparison-charts-container">
+                      <div id="chart-container-0" class="chart-container">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                              <div>
                                   <label for="requests_by_day_app_selector">Select App:</label>
                                   <select id="requests_by_day_app_selector"></select>
-                                  <div class="chart-controls" style="float: right;">
-                                      <button class="move-up-btn">Move Up</button>
-                                      <button class="move-down-btn">Move Down</button>
-                                      <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
-                                  </div>
-                                  <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
-                                  <hr>
+                              </div>
+                              <div class="chart-controls">
+                                  <button class="toggle-junk-btn">Show Junk</button>
+                                  <button class="move-up-btn">Move Up</button>
+                                  <button class="move-down-btn">Move Down</button>
+                                  <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
                               </div>
                           </div>
-                          <button id="add-comparison-chart-btn">Compare another app</button>
-                      </div>
-                      <div class="col-md-6">
-                          <h3>Junk Per App Per Day</h3>
-                          <div id="junk-comparison-charts-container">
-                              <div id="junk-chart-container-0">
-                                  <label for="junk_requests_by_day_app_selector">Select App:</label>
-                                  <select id="junk_requests_by_day_app_selector"></select>
-                                  <div class="chart-controls" style="float: right;">
-                                      <button class="move-up-btn">Move Up</button>
-                                      <button class="move-down-btn">Move Down</button>
-                                      <button class="remove-chart-btn" data-chart-id="junk_requests_by_day_chart">Remove</button>
-                                  </div>
-                                  <canvas id="junk_requests_by_day_chart" width="400" height="100"></canvas>
-                                  <hr>
-                              </div>
+                          <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
+                          <div class="junk-chart-wrapper" style="display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                              <h5 style="margin-top: 0;">Junk Traffic</h5>
+                              <canvas id="junk_requests_by_day_chart" width="400" height="100"></canvas>
                           </div>
-                          <button id="add-junk-comparison-chart-btn">Compare another app</button>
+                          <hr>
                       </div>
                   </div>
+                  <button id="add-comparison-chart-btn">Compare another app</button>
               </div>
               <div class="col-md-4">
                   <h3>Response Time (ms)</h3>
