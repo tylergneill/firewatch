@@ -8,7 +8,6 @@ www.skrutable.info 443 173.252.87.1 - - [13/Nov/2025:01:00:31 +0000] "GET /robot
 www.skrutable.info 443 173.252.70.11 - - [13/Nov/2025:01:00:31 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" 0.002
 www.skrutable.info 443 173.252.87.4 - - [13/Nov/2025:01:00:31 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" 0.003
 www.skrutable.info 443 57.141.6.57 - - [13/Nov/2025:01:00:32 +0000] "GET /index.html HTTP/1.1" 404 207 "-" "meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)" 0.002
-skrutable.info 443 20.222.232.51 - - [13/Nov/2025:01:05:57 +0000] "GET /scx.php7 HTTP/1.1" 404 207 "-" "-" 0.002
 skrutable.info 443 51.68.107.154 - - [13/Nov/2025:01:20:08 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.001
 skrutable.info 443 51.68.107.154 - - [13/Nov/2025:01:20:09 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002
 skrutable.info 443 47.128.33.87 - - [13/Nov/2025:01:34:26 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)" 0.002
@@ -1826,56 +1825,15 @@ skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:19 +0000] "GET /assets/
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:27 +0000] "POST / HTTP/1.1" 200 3410 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.118
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:27 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:35 +0000] "POST / HTTP/1.1" 200 3410 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.143
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:35 +0000] "GET / HTTP/1.1" 200 19805 "-" "-" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:35 +0000] "GET / HTTP/1.1" 200 19805 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:35 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:35 +0000] "GET /ex1 HTTP/1.1" 500 141 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:35 +0000] "GET /settings HTTP/1.1" 200 8694 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /ocr HTTP/1.1" 200 16159 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /about HTTP/1.1" 200 6662 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /help HTTP/1.1" 200 8689 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /reset HTTP/1.1" 302 189 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /updates HTTP/1.1" 200 10927 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /api HTTP/1.1" 200 13797 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /scanGRETIL HTTP/1.1" 200 8278 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /reciters HTTP/1.1" 200 7935 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.004
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /api HTTP/1.1" 200 13797 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /setFontSize%2814%29 HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:36 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /scanGRETILresults HTTP/1.1" 200 25770 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /help HTTP/1.1" 200 8689 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /ex3 HTTP/1.1" 200 21991 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /ex1 HTTP/1.1" 500 141 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.004
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /setFontSize%2820%29 HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /scanGRETIL HTTP/1.1" 200 8278 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET /ex2 HTTP/1.1" 200 21409 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:37 +0000] "GET / HTTP/1.1" 200 19805 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:38 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:38 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:38 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:39 +0000] "GET /scanGRETILresults HTTP/1.1" 200 25770 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:40 +0000] "GET /ocr HTTP/1.1" 200 16159 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:40 +0000] "GET /ex1 HTTP/1.1" 500 141 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.004
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:40 +0000] "GET /settings HTTP/1.1" 200 8694 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:40 +0000] "GET /clearOcrResult%28%29 HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:40 +0000] "GET /reset HTTP/1.1" 302 189 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-www.skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:41 +0000] "GET /about HTTP/1.1" 200 6662 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:41 +0000] "GET /ex1 HTTP/1.1" 500 141 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:43 +0000] "POST / HTTP/1.1" 200 3424 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.120
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:43 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:45 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:01:45 +0000] "GET /ocr_instructions HTTP/1.1" 200 10752 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:51 +0000] "POST / HTTP/1.1" 200 3427 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.147
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:01:51 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:00 +0000] "POST / HTTP/1.1" 200 3433 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.150
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:00 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:09 +0000] "POST / HTTP/1.1" 200 3408 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.117
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:10 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:02:11 +0000] "GET /phpinfo HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:19 +0000] "POST / HTTP/1.1" 200 3423 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.138
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:20 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:02:29 +0000] "POST / HTTP/1.1" 200 3422 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.181
@@ -1900,30 +1858,6 @@ skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:04:15 +0000] "POST / HTTP/
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:04:16 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.002
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:04:24 +0000] "POST / HTTP/1.1" 200 3447 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.214
 skrutable.info 443 106.219.155.82 - - [13/Nov/2025:09:04:25 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:33 +0000] "GET /_profiler/phpinfo HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:33 +0000] "GET /wp-config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:34 +0000] "GET /aws-secret.yaml HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:34 +0000] "GET /env.backup HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:44 +0000] "GET /api/shared/config/config.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:44 +0000] "GET /api/shared/config.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:44 +0000] "GET /config.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:55 +0000] "GET /api/config.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:55 +0000] "GET /service/email_service.py HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:55 +0000] "GET /server/config/database.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:04:56 +0000] "GET /scripts/nodemailer.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:15 +0000] "GET /.aws/credentials HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:15 +0000] "GET /wp-config.php.bak HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:15 +0000] "GET /static/js/main.141b0494.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:15 +0000] "GET /static/js/2.ca066a4b.chunk.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:15 +0000] "GET /static/js/main.e85f7a37.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:19 +0000] "GET /app_dev.php/_profiler/phpinfo HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:25 +0000] "GET /server-info HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.001
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:25 +0000] "GET /config.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.003
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:31 +0000] "GET /server.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:31 +0000] "GET /appsettings.json HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:34 +0000] "GET /shared/config/config.js HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:35 +0000] "GET /config/aws.yml HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
-skrutable.info 443 45.148.10.244 - - [13/Nov/2025:09:05:38 +0000] "GET /settings.py HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0" 0.002
 skrutable.info 443 157.49.113.211 - - [13/Nov/2025:09:31:51 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36" 0.002
 skrutable.info 443 157.49.113.211 - - [13/Nov/2025:09:32:03 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36" 0.002
 www.skrutable.info 443 120.138.12.42 - - [13/Nov/2025:09:45:49 +0000] "POST /ocr HTTP/1.1" 200 12647 "https://www.skrutable.info/ocr" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" 43.030
@@ -1948,85 +1882,6 @@ skrutable.info 443 182.77.73.246 - - [13/Nov/2025:11:07:21 +0000] "POST / HTTP/1
 skrutable.info 443 182.77.73.246 - - [13/Nov/2025:11:07:33 +0000] "POST / HTTP/1.1" 502 559 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" 5.421
 www.skrutable.info 443 142.44.220.0 - - [13/Nov/2025:11:10:40 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" 0.002
 www.skrutable.info 443 148.113.130.46 - - [13/Nov/2025:11:10:48 +0000] "GET /api HTTP/1.1" 200 1910 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:10 +0000] "GET / HTTP/1.1" 200 3360 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /src/settings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /meteor.settings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.Staging.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /login?pp=enable&pp=env HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /tsconfig.app.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.004
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /private/config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.004
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/env.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /tsconfig.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/settings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.vscode/sftp.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /phpinfo.php3 HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /index.php/phpinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.009
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/aws.yml HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.011
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /frontend_dev.php/$ HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.010
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /aws.yml HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.012
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET / HTTP/1.1" 200 3360 "-" "Go-http-client/1.1" 0.012
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /_profiler/phpinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.014
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /wp-config.php.bak HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.014
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /prevlaravel/sftp-config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.015
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /hosting.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.012
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/default.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.012
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.Test.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.011
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /public/client/planinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.033
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /phpinfo.php4 HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.032
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.wp-config.php.swp HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.033
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /?pp=env&pp=env HTTP/1.1" 200 3360 "-" "Go-http-client/1.1" 0.019
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.aws/credentials HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.020
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/test.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.020
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/aws.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.024
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /angular.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.024
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/environment.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.027
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /api/config/tsconfig.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.028
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /tsconfig.spec.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.028
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/development.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.030
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.docker/config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.037
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.038
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/production.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.038
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.Production.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.039
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/php.ini HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.043
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.ssh/sftp-config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.Development.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/local.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.001
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /conf/application.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /application/config/constants.php/ HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.004
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/daemon.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.vscode/settings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.007
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /wp-config.php.old HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.009
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /phpinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.aws/config HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.009
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config.js HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.011
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.local HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.011
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /helpers/utility.js HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.010
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /.production HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.012
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /phpinfo.php5 HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.013
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /src/config/environment.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.004
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /config/staging.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.005
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /?pp=enable&pp=env HTTP/1.1" 200 3360 "-" "Go-http-client/1.1" 0.006
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /?phpinfo=1 HTTP/1.1" 200 3360 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /src/config/config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.004
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /settings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.006
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /manifest.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.006
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.QA.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /appsettings.Local.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.007
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /app_dev.php/_profiler/phpinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.001
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /launchSettings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.001
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /env.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /private/env.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.001
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /Properties/launchSettings.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:24 +0000] "GET /sftp-config.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.001
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /sftp.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /.remote HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /symfony/_profiler/phpinfo HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /live_env HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /config/prod.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /config/dev.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.003
-skrutable.info 443 62.60.131.204 - - [13/Nov/2025:11:12:25 +0000] "GET /bundleconfig.json HTTP/1.1" 404 207 "-" "Go-http-client/1.1" 0.002
 skrutable.info 443 182.77.73.246 - - [13/Nov/2025:11:12:33 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" 0.003
 skrutable.info 443 182.77.73.246 - - [13/Nov/2025:11:12:34 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" 0.002
 skrutable.info 443 182.77.73.246 - - [13/Nov/2025:11:12:56 +0000] "POST / HTTP/1.1" 200 3441 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" 0.204
@@ -2625,24 +2480,12 @@ skrutable.info 443 186.19.123.161 - - [13/Nov/2025:14:59:55 +0000] "GET / HTTP/1
 skrutable.info 443 47.128.39.146 - - [13/Nov/2025:15:07:17 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)" 0.002
 www.skrutable.info 443 125.94.144.102 - - [13/Nov/2025:15:12:06 +0000] "GET / HTTP/1.1" 200 3360 "http://www.skrutable.info" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1" 0.003
 skrutable.info 443 54.162.69.192 - - [13/Nov/2025:15:19:48 +0000] "GET /api HTTP/1.1" 200 1910 "-" "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Amazonbot/0.1; +https://developer.amazon.com/support/amazonbot) Chrome/119.0.6045.214 Safari/537.36" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:55 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:56 +0000] "GET /_profiler/phpinfo HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:56 +0000] "GET /blog.env HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:57 +0000] "GET /config.json HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:57 +0000] "GET /.aws/credentials HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:58 +0000] "GET /docker-compose.yml HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:58 +0000] "GET /credentials HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:59 +0000] "GET /.aws/config HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.003
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:59 +0000] "GET /actuator/env HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:59 +0000] "GET /.kube/config HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.003
-skrutable.info 443 195.178.110.48 - - [13/Nov/2025:15:21:59 +0000] "GET /config.yml HTTP/1.1" 404 207 "-" "Mozilla/5.0" 0.002
 www.skrutable.info 443 209.240.10.67 - - [13/Nov/2025:15:30:05 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.003
 www.skrutable.info 443 209.240.10.67 - - [13/Nov/2025:15:30:05 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.004
 www.skrutable.info 443 209.240.10.67 - - [13/Nov/2025:15:30:05 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.002
 www.skrutable.info 443 14.191.157.17 - - [13/Nov/2025:15:42:17 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0" 0.003
 skrutable.info 443 185.185.217.76 - - [13/Nov/2025:15:55:21 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (compatible; intelx.io_bot +https://intelx.io)" 0.003
 skrutable.info 443 42.105.56.198 - - [13/Nov/2025:15:58:57 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "https://skrutable.info/" "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36" 0.002
-skrutable.info 443 4.217.221.207 - - [13/Nov/2025:16:02:12 +0000] "GET /wp-admin/includes HTTP/1.1" 404 207 "-" "-" 0.001
 www.skrutable.info 443 69.246.57.58 - - [13/Nov/2025:16:15:33 +0000] "POST / HTTP/1.1" 200 3376 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.163
 www.skrutable.info 443 69.246.57.58 - - [13/Nov/2025:16:15:33 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.004
 www.skrutable.info 443 69.246.57.58 - - [13/Nov/2025:16:15:33 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.002
@@ -2716,15 +2559,6 @@ skrutable.info 443 34.94.185.169 - - [13/Nov/2025:19:08:16 +0000] "HEAD /wordpre
 skrutable.info 443 34.94.185.169 - - [13/Nov/2025:19:08:16 +0000] "HEAD /new/ HTTP/1.1" 404 0 "http://skrutable.info/new/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Safari/537.36" 0.002
 skrutable.info 443 34.94.185.169 - - [13/Nov/2025:19:08:17 +0000] "HEAD /backup/ HTTP/1.1" 404 0 "http://skrutable.info/backup/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_7_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15" 0.003
 skrutable.info 443 34.7.43.86 - - [13/Nov/2025:19:20:21 +0000] "GET /admin HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" 0.003
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:54 +0000] "GET /wp-admin/includes/ HTTP/1.1" 404 207 "-" "-" 0.003
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:54 +0000] "GET /wp-includes/Text/Diff/Renderer/ HTTP/1.1" 404 207 "-" "-" 0.001
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:54 +0000] "GET /wp-includes/style-engine/ HTTP/1.1" 404 207 "-" "-" 0.002
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:56 +0000] "GET /wp-includes/IXR/ HTTP/1.1" 404 207 "-" "-" 0.002
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:56 +0000] "GET /wp-includes/block-supports/ HTTP/1.1" 404 207 "-" "-" 0.002
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:56 +0000] "GET /wp-includes/fonts/ HTTP/1.1" 404 207 "-" "-" 0.003
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:57 +0000] "GET /wp-includes/js/crop/ HTTP/1.1" 404 207 "-" "-" 0.002
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:57 +0000] "GET /wp-includes/rest-api/ HTTP/1.1" 404 207 "-" "-" 0.002
-skrutable.info 443 40.122.173.152 - - [13/Nov/2025:19:21:57 +0000] "GET /wp-includes/widgets/ HTTP/1.1" 404 207 "-" "-" 0.002
 skrutable.info 443 104.207.47.23 - - [13/Nov/2025:19:28:57 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 OPR/89.0.4447.51" 0.002
 skrutable.info 443 154.213.162.235 - - [13/Nov/2025:19:28:58 +0000] "GET / HTTP/1.1" 200 3360 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 OPR/89.0.4447.51" 0.004
 www.skrutable.info 443 104.207.58.130 - - [13/Nov/2025:19:29:01 +0000] "GET / HTTP/1.1" 200 3360 "https://skrutable.info/" "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 OPR/89.0.4447.51" 0.003
@@ -2802,8 +2636,6 @@ www.skrutable.info 443 73.202.84.219 - - [13/Nov/2025:22:23:14 +0000] "POST / HT
 www.skrutable.info 443 73.202.84.219 - - [13/Nov/2025:22:23:14 +0000] "GET /assets/melodies/-.mp3 HTTP/1.1" 404 207 "https://www.skrutable.info/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15" 0.002
 skrutable.info 443 51.68.111.207 - - [13/Nov/2025:22:30:48 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002
 skrutable.info 443 51.68.111.207 - - [13/Nov/2025:22:30:49 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.003
-skrutable.info 443 93.123.109.152 - - [13/Nov/2025:22:58:41 +0000] "GET /_git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" 0.022
-skrutable.info 443 93.123.109.152 - - [13/Nov/2025:22:58:41 +0000] "GET /git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" 0.015
 skrutable.info 443 44.252.59.175 - - [13/Nov/2025:23:06:06 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FSL 7.0.6.01001)" 0.003
 skrutable.info 443 146.75.237.91 - - [13/Nov/2025:23:10:41 +0000] "GET / HTTP/1.1" 200 3360 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15" 0.004
 skrutable.info 443 51.68.107.161 - - [13/Nov/2025:23:11:27 +0000] "GET /robots.txt HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; MJ12bot/v2.0.4; http://mj12bot.com/)" 0.002

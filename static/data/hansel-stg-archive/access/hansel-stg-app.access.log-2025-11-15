@@ -7,20 +7,3 @@ hansel-stg.duckdns.org 443 209.97.189.117 - - [15/Nov/2025:03:14:27 +0000] "GET 
 hansel-stg.duckdns.org 443 202.120.37.109 - - [15/Nov/2025:03:21:25 +0000] "HEAD / HTTP/1.1" 401 0 "-" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/5d7.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36" 0.000
 hansel-stg.duckdns.org 443 202.120.37.109 - - [15/Nov/2025:03:32:57 +0000] "HEAD / HTTP/1.1" 401 0 "-" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/5d7.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36" 0.000
 hansel-stg.duckdns.org 443 74.7.230.0 - - [15/Nov/2025:06:34:37 +0000] "GET /robots.txt HTTP/1.1" 401 581 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36; compatible; OAI-SearchBot/1.3; robots.txt; +https://openai.com/searchbot" 0.000
-hansel-stg.duckdns.org 443 4.205.254.11 - - [15/Nov/2025:13:59:18 +0000] "GET /.well-known/xin1.php?p HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 4.205.254.11 - - [15/Nov/2025:13:59:21 +0000] "GET /baxa1.phP8 HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 4.205.254.11 - - [15/Nov/2025:13:59:22 +0000] "GET /wp-content/themes/pridmag/db.php?u HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 4.205.254.11 - - [15/Nov/2025:13:59:25 +0000] "GET /wsr2.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:19 +0000] "GET /wp-admin/network/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:20 +0000] "GET /up.php?x= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:25 +0000] "GET /moon.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:25 +0000] "GET /autoload_classmap.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:25 +0000] "GET /fm.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:26 +0000] "GET /file.php? HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:26 +0000] "GET /wp-admin/js/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:27 +0000] "GET /wp-admin/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:27 +0000] "GET /wp-admin/css/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:27 +0000] "GET /manager.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:32 +0000] "GET /wp-admin/includes/xmrlpc.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:36 +0000] "GET /wp-includes/fonts/index.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
-hansel-stg.duckdns.org 443 13.79.87.25 - - [15/Nov/2025:19:53:37 +0000] "GET /wp-content/themes/twentytwentytwo/index.php?p= HTTP/1.1" 401 179 "-" "-" 0.000

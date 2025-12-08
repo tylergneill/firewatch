@@ -155,3 +155,6 @@ hansel-stg.duckdns.org 443 172.190.142.176 - - [13/Nov/2025:08:40:41 +0000] "GET
 hansel-stg.duckdns.org 443 45.144.212.58 - - [13/Nov/2025:09:43:07 +0000] "GET /.git/config HTTP/1.1" 401 581 "-" "Mozilla/5.0 (Linux; Android 9; SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.111 Mobile Safari/537.36" 0.000
 hansel-stg.duckdns.org 443 54.64.159.167 - - [13/Nov/2025:15:11:06 +0000] "GET /.git/config HTTP/1.1" 401 179 "-" "python-httpx/0.27.0" 0.000
 hansel-stg.duckdns.org 443 139.59.32.114 - - [13/Nov/2025:17:36:33 +0000] "GET /wp-login.php HTTP/1.1" 401 179 "-" "Mozilla/5.0" 0.000
+hansel-stg.duckdns.org 443 172.190.142.176 - - [13/Nov/2025:08:40:32 +0000] "GET /scx.php7 HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-stg.duckdns.org 443 213.209.157.81 - - [13/Nov/2025:15:09:59 +0000] "GET / HTTP/1.1" 401 581 "-" "Mozilla/5.0 (Linux; Android 8.0.0; SAMSUNG SM-G935F Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/9.4 Chrome/67.0.3396.87 Mobile Safari/537.36" 0.000
+hansel-stg.duckdns.org 443 54.64.159.167 - - [13/Nov/2025:15:11:06 +0000] "GET / HTTP/1.1" 401 581 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124" 0.000

@@ -422,3 +422,75 @@ panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:53 +0000] "GET /shlo.php
 panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:53 +0000] "GET /CLA.php HTTP/1.1" 404 207 "-" "-" 0.002
 panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:53 +0000] "GET /kill-9-1.php HTTP/1.1" 404 207 "-" "-" 0.002
 panditya.info 443 213.209.157.24 - - [15/Nov/2025:23:39:41 +0000] "GET /.git/credentials HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 YaBrowser/19.7.0.1990 Yowser/2.5 Safari/537.36" 0.001
+panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:39 +0000] "GET / HTTP/1.1" 200 3964 "-" "Mozilla/5.0 (Windows NT 5.0; rv:21.0) Gecko/20100101 Firefox/21.0" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:39 +0000] "GET / HTTP/1.1" 200 3964 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36" 0.003
+panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:41 +0000] "GET /sendgrid.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:41 +0000] "GET /sendgrid.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/125.2 (KHTML, like Gecko) Safari/85.8" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:43 +0000] "GET /twilio.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:44 +0000] "GET /phpinfo/ HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36 OPR/38.0.2220.31" 0.001
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:47 +0000] "GET /app_dev.php/_profiler/phpinfo HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Linux; Android 6.0.1; SAMSUNG SM-N910V 4G Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/4.0 Chrome/44.0.2403.133 Mobile Safari/537.36" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:53 +0000] "GET /.config.yaml HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) coc_coc_browser/50.0.125 Chrome/44.0.2403.125 Safari/537.36" 0.002
+www.panditya.info 443 78.153.140.128 - - [15/Nov/2025:01:39:56 +0000] "GET /secrets.env HTTP/1.1" 404 207 "-" "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; Qwest 1.0)" 0.002
+panditya.info 443 93.123.109.152 - - [15/Nov/2025:08:49:04 +0000] "GET /_git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" 0.001
+panditya.info 443 93.123.109.152 - - [15/Nov/2025:08:49:04 +0000] "GET /git/config HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" 0.009
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:04:32 +0000] "GET / HTTP/1.1" 200 1521 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:04:33 +0000] "GET /static/js/graph.js HTTP/1.1" 200 5426 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:04:34 +0000] "GET /static/js/dropdown.js HTTP/1.1" 200 1071 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:23 +0000] "GET /phpinfo HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:24 +0000] "GET /_profiler/phpinfo HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:33 +0000] "GET /phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /phpinfo.php.bak HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /php_info.php.bak HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /test.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /info.php.bak HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /php_info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:34 +0000] "GET /info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:35 +0000] "GET /php_info.php.old HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:35 +0000] "GET /info.php.old HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:35 +0000] "GET /test.php.bak HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:35 +0000] "GET /phpinfo.php.old HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /info.php.orig HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /phpinfo.php.orig HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /test.php.old HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /php_info.php.orig HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /test.php.orig HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /php_info.php~ HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /php_info.php.backup HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /test.php.backup HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /phpinfo.php.backup HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /phpinfo.php~ HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /info.php.backup HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:49 +0000] "GET /info.php~ HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /test.php.swp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /php_info.php.swp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /test.php~ HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /phpinfo.php.tmp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /test.php.tmp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /info.php.swp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /info.php.tmp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:55 +0000] "GET /php_info.php.tmp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:56 +0000] "GET /phpinfo.php.swp HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:56 +0000] "GET /admin/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /admin/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /test/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /tmp/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /dev/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /dev/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /test/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:05:57 +0000] "GET /tmp/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:01 +0000] "GET /includes/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:01 +0000] "GET /includes/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:19 +0000] "GET /scripts/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:20 +0000] "GET /scripts/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:33 +0000] "GET /public/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:33 +0000] "GET /public/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:33 +0000] "GET /web/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:33 +0000] "GET /web/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:43 +0000] "GET /www/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:43 +0000] "GET /site/info.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.003
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:43 +0000] "GET /www/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.002
+panditya.info 443 54.153.203.13 - - [15/Nov/2025:21:06:43 +0000] "GET /site/phpinfo.php.save HTTP/1.1" 404 207 "-" "python-httpx/0.24.1" 0.001
+panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:34 +0000] "GET /.well-known/xin1.php?p HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:37 +0000] "GET /baxa1.phP8 HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:38 +0000] "GET /wp-content/themes/pridmag/db.php?u HTTP/1.1" 404 207 "-" "-" 0.002
+panditya.info 443 52.184.159.184 - - [15/Nov/2025:23:27:41 +0000] "GET /wsr2.php?p= HTTP/1.1" 404 207 "-" "-" 0.003

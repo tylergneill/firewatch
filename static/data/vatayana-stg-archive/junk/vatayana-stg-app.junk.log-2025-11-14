@@ -152,3 +152,4 @@ vatayana-stg.duckdns.org 443 20.196.107.56 - - [14/Nov/2025:03:56:12 +0000] "GET
 vatayana-stg.duckdns.org 443 20.196.107.56 - - [14/Nov/2025:03:56:12 +0000] "GET /144.php HTTP/1.1" 502 157 "-" "-" 0.000
 vatayana-stg.duckdns.org 443 20.196.107.56 - - [14/Nov/2025:03:56:13 +0000] "GET /exhitrgp.php HTTP/1.1" 502 157 "-" "-" 0.000
 vatayana-stg.duckdns.org 443 20.196.107.56 - - [14/Nov/2025:03:56:13 +0000] "GET /n3.php HTTP/1.1" 502 157 "-" "-" 0.000
+vatayana-stg.duckdns.org 443 20.196.107.56 - - [14/Nov/2025:03:55:22 +0000] "GET /scx.php7 HTTP/1.1" 502 157 "-" "-" 0.000

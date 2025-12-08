@@ -1,0 +1,16 @@
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:25 +0000] "GET /wp-admin/network/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:27 +0000] "GET /up.php?x= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:33 +0000] "GET /moon.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:33 +0000] "GET /autoload_classmap.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:34 +0000] "GET /fm.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:34 +0000] "GET /file.php? HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:36 +0000] "GET /wp-admin/js/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:36 +0000] "GET /wp-admin/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:36 +0000] "GET /wp-admin/css/wp-conflg.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:36 +0000] "GET /manager.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:42 +0000] "GET /wp-admin/includes/xmrlpc.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:49 +0000] "GET /wp-includes/fonts/index.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+hansel-library.info 443 13.79.87.25 - - [16/Nov/2025:14:25:50 +0000] "GET /wp-content/themes/twentytwentytwo/index.php?p= HTTP/1.1" 401 179 "-" "-" 0.000
+146.190.74.47 443 78.153.140.203 - - [16/Nov/2025:16:23:31 +0000] "GET /app_dev.php/_profiler/phpinfo HTTP/1.1" 401 179 "-" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" 0.000
+146.190.74.47 443 78.153.140.203 - - [16/Nov/2025:16:23:32 +0000] "GET /?phpinfo=-1 HTTP/1.1" 401 179 "-" "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2 ( .NET CLR 3.0.04506.648)" 0.000
+146.190.74.47 443 78.153.140.203 - - [16/Nov/2025:16:23:38 +0000] "GET /aws.yml HTTP/1.1" 401 581 "-" "Mozilla/5.0 (Linux; U; Android 4.4.2; en-us; LGLS740 Build/KOT49I.LS740ZV5) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.1599.103 Mobile Safari/537.36" 0.000
