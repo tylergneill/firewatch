@@ -173,20 +173,41 @@
               </div>
               <div class="col-md-12">
                   <h3>Per App Per Day</h3>
-                  <div id="comparison-charts-container">
-                      <div id="chart-container-0">
-                          <label for="requests_by_day_app_selector">Select App:</label>
-                          <select id="requests_by_day_app_selector"></select>
-                          <div class="chart-controls" style="float: right;">
-                              <button class="move-up-btn">Move Up</button>
-                              <button class="move-down-btn">Move Down</button>
-                              <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                  <div class="row">
+                      <div class="col-md-6">
+                          <div id="comparison-charts-container">
+                              <div id="chart-container-0">
+                                  <label for="requests_by_day_app_selector">Select App:</label>
+                                  <select id="requests_by_day_app_selector"></select>
+                                  <div class="chart-controls" style="float: right;">
+                                      <button class="move-up-btn">Move Up</button>
+                                      <button class="move-down-btn">Move Down</button>
+                                      <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                                  </div>
+                                  <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
+                                  <hr>
+                              </div>
                           </div>
-                          <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
-                          <hr>
+                          <button id="add-comparison-chart-btn">Compare another app</button>
+                      </div>
+                      <div class="col-md-6">
+                          <h3>Junk Per App Per Day</h3>
+                          <div id="junk-comparison-charts-container">
+                              <div id="junk-chart-container-0">
+                                  <label for="junk_requests_by_day_app_selector">Select App:</label>
+                                  <select id="junk_requests_by_day_app_selector"></select>
+                                  <div class="chart-controls" style="float: right;">
+                                      <button class="move-up-btn">Move Up</button>
+                                      <button class="move-down-btn">Move Down</button>
+                                      <button class="remove-chart-btn" data-chart-id="junk_requests_by_day_chart">Remove</button>
+                                  </div>
+                                  <canvas id="junk_requests_by_day_chart" width="400" height="100"></canvas>
+                                  <hr>
+                              </div>
+                          </div>
+                          <button id="add-junk-comparison-chart-btn">Compare another app</button>
                       </div>
                   </div>
-                  <button id="add-comparison-chart-btn">Compare another app</button>
               </div>
               <div class="col-md-4">
                   <h3>Response Time (ms)</h3>
@@ -382,6 +403,7 @@
     </script>
     <script id="requests_by_day_labels" type="application/json">{{ requests_by_day_labels|safe }}</script>
     <script id="requests_by_day_data" type="application/json">{{ requests_by_day_data|safe }}</script>
+    <script id="junk_requests_by_day_data" type="application/json">{{ junk_requests_by_day_data|safe }}</script>
     <script src="{{ url_for('static', filename='web/script.js') }}"></script>
     <script>
         // On page load, set the initial view mode based on the value passed from the Flask backend

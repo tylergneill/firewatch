@@ -38,6 +38,16 @@ LOG_RE = re.compile(
 )
 
 
+JUNK_LOG_RE = re.compile(
+    r'^\S+\s+'                 # $host
+    r'\S+\s+'                  # $server_port
+    r'(?P<ip>\S+)\s+'                    # $remote_addr
+    r'-\s+'                              # literal dash
+    r'-\s+'           # literal dash
+    r'\[(?P<time>[^\]]+)\]\s+'           # [time_local]
+)
+
+
 def tail_lines(path: pathlib.Path, n: int):
     """Return last n lines of a text file as bytes."""
     if n <= 0:
@@ -118,6 +128,33 @@ def parse_line(line: bytes):
     }
 
 
+def parse_junk_line(line: bytes):
+    """Parse one junk log line into fields used by the summary."""
+    try:
+        s = line.decode("utf-8", errors="replace").strip()
+    except Exception:
+        return None
+
+    if not s:
+        return None
+
+    m = JUNK_LOG_RE.match(s)
+    if not m:
+        return None
+
+    d = m.groupdict()
+
+    try:
+        time = datetime.datetime.strptime(d['time'], "%d/%b/%Y:%H:%M:%S %z")
+    except (ValueError, KeyError):
+        time = None
+
+    return {
+        "ip": d["ip"],
+        "time": time,
+    }
+
+
 @lru_cache(maxsize=2048)
 def get_geo_for_ip(ip: str):
     """Get geo location for an IP, with in-memory caching."""
@@ -168,6 +205,27 @@ def get_log_sources_for_app(app_name, data_dir, start_date, end_date):
         if current_log_path.is_file():
             log_files.add(current_log_path)
 
+    return sorted(list(log_files))
+
+
+def get_junk_log_sources_for_app(app_name, data_dir, start_date, end_date):
+    """
+    Finds all relevant junk log files for a given app and date range.
+    """
+    archive_dir = data_dir / f"{app_name}-archive" / "junk"
+    log_files = set()
+    delta = end_date - start_date
+    for i in range(delta.days + 1):
+        day = start_date + datetime.timedelta(days=i)
+        date_str = day.isoformat()
+        archived_log_path = archive_dir / f"{app_name}-app.junk.log-{date_str}"
+        if archived_log_path.is_file():
+            log_files.add(archived_log_path)
+    today = datetime.date.today()
+    if start_date <= today and today <= end_date:
+        current_log_path = data_dir / f"{app_name}-app.junk.log"
+        if current_log_path.is_file():
+            log_files.add(current_log_path)
     return sorted(list(log_files))
 
 
@@ -279,4 +337,38 @@ def _process_single_log_file(file_path_str: str, app_names: list):
         "app_ip_sets": serializable_app_ip_sets,
         "app_requests_by_day": serializable_app_requests_by_day,
         "uptime_data": serializable_uptime_data,
+    }
+
+
+def _process_single_junk_log_file(file_path_str: str, app_names: list):
+    """
+    Processes a single junk log file and returns aggregated data.
+    """
+    file_path = pathlib.Path(file_path_str)
+    
+    file_junk_requests_by_day = defaultdict(lambda: defaultdict(int))
+
+    app_name = "unknown"
+    for name in app_names:
+        if name in file_path.name:
+            app_name = name
+            break
+            
+    for line in read_lines_from_files([file_path]):
+        p = parse_junk_line(line)
+        if not p:
+            continue
+            
+        if p['time']:
+            log_date = p['time'].date()
+            file_junk_requests_by_day[app_name][log_date] += 1
+            
+    serializable_junk_requests_by_day = {
+        app: {date.isoformat(): count for date, count in daily_counts.items()}
+        for app, daily_counts in file_junk_requests_by_day.items()
+    }
+    
+    return {
+        "app_name": app_name,
+        "junk_requests_by_day": serializable_junk_requests_by_day,
     }

@@ -11,9 +11,9 @@ from urllib.parse import urlparse, parse_qs
 
 from utils.utils import (
     find_app_version, parse_line, get_geo_for_ip,
-    get_log_sources_for_app,
+    get_log_sources_for_app, get_junk_log_sources_for_app,
     read_lines_from_files, get_dates_from_request_args, tail_lines,
-    _process_single_log_file
+    _process_single_log_file, _process_single_junk_log_file
 )
 from utils.constants import app_names, LOG_FILE_PATH, HTTP_STATUS_CODES
 
@@ -21,8 +21,6 @@ from utils.constants import app_names, LOG_FILE_PATH, HTTP_STATUS_CODES
 DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
-
-
 
 MAX_LINES_PER_FILE = 20
 
@@ -102,6 +100,7 @@ def index():
     app_response_times = defaultdict(list)
     app_ip_sets = defaultdict(set)
     app_requests_by_day = defaultdict(lambda: defaultdict(int))
+    junk_requests_by_day = defaultdict(lambda: defaultdict(int))
     
     # Initialize uptime data structures
     uptime_data = {}
@@ -117,6 +116,7 @@ def index():
     with shelve.open(CACHE_FILE) as cache:
         for app_name in selected_apps:
             log_files_for_app = get_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
+            junk_log_files_for_app = get_junk_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
             
             for log_file in log_files_for_app:
                 log_file_str = str(log_file.resolve())
@@ -159,6 +159,25 @@ def index():
                         uptime_data[app_name][date_obj]['5xx'] += counts.get('5xx', 0)
                         uptime_data[app_name][date_obj]['total'] += counts.get('total', 0)
 
+            for log_file in junk_log_files_for_app:
+                log_file_str = str(log_file.resolve())
+                is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
+
+                processed_file_data = None
+                cache_key = f"junk_{log_file_str}"
+                if not is_current_active_log_file and cache_key in cache:
+                    processed_file_data = cache[cache_key]
+                else:
+                    processed_file_data = _process_single_junk_log_file(log_file_str, app_names)
+                    if not is_current_active_log_file:
+                        cache[cache_key] = processed_file_data
+                
+                if not processed_file_data:
+                    continue
+                
+                for date_str, count in processed_file_data["junk_requests_by_day"].get(app_name, {}).items():
+                    junk_requests_by_day[app_name][datetime.date.fromisoformat(date_str)] += count
+
             # Raw view data
             if tail_filter_ip or tail_filter_status:
                 filtered_lines = []
@@ -191,6 +210,9 @@ def index():
     requests_by_day_data = {}
     for app_name in selected_apps:
         requests_by_day_data[app_name] = [app_requests_by_day[app_name].get(date, 0) for date in all_dates]
+    junk_requests_by_day_data = {}
+    for app_name in selected_apps:
+        junk_requests_by_day_data[app_name] = [junk_requests_by_day[app_name].get(date, 0) for date in all_dates]
 
     # Finalize uptime data colors
     final_uptime_data = {}
@@ -370,6 +392,7 @@ def index():
         uptime_color_explanations=uptime_color_explanations,
         requests_by_day_labels=json.dumps(requests_by_day_labels),
         requests_by_day_data=json.dumps(requests_by_day_data),
+        junk_requests_by_day_data=json.dumps(junk_requests_by_day_data),
     )
 
 
@@ -394,7 +417,7 @@ def select_apps():
         # Convert list values from parse_qs to single values suitable for url_for.
         redirect_args = {k: v[0] for k, v in query_params.items()}
         
-        # Prioritize parameters submitted directly with the form (e.g., view_mode),
+        # Prioritize parameters submitted directly with the form (e.g., view_memode),
         # then fallback to parameters from the referrer's query string,
         # and finally to hardcoded defaults if neither is available.
         # This ensures view state and other filters are maintained across app selections.

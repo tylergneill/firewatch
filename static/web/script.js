@@ -364,6 +364,146 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     updateChartControls(); // Initial check
+
+    let junkChartCounter = 0;
+    const junkCharts = {};
+
+    const junk_requests_by_day_data = JSON.parse(document.getElementById('junk_requests_by_day_data').textContent);
+
+    function updateJunkChartControls() {
+        const chartContainers = document.querySelectorAll('#junk-comparison-charts-container [id^="junk-chart-container-"]');
+        const showControls = chartContainers.length > 1;
+        chartContainers.forEach(container => {
+            const controls = container.querySelector('.chart-controls');
+            if (controls) {
+                controls.style.display = showControls ? 'block' : 'none';
+            }
+        });
+    }
+
+    function renderJunkRequestsByDayChart(canvasId, selectedApp) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        
+        if (junkCharts[canvasId]) {
+            junkCharts[canvasId].destroy();
+        }
+
+        junkCharts[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: requests_by_day_labels,
+                datasets: [{
+                    label: `Total Junk Requests for ${selectedApp}`,
+                    data: junk_requests_by_day_data[selectedApp],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                animation: {
+                    duration: 0
+                }
+            }
+        });
+    }
+
+    function addJunkChartEventListeners(chartContainer, chartId) {
+        const moveUpButton = chartContainer.querySelector('.move-up-btn');
+        const moveDownButton = chartContainer.querySelector('.move-down-btn');
+        const removeButton = chartContainer.querySelector('.remove-chart-btn');
+
+        moveUpButton.addEventListener('click', () => {
+            const parent = chartContainer.parentNode;
+            if (chartContainer.previousElementSibling) {
+                parent.insertBefore(chartContainer, chartContainer.previousElementSibling);
+            }
+        });
+
+        moveDownButton.addEventListener('click', () => {
+            const parent = chartContainer.parentNode;
+            if (chartContainer.nextElementSibling) {
+                parent.insertBefore(chartContainer.nextElementSibling, chartContainer);
+            }
+        });
+        
+        removeButton.addEventListener('click', () => {
+            if (junkCharts[chartId]) {
+                junkCharts[chartId].destroy();
+                delete junkCharts[chartId];
+            }
+            chartContainer.remove();
+            updateJunkChartControls();
+        });
+    }
+
+    const initialJunkChartContainer = document.getElementById('junk-chart-container-0');
+    const initialJunkAppSelector = document.getElementById('junk_requests_by_day_app_selector');
+    if (SELECTED_APPS.length > 0) {
+        SELECTED_APPS.forEach(app => {
+            const option = document.createElement('option');
+            option.value = app;
+            option.textContent = app;
+            initialJunkAppSelector.appendChild(option);
+        });
+        renderJunkRequestsByDayChart('junk_requests_by_day_chart', SELECTED_APPS[0]);
+        initialJunkAppSelector.addEventListener('change', (event) => {
+            renderJunkRequestsByDayChart('junk_requests_by_day_chart', event.target.value);
+        });
+        addJunkChartEventListeners(initialJunkChartContainer, 'junk_requests_by_day_chart');
+    } else {
+        initialJunkChartContainer.style.display = 'none';
+    }
+
+    document.getElementById('add-junk-comparison-chart-btn').addEventListener('click', () => {
+        junkChartCounter++;
+        const newChartId = `junk_comparison_chart_${junkChartCounter}`;
+        const newSelectorId = `junk_comparison_selector_${junkChartCounter}`;
+        
+        const newChartContainer = document.createElement('div');
+        newChartContainer.id = `junk-chart-container-${junkChartCounter}`;
+        newChartContainer.innerHTML = `
+            <label for="${newSelectorId}">Select App:</label>
+            <select id="${newSelectorId}"></select>
+            <div class="chart-controls" style="float: right;">
+                <button class="move-up-btn">Move Up</button>
+                <button class="move-down-btn">Move Down</button>
+                <button class="remove-chart-btn" data-chart-id="${newChartId}">Remove</button>
+            </div>
+            <canvas id="${newChartId}" width="400" height="100"></canvas>
+            <hr>
+        `;
+        
+        document.getElementById('junk-comparison-charts-container').appendChild(newChartContainer);
+        
+        const newSelector = document.getElementById(newSelectorId);
+        if (SELECTED_APPS.length > 0) {
+            SELECTED_APPS.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app;
+                option.textContent = app;
+                newSelector.appendChild(option);
+            });
+            renderJunkRequestsByDayChart(newChartId, SELECTED_APPS[0]);
+            newSelector.addEventListener('change', (event) => {
+                renderJunkRequestsByDayChart(newChartId, event.target.value);
+            });
+            addJunkChartEventListeners(newChartContainer, newChartId);
+        }
+        updateJunkChartControls();
+    });
+
+    updateJunkChartControls();
 });
 
 // Dark mode toggle
