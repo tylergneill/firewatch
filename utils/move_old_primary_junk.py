@@ -11,7 +11,6 @@ from primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 """
 Usage: python move_old_primary_junk.py \
   --data-dir static/data \
-  --junk-dir static/data \
   --cache-file static/cache/firewatch_cache.db
 """
 
@@ -107,25 +106,25 @@ def process_log_file(log_path: pathlib.Path):
     return len(good_lines), len(junk_lines)
 
 
-def main(data_dir: str, cache_file: str):
+def main(args):
     """
     Main function to find and process all log files.
     """
-    data_path = pathlib.Path(data_dir)
+    data_path = pathlib.Path(args.data_dir)
 
     if not data_path.is_dir():
-        print(f"Error: Data directory not found at '{data_dir}'")
+        print(f"Error: Data directory not found at '{args.data_dir}'")
         sys.exit(1)
 
     print(f"Starting crawler purge for directory: {data_path}")
-    print(f"Purging cache entries from: {cache_file}")
+    print(f"Purging cache entries from: {args.cache_file}")
 
     log_files = sorted(data_path.rglob('*.access.log*'))
     print(f"Found {len(log_files)} log files to process.\n")
 
     app_stats = defaultdict(lambda: {'good': 0, 'newly_junk': 0})
 
-    with shelve.open(cache_file) as cache:
+    with shelve.open(args.cache_file) as cache:
         for log_file in log_files:
             if log_file.is_file():
                 app_name_parts = log_file.name.split('-app.access.log')
@@ -185,14 +184,14 @@ def main(data_dir: str, cache_file: str):
         
         percent_purged_overall = (total_in_junk_file / true_original_lines * 100) if true_original_lines > 0 else 0
         
-        print(f"{app_name:<25} | {true_original_lines:>15,d} | {newly_purged:>15,d} | {total_in_junk_file:>15,d} | {percent_purged_overall:>19.2f}%")
+        print(f"{app_name:<25} | {true_original_lines:>15,} | {newly_purged:>15,} | {total_in_junk_file:>15,} | {percent_purged_overall:>19.2f}%")
 
     grand_total_junk = sum(total_junk_stats.values())
     grand_total_original_overall = grand_total_good + grand_total_junk
 
     print("-" * len(header))
     total_percent_purged_overall = (grand_total_junk / grand_total_original_overall * 100) if grand_total_original_overall > 0 else 0
-    print(f"{'Total':<25} | {grand_total_original_overall:>15,d} | {grand_total_newly_purged:>15,d} | {grand_total_junk:>15,d} | {total_percent_purged_overall:>19.2f}%")
+    print(f"{'Total':<25} | {grand_total_original_overall:>15,} | {grand_total_newly_purged:>15,} | {grand_total_junk:>15,} | {total_percent_purged_overall:>19.2f}%")
     print("\nPurge complete.")
 
 
@@ -211,4 +210,4 @@ if __name__ == "__main__":
         help="The path to the shelve cache file to purge."
     )
     args = parser.parse_args()
-    main(args.data_dir, args.cache_file)
+    main(args)
