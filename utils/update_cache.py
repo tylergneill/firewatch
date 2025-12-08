@@ -25,9 +25,10 @@ def update_cache(start_date, end_date):
     """
     print(f"Updating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
 
-    CACHE_DIR = "../static/cache"
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    CACHE_FILE = os.path.join(CACHE_DIR, "firewatch_cache.db")
+    CACHE_DIR = project_root / "static" / "cache"
+    os.makedirs(str(CACHE_DIR), exist_ok=True)
+    CACHE_FILE = CACHE_DIR / "firewatch_cache.db"
+
 
     with shelve.open(CACHE_FILE) as cache:
         for app_name in app_names:
