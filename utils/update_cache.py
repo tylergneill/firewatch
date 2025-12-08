@@ -6,6 +6,13 @@ import time
 import sys
 from pathlib import Path
 
+"""
+Usage Options:
+    python utils/update_cache.py --rebuild-all  # for a full refresh
+    python utils/update_cache.py --start-date YYYY-MM-DD --end-date YYYY-MM-DD  # for a partial update
+"""
+
+
 # Add project root to path to allow importing from flask_app
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
@@ -19,18 +26,37 @@ Usage: nice -n 19 python update_cache.py --start-date 2025-03-01 --end-date 2025
 """
 
 
-def update_cache(start_date, end_date):
+def update_cache(start_date, end_date, rebuild_all=False):
     """
-    Populates the cache for all apps for a given date range.
+    Populates the cache for all apps.
+    If rebuild_all is True, clears the cache and processes all logs.
+    Otherwise, updates only the logs within the given date range.
     """
-    print(f"Updating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
+    if rebuild_all:
+        print("Rebuilding entire cache (Scorched Earth Mode)...")
+        # Set a wide date range to capture all logs
+        start_date = datetime.date(2020, 1, 1)
+        end_date = datetime.date.today()
+    else:
+        print(f"Updating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
 
     CACHE_DIR = project_root / "static" / "cache"
     os.makedirs(str(CACHE_DIR), exist_ok=True)
     CACHE_FILE = CACHE_DIR / "firewatch_cache.db"
 
 
-    with shelve.open(CACHE_FILE) as cache:
+    if rebuild_all and CACHE_FILE.exists():
+        print(f"  - Deleting existing cache file: {CACHE_FILE}")
+        # shelve creates multiple files, so we need to remove them all
+        # Common extensions are .db, .dat, .bak, .dir or no extension + .db (bsddb)
+        # But the globs below should cover the standard cases on Linux/Mac
+        for f in CACHE_FILE.parent.glob(f"{CACHE_FILE.name}*"):
+            try:
+                f.unlink()
+            except OSError as e:
+                print(f"    Error deleting {f}: {e}")
+
+    with shelve.open(str(CACHE_FILE)) as cache:
         for app_name in app_names:
             print(f"  Processing app: {app_name}")
 
@@ -65,24 +91,44 @@ def update_cache(start_date, end_date):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Update the cache for the Firewatch application.")
-    parser.add_argument(
+    
+    # Create a mutually exclusive group so user must pick a strategy
+    mode_group = parser.add_argument_group('Update Mode')
+    
+    # Option 1: Selective update (requires dates)
+    mode_group.add_argument(
         '--start-date',
-        required=True,
-        help="Start date in YYYY-MM-DD format."
+        help="Start date in YYYY-MM-DD format. Required unless --rebuild-all is set."
     )
-    parser.add_argument(
+    mode_group.add_argument(
         '--end-date',
-        required=True,
-        help="End date in YYYY-MM-DD format."
+        help="End date in YYYY-MM-DD format. Required unless --rebuild-all is set."
+    )
+    
+    # Option 2: Scorched earth (no dates needed)
+    mode_group.add_argument(
+        '--rebuild-all',
+        action='store_true',
+        help="Delete the existing cache and process ALL available log files from scratch."
     )
 
     args = parser.parse_args()
 
-    try:
-        start = datetime.date.fromisoformat(args.start_date)
-        end = datetime.date.fromisoformat(args.end_date)
-    except ValueError:
-        print("Error: Dates must be in YYYY-MM-DD format.")
-        exit(1)
+    # Validation
+    if args.rebuild_all:
+        if args.start_date or args.end_date:
+            print("Warning: --start-date and --end-date are ignored when --rebuild-all is set.")
+        start = None
+        end = None
+    else:
+        if not args.start_date or not args.end_date:
+            parser.error("Both --start-date and --end-date are required for selective update mode.")
+        
+        try:
+            start = datetime.date.fromisoformat(args.start_date)
+            end = datetime.date.fromisoformat(args.end_date)
+        except ValueError:
+            print("Error: Dates must be in YYYY-MM-DD format.")
+            exit(1)
 
-    update_cache(start, end)
+    update_cache(start, end, rebuild_all=args.rebuild_all)
