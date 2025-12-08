@@ -26,7 +26,7 @@ Usage: nice -n 19 python update_cache.py --start-date 2025-03-01 --end-date 2025
 """
 
 
-def update_cache(start_date, end_date, rebuild_all=False):
+def update_cache(start_date, end_date, rebuild_all=False, db_file=None, data_dir=None):
     """
     Populates the cache for all apps.
     If rebuild_all is True, clears the cache and processes all logs.
@@ -40,9 +40,17 @@ def update_cache(start_date, end_date, rebuild_all=False):
     else:
         print(f"Updating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
 
-    CACHE_DIR = project_root / "static" / "cache"
-    os.makedirs(str(CACHE_DIR), exist_ok=True)
-    CACHE_FILE = CACHE_DIR / "firewatch_cache.db"
+    if db_file:
+        CACHE_FILE = Path(db_file)
+    else:
+        CACHE_DIR = project_root / "static" / "cache"
+        os.makedirs(str(CACHE_DIR), exist_ok=True)
+        CACHE_FILE = CACHE_DIR / "firewatch_cache.db"
+        
+    if data_dir:
+        data_path = Path(data_dir)
+    else:
+        data_path = LOG_FILE_PATH
 
 
     if rebuild_all and CACHE_FILE.exists():
@@ -61,7 +69,7 @@ def update_cache(start_date, end_date, rebuild_all=False):
             print(f"  Processing app: {app_name}")
 
             # Process access logs
-            access_log_files_for_app = get_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
+            access_log_files_for_app = get_log_sources_for_app(app_name, data_path, start_date, end_date)
             if not access_log_files_for_app:
                 print(f"    No access log files found for this date range.")
             else:
@@ -74,7 +82,7 @@ def update_cache(start_date, end_date, rebuild_all=False):
                 print(f"    Finished processing {len(access_log_files_for_app)} access file(s) for {app_name}.")
 
             # Process junk logs
-            junk_log_files_for_app = get_junk_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
+            junk_log_files_for_app = get_junk_log_sources_for_app(app_name, data_path, start_date, end_date)
             if not junk_log_files_for_app:
                 print(f"    No junk log files found for this date range.")
             else:
@@ -112,6 +120,17 @@ if __name__ == "__main__":
         help="Delete the existing cache and process ALL available log files from scratch."
     )
 
+    parser.add_argument(
+        '--data-dir',
+        default=None,
+        help="Path to the data directory containing log files (default: ../firewatch-data)"
+    )
+    parser.add_argument(
+        '--db-file',
+        default=None,
+        help="Path to the shelve cache file (default: static/cache/firewatch_cache.db)"
+    )
+
     args = parser.parse_args()
 
     # Validation
@@ -131,4 +150,4 @@ if __name__ == "__main__":
             print("Error: Dates must be in YYYY-MM-DD format.")
             exit(1)
 
-    update_cache(start, end, rebuild_all=args.rebuild_all)
+    update_cache(start, end, rebuild_all=args.rebuild_all, db_file=args.db_file, data_dir=args.data_dir)
