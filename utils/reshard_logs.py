@@ -76,100 +76,96 @@ def main():
 
     all_files = [p for p in log_root_dir.rglob('*') if p.is_file()]
     
-    # Identify all potential shard paths first and clear them to ensure a clean run
-    all_shard_paths = set()
-    for file_path in all_files:
-        archive_dir, base_filename = get_log_parts(file_path, log_root_dir)
-        if archive_dir:
-            # This doesn't know the date, so we can't know the exact shard path.
-            # Deleting all files in the archive dir is too risky.
-            # A better approach is to write to temp files and then move.
-            pass
-    
-    # For simplicity and to avoid deleting wrong files, we will build new files
-    # and then replace old ones. We'll collect all data in memory first. This
-    # is a rollback of the no-buffering idea, but with the *correct* logic.
-
-    files_to_process = sorted([p for p in all_files if get_log_parts(p, log_root_dir)[0] is not None])
-    
-    shards = defaultdict(list)
+    # We'll collect all data in memory first for each app individually.
     today = datetime.now(timezone.utc).date()
 
-    # --- Pass 1: Read all logs and organize them into daily lists, preserving order ---
-    for file_path in files_to_process:
-        print(f"Reading {file_path.relative_to(log_root_dir)}", file=sys.stderr)
-        try:
-            with file_path.open("r", encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    ts = parse_time_from_line(line)
-                    shard_date = ts.astimezone(timezone.utc).date() if ts else None
-                    
-                    archive_dir, base_filename = get_log_parts(file_path, log_root_dir)
-                    if not archive_dir: continue
+    # Get app names from the directory structure
+    app_names = sorted(list(set([f.name.split('-app.')[0] for f in all_files if '-app.' in f.name])))
 
-                    if shard_date:
-                        shard_path = archive_dir / f"{base_filename}-{shard_date.isoformat()}"
-                    else:
-                        shard_path = archive_dir / f"{base_filename}-unparsable"
-                    
-                    shards[shard_path].append(line)
-
-        except Exception as e:
-            print(f"Error reading {file_path}: {e}", file=sys.stderr)
-
-    # --- Pass 2: Write out all shards, preserving original collected order ---
-    written_shards = set()
-    for shard_path, lines in shards.items():
-        if not lines:
+    for app_name in app_names:
+        print(f"\n--- Processing app: {app_name} ---", file=sys.stderr)
+        app_files_to_process = sorted([
+            p for p in all_files 
+            if p.name.startswith(app_name + '-app.') and get_log_parts(p, log_root_dir)[0] is not None
+        ])
+        
+        if not app_files_to_process:
+            print(f"No log files found for {app_name}.", file=sys.stderr)
             continue
-        print(f"Writing shard {shard_path.relative_to(log_root_dir)}", file=sys.stderr)
-        shard_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        # Use temp file to avoid race conditions or corruption
-        temp_path = shard_path.with_suffix(shard_path.suffix + '.tmp')
-        try:
-            with temp_path.open("w", encoding="utf-8") as f:
-                f.writelines(lines)
-            shutil.move(temp_path, shard_path)
-            written_shards.add(shard_path)
-        except Exception as e:
-            print(f"Error writing to {shard_path}: {e}", file=sys.stderr)
-        finally:
-            if temp_path.exists():
-                temp_path.unlink()
 
-    # --- Pass 3: Clean up original files ---
-    for file_path in files_to_process:
-        is_top_level = file_path.parent == log_root_dir
-        
-        if is_top_level:
-            todays_lines = []
-            with file_path.open("r", encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    ts = parse_time_from_line(line)
-                    if ts and ts.astimezone(timezone.utc).date() == today:
-                        todays_lines.append(line)
+        shards = defaultdict(list)
 
-            if todays_lines:
-                print(f"Updating top-level log: {file_path.name}", file=sys.stderr)
-                file_path.write_text("".join(todays_lines))
-            else:
-                print(f"Deleting empty top-level log: {file_path.name}", file=sys.stderr)
-                file_path.unlink()
-        else: # It's an archived file that was processed
-            # Delete it only if it wasn't one of the final written shards
-            if file_path not in written_shards:
-                print(f"Deleting original archived log: {file_path.relative_to(log_root_dir)}", file=sys.stderr)
-                try:
+        # --- Pass 1: Read all logs for the current app and organize them into daily lists ---
+        for file_path in app_files_to_process:
+            print(f"Reading {file_path.relative_to(log_root_dir)} for {app_name}", file=sys.stderr)
+            try:
+                with file_path.open("r", encoding="utf-8", errors="replace") as f:
+                    for line in f:
+                        ts = parse_time_from_line(line)
+                        shard_date = ts.astimezone(timezone.utc).date() if ts else None
+                        
+                        archive_dir, base_filename = get_log_parts(file_path, log_root_dir)
+                        if not archive_dir: continue # Should not happen with app_files_to_process filtering
+
+                        if shard_date:
+                            shard_path = archive_dir / f"{base_filename}-{shard_date.isoformat()}"
+                        else:
+                            shard_path = archive_dir / f"{base_filename}-unparsable"
+                        
+                        shards[shard_path].append(line)
+
+            except Exception as e:
+                print(f"Error reading {file_path}: {e}", file=sys.stderr)
+
+        # --- Pass 2: Write out all shards for the current app ---
+        written_shards = set()
+        for shard_path, lines in shards.items():
+            if not lines:
+                continue
+            print(f"Writing shard {shard_path.relative_to(log_root_dir)} for {app_name}", file=sys.stderr)
+            shard_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            temp_path = shard_path.with_suffix(shard_path.suffix + '.tmp')
+            try:
+                with temp_path.open("w", encoding="utf-8") as f:
+                    f.writelines(lines)
+                shutil.move(temp_path, shard_path)
+                written_shards.add(shard_path)
+            except Exception as e:
+                print(f"Error writing to {shard_path}: {e}", file=sys.stderr)
+            finally:
+                if temp_path.exists():
+                    temp_path.unlink()
+
+        # --- Pass 3: Clean up original files for the current app ---
+        for file_path in app_files_to_process:
+            is_top_level = file_path.parent == log_root_dir
+            
+            if is_top_level:
+                todays_lines = []
+                with file_path.open("r", encoding="utf-8", errors="replace") as f:
+                    for line in f:
+                        ts = parse_time_from_line(line)
+                        if ts and ts.astimezone(timezone.utc).date() == today:
+                            todays_lines.append(line)
+
+                if todays_lines:
+                    print(f"Updating top-level log: {file_path.name}", file=sys.stderr)
+                    file_path.write_text("".join(todays_lines))
+                else:
+                    print(f"Deleting empty top-level log: {file_path.name}", file=sys.stderr)
                     file_path.unlink()
-                except FileNotFoundError:
-                    pass
-                except Exception as e:
-                    print(f"Error deleting {file_path}: {e}", file=sys.stderr)
+            else:
+                if file_path not in written_shards:
+                    print(f"Deleting original archived log: {file_path.relative_to(log_root_dir)}", file=sys.stderr)
+                    try:
+                        file_path.unlink()
+                    except FileNotFoundError:
+                        pass
+                    except Exception as e:
+                        print(f"Error deleting {file_path}: {e}", file=sys.stderr)
 
-
-    print("Sharding complete.", file=sys.stderr)
-
+    print("\nSharding complete.", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
