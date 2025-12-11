@@ -128,7 +128,7 @@ def index():
                 if not is_current_active_log_file and log_file_str in cache:
                     processed_file_data = cache[log_file_str]
                 else:
-                    processed_file_data = _process_single_log_file(log_file_str, app_names)
+                    processed_file_data = _process_single_log_file(log_file_str, app_name)
                     if not is_current_active_log_file: # Only cache if it's not the current active log
                         cache[log_file_str] = processed_file_data
                 
@@ -168,7 +168,7 @@ def index():
                 if not is_current_active_log_file and cache_key in cache:
                     processed_file_data = cache[cache_key]
                 else:
-                    processed_file_data = _process_single_junk_log_file(log_file_str, app_names)
+                    processed_file_data = _process_single_junk_log_file(log_file_str, app_name)
                     if not is_current_active_log_file:
                         cache[cache_key] = processed_file_data
                 

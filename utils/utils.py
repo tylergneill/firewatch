@@ -188,6 +188,7 @@ def get_log_sources_for_app(app_name, data_dir, start_date, end_date):
     including archived files and the current log file.
     """
     archive_dir = data_dir / f"{app_name}-archive" / "access"
+    print(archive_dir)
 
     log_files = set()
     delta = end_date - start_date
@@ -252,7 +253,7 @@ def get_dates_from_request_args(request_args):
         start_date = today
     return start_date, end_date
 
-def _process_single_log_file(file_path_str: str, app_names: list):
+def _process_single_log_file(file_path_str: str, app_name: str):
     """
     Processes a single log file and returns aggregated data.
     """
@@ -271,12 +272,6 @@ def _process_single_log_file(file_path_str: str, app_names: list):
     file_app_ip_sets = defaultdict(set)
     file_app_requests_by_day = defaultdict(lambda: defaultdict(int))
     file_uptime_data = defaultdict(lambda: defaultdict(lambda: {'2xx': 0, '5xx': 0, 'total': 0}))
-
-    app_name = "unknown"
-    for name in app_names:
-        if name in file_path.name:
-            app_name = name
-            break
     
     # Process lines for this file
     for line in read_lines_from_files([file_path]):
@@ -340,19 +335,13 @@ def _process_single_log_file(file_path_str: str, app_names: list):
     }
 
 
-def _process_single_junk_log_file(file_path_str: str, app_names: list):
+def _process_single_junk_log_file(file_path_str: str, app_name: str):
     """
     Processes a single junk log file and returns aggregated data.
     """
     file_path = pathlib.Path(file_path_str)
     
     file_junk_requests_by_day = defaultdict(lambda: defaultdict(int))
-
-    app_name = "unknown"
-    for name in app_names:
-        if name in file_path.name:
-            app_name = name
-            break
             
     # Check for date pattern in filename (YYYY-MM-DD)
     # If present, we assume the file contains logs only for that day.
