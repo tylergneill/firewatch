@@ -65,7 +65,7 @@ def get_log_parts(path, root):
 
 def main():
     parser = argparse.ArgumentParser(description="Shard log files by timestamp.")
-    parser.add_argument("log_root_dir", nargs="?", default="static/data",
+    parser.add_argument("--data-dir", dest="log_root_dir", default="static/data",
                         help="Path to the root directory containing log files. Defaults to 'static/data'.")
     args = parser.parse_args()
 
