@@ -88,3 +88,30 @@ The core analysis is performed by a series of Python scripts. They should genera
     ```bash
     python summarize_traffic_analytics.py
     ```
+
+### Data Refresh Workflow
+
+The `data-refresh-full` Makefile target executes a complete cycle of data synchronization, log processing, and cache rebuilding. This ensures local data is completely up-to-date, and the server is also updated with properly sharded daily logs and a current access/junk distinction.
+
+```bash
+make data-refresh-full
+```
+This command performs the following operations:
+1.  **`bash utils/sync_data_down.sh`**: Downloads the latest raw log data from its source to your local `firewatch-data` directory.
+2.  **`python utils/reshard_logs.py`**: Reorganizes and reshard log files within the `../firewatch-data` directory, optimizing them for processing.
+3.  **`python utils/generate_traffic_analytics.py`**: Processes all access and junk logs to rebuild the detailed traffic analytics database.
+4.  **`python utils/move_old_junk.py`**: Reclassifies log entries retroactively, moving traffic that matches current junk definitions from access logs to junk logs.
+5.  **`python utils/update_cache.py --rebuild-all`**: Completely rebuilds the application's cache based on the newly processed and reclassified log data.
+6.  **`bash utils/sync_data_up.sh`**: Uploads the processed log data (archived only) back to the server.
+
+Afterward, the update_cache script still needs to be run on the server. 
+
+```bash
+docker exec -it firewatch /bin/bash
+```
+
+And inside the container, at `/app`:
+```bash
+nice -n 19 python utils/update_cache.py --rebuild-all
+```
+(`nice` helps deprioritize this backend task if any other requests on the host machine need resources.)
