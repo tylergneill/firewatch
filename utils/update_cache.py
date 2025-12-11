@@ -26,7 +26,7 @@ Usage: nice -n 19 python update_cache.py --start-date 2025-03-01 --end-date 2025
 """
 
 
-def update_cache(start_date, end_date, rebuild_all=False, db_file=None, data_dir=None):
+def update_cache(start_date, end_date, rebuild_all=False, cache_file=None, data_dir=None):
     """
     Populates the cache for all apps.
     If rebuild_all is True, clears the cache and processes all logs.
@@ -40,17 +40,10 @@ def update_cache(start_date, end_date, rebuild_all=False, db_file=None, data_dir
     else:
         print(f"Updating cache for dates: {start_date.isoformat()} to {end_date.isoformat()}")
 
-    if db_file:
-        CACHE_FILE = Path(db_file)
-    else:
-        CACHE_DIR = project_root / "static" / "cache"
-        os.makedirs(str(CACHE_DIR), exist_ok=True)
-        CACHE_FILE = CACHE_DIR / "firewatch_cache.db"
+    CACHE_FILE = Path(cache_file).resolve()
+    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
         
-    if data_dir:
-        data_path = Path(data_dir)
-    else:
-        data_path = LOG_FILE_PATH
+    data_path = Path(data_dir).resolve()
 
 
     if rebuild_all and CACHE_FILE.exists():
@@ -122,12 +115,12 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '--data-dir',
-        default=None,
-        help="Path to the data directory containing log files (default: ../firewatch-data)"
+        default="static/data",
+        help="Path to the data directory containing log files (default: static/data)"
     )
     parser.add_argument(
-        '--db-file',
-        default=None,
+        '--cache-file',
+        default="static/cache/firewatch_cache.db",
         help="Path to the shelve cache file (default: static/cache/firewatch_cache.db)"
     )
 
@@ -150,4 +143,4 @@ if __name__ == "__main__":
             print("Error: Dates must be in YYYY-MM-DD format.")
             exit(1)
 
-    update_cache(start, end, rebuild_all=args.rebuild_all, db_file=args.db_file, data_dir=args.data_dir)
+    update_cache(start, end, rebuild_all=args.rebuild_all, cache_file=args.cache_file, data_dir=args.data_dir)
