@@ -122,6 +122,10 @@ def main():
         for shard_path, lines in shards.items():
             if not lines:
                 continue
+
+            # Deduplicate lines while preserving order
+            lines = list(dict.fromkeys(lines))
+
             print(f"Writing shard {shard_path.relative_to(log_root_dir)} for {app_name}", file=sys.stderr)
             shard_path.parent.mkdir(parents=True, exist_ok=True)
             
@@ -148,6 +152,9 @@ def main():
                         ts = parse_time_from_line(line)
                         if ts and ts.astimezone(timezone.utc).date() == today:
                             todays_lines.append(line)
+
+                # Deduplicate lines while preserving order
+                todays_lines = list(dict.fromkeys(todays_lines))
 
                 if todays_lines:
                     print(f"Updating top-level log: {file_path.name}", file=sys.stderr)
