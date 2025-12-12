@@ -1,12 +1,20 @@
-import logging
-from collections import Counter, defaultdict
+import datetime
 import pathlib
 import re
-import requests
-import datetime
 import os
-from functools import lru_cache
 
+import geoip2.database
+import geoip2.errors
+from collections import Counter, defaultdict
+
+from .constants import GEOIP_DATABASE_PATH
+
+
+# Global GeoIP reader instance
+try:
+    geoip_reader = geoip2.database.Reader(GEOIP_DATABASE_PATH)
+except FileNotFoundError:
+    geoip_reader = None
 
 def find_app_version():
     # Construct an absolute path to the VERSION file
@@ -155,16 +163,14 @@ def parse_junk_line(line: bytes):
     }
 
 
-@lru_cache(maxsize=2048)
 def get_geo_for_ip(ip: str):
     """Get geo location for an IP, with in-memory caching."""
+    if not geoip_reader:
+        return {"error": f"GeoIP database not found at {GEOIP_DATABASE_PATH}"}
     try:
-        response = requests.get(f"http://ip-api.com/json/{ip}", timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        return data
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
+        return geoip_reader.city(ip)
+    except geoip2.errors.AddressNotFoundError:
+        return {"error": f"Address {ip} not found in database."}
 
 
 def find_archived_logs_for_daterange(dir_path, start_date, end_date):
@@ -188,7 +194,6 @@ def get_log_sources_for_app(app_name, data_dir, start_date, end_date):
     including archived files and the current log file.
     """
     archive_dir = data_dir / f"{app_name}-archive" / "access"
-    print(archive_dir)
 
     log_files = set()
     delta = end_date - start_date

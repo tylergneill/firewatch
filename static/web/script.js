@@ -84,40 +84,7 @@ function select_all_prd(is_checked) {
 function select_all_stg(is_checked) {
     set_apps_checked_state(STG_APPS, is_checked);
 }
-// Event listener for the "Find Locations" button
-document.getElementById('find-locations-btn').addEventListener('click', function() {
-    this.disabled = true; // Disable button to prevent multiple clicks
-    this.textContent = '...'; // Change button text to indicate loading
 
-    // Iterate over each IP row in the table
-    document.querySelectorAll('.ip-row').forEach(row => {
-        const ip = row.dataset.ip; // Get IP from data attribute
-        const locationCell = row.querySelector('.geo-location');
-        locationCell.textContent = 'Loading...'; // Show loading text in location cell
-
-        // Fetch geolocation data for the IP
-        fetch(`/api/geo/${ip}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    // Display error if API returns one
-                    locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
-                } else if (data.status === 'success') {
-                    // Display formatted location if successful
-                    const locationParts = [data.city, data.regionName, data.country].filter(Boolean);
-                    locationCell.textContent = locationParts.join(', ') || '?';
-                } else {
-                    // Indicate unknown status
-                    locationCell.textContent = 'Unknown';
-                }
-            })
-            .catch(error => {
-                // Log and display fetch errors
-                console.error('Error fetching geo location:', error);
-                locationCell.innerHTML = `<span class="text-danger" title="${error}">Error</span>`;
-            });
-    });
-});
 
 function toggle_collapsible(elementId) {
     var wrapper = document.getElementById(elementId);

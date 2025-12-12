@@ -47,6 +47,18 @@ Taken together, Firewatch removes the most obvious and voluminous garbage at the
     ```
     Your log files should be placed inside `../firewatch-data` following the structure found in `static/data`.
 
+4.  **GeoIP Database Setup:**
+    This application uses the MaxMind GeoLite2 City database for IP geolocation. You need to download the database and make it available to the application.
+
+    1.  **Sign up for a MaxMind account:** Go to the [MaxMind website](https://www.maxmind.com/en/geolite2/signup) and sign up for a GeoLite2 Free Downloadable Databases account.
+    2.  **Download the database:** Download the `GeoLite2-City.mmdb` file.
+    3.  **Mount the database:** The application expects the database to be mounted at `/data/geoip/GeoLite2-City.mmdb`. When running with Docker, you can mount the directory containing the database file like this:
+        ```bash
+        docker run -v /path/to/your/geoip/directory:/data/geoip ...
+        ```
+        Replace `/path/to/your/geoip/directory` with the actual path to the directory where you saved the `GeoLite2-City.mmdb` file.
+
+
 ## Usage
 
 ### Running the Web UI

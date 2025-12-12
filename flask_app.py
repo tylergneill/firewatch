@@ -1,20 +1,15 @@
 import os
 from collections import Counter, defaultdict
-import pathlib
+
 import datetime
 import json
 import re
 import shelve
-
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from urllib.parse import urlparse, parse_qs
+import geoip2
 
-from utils.utils import (
-    find_app_version, parse_line, get_geo_for_ip,
-    get_log_sources_for_app, get_junk_log_sources_for_app,
-    read_lines_from_files, get_dates_from_request_args, tail_lines,
-    _process_single_log_file, _process_single_junk_log_file
-)
+from utils.utils import (find_app_version, parse_line, get_geo_for_ip, get_log_sources_for_app, get_junk_log_sources_for_app, read_lines_from_files, get_dates_from_request_args, tail_lines, _process_single_log_file, _process_single_junk_log_file)
 from utils.constants import app_names, LOG_FILE_PATH, HTTP_STATUS_CODES
 
 # Detect debug mode from environment
@@ -258,6 +253,21 @@ def index():
             "status_summary": dict(ip_status_counts[ip].most_common())
         })
     
+    for ip_data in ip_counts_top:
+        geo_info = get_geo_for_ip(ip_data['ip'])
+        if isinstance(geo_info, dict) and 'error' in geo_info:
+            ip_data['geo'] = geo_info
+        else:
+            ip_data['geo'] = {
+                'country': geo_info.country.name if geo_info.country else 'N/A',
+                'country_iso': geo_info.country.iso_code if geo_info.country else 'N/A',
+                'city': geo_info.city.name if geo_info.city else 'N/A',
+                'state': geo_info.subdivisions[0].name if geo_info.subdivisions else 'N/A',
+                'latitude': geo_info.location.latitude if geo_info.location else 'N/A',
+                'longitude': geo_info.location.longitude if geo_info.location else 'N/A',
+                'time_zone': geo_info.location.time_zone if geo_info.location else 'N/A',
+            }
+    
     avg_req_time = total_req_time / total if total > 0 else 0
 
     # Create a structured list of apps for the template
@@ -404,13 +414,6 @@ def index():
         junk_counts=junk_counts,
         total_junk_count=total_junk_count,
     )
-
-
-@app.route('/api/geo/<ip>')
-def geo_for_ip(ip):
-    geo_info = get_geo_for_ip(ip)
-    return jsonify(geo_info)
-
 
 @app.route("/select_apps", methods=['POST'])
 def select_apps():

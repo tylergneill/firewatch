@@ -1,6 +1,9 @@
 import pathlib
+import os
 
 LOG_FILE_PATH = pathlib.Path("static/data")
+# The path to the GeoLite2-City.mmdb file. This path should be mounted as a volume.
+GEOIP_DATABASE_PATH = os.environ.get("GEOIP_DATABASE_PATH", "../firewatch-data-geoip-db/GeoLite2-City.mmdb")
 
 app_names = [
     "skrutable",

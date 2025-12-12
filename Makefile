@@ -1,5 +1,6 @@
 LOCAL_DATA_PATH = $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))../firewatch-data)
 LOCAL_CACHE_PATH = $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))../firewatch-data-cache)
+LOCAL_GEOIP_DB_PATH = $(shell realpath $(dir $(lastword $(MAKEFILE_LIST)))../firewatch-data-geoip-db)
 
 # (or export LOCAL_DATA_PATH env var if different from above)
 
@@ -12,6 +13,8 @@ run:
 	  -p 5071:5071 \
 	  -v $(LOCAL_DATA_PATH):/app/static/data \
 	  -v $(LOCAL_CACHE_PATH):/app/static/cache \
+	  -v $(LOCAL_GEOIP_DB_PATH):/data/geoip \
+	  -e GEOIP_DATABASE_PATH=/data/geoip/GeoLite2-City.mmdb \
 	  --name firewatch-dev \
 	  firewatch-dev:debug
 
@@ -24,6 +27,8 @@ run-official:
 	  -p 5070:5070 \
 	  -v $(LOCAL_DATA_PATH):/app/static/data \
 	  -v $(LOCAL_CACHE_PATH):/app/static/cache \
+	  -v $(LOCAL_GEOIP_DB_PATH):/data/geoip \
+	  -e GEOIP_DATABASE_PATH=/data/geoip/GeoLite2-City.mmdb \
 	  tylergneill/firewatch-app:$(VERSION)
 
 data-refresh-full:
