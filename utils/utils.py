@@ -258,7 +258,7 @@ def get_dates_from_request_args(request_args):
         start_date = today
     return start_date, end_date
 
-def _process_single_log_file(file_path_str: str, app_name: str):
+def _process_single_log_file(file_path_str: str, app_name: str, filter_ip=None, filter_ua=None, filter_status=None):
     """
     Processes a single log file and returns aggregated data.
     """
@@ -282,6 +282,14 @@ def _process_single_log_file(file_path_str: str, app_name: str):
     for line in read_lines_from_files([file_path]):
         p = parse_line(line)
         if not p:
+            continue
+        
+        # Apply filters
+        if filter_ip and p['ip'] != filter_ip:
+            continue
+        if filter_ua and p['ua'] != filter_ua:
+            continue
+        if filter_status and p['status'] != filter_status:
             continue
 
         # Uptime data

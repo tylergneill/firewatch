@@ -120,7 +120,11 @@ def index():
                 is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
 
                 processed_file_data = None
-                if not is_current_active_log_file and log_file_str in cache:
+                
+                # We don't cache filtered results
+                if any([filter_ip, filter_ua, filter_status]):
+                    processed_file_data = _process_single_log_file(log_file_str, app_name, filter_ip, filter_ua, filter_status)
+                elif not is_current_active_log_file and log_file_str in cache:
                     processed_file_data = cache[log_file_str]
                 else:
                     processed_file_data = _process_single_log_file(log_file_str, app_name)
