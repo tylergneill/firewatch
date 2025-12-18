@@ -7,7 +7,7 @@ import geoip2.database
 import geoip2.errors
 from collections import Counter, defaultdict
 
-from .constants import GEOIP_DATABASE_PATH
+from utils.constants import GEOIP_DATABASE_PATH
 
 
 # Global GeoIP reader instance
