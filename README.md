@@ -52,11 +52,16 @@ Taken together, Firewatch removes the most obvious and voluminous garbage at the
 
     1.  **Sign up for a MaxMind account:** Go to the [MaxMind website](https://www.maxmind.com/en/geolite2/signup) and sign up for a GeoLite2 Free Downloadable Databases account.
     2.  **Download the database:** Download the `GeoLite2-City.mmdb` file.
-    3.  **Mount the database:** The application expects the database to be mounted at `/data/geoip/GeoLite2-City.mmdb`. When running with Docker, you can mount the directory containing the database file like this:
+    3.  **Setup for Local and Docker Usage:**
+        To support both local offline analysis scripts (like `generate_traffic_analytics.py` used in `make data-refresh-full`) and the Docker container, create a directory named `firewatch-data-geoip-db` alongside the project directory and place the `.mmdb` file inside it.
+
         ```bash
-        docker run -v /path/to/your/geoip/directory:/data/geoip ...
+        mkdir ../firewatch-data-geoip-db
+        mv /path/to/downloaded/GeoLite2-City.mmdb ../firewatch-data-geoip-db/
         ```
-        Replace `/path/to/your/geoip/directory` with the actual path to the directory where you saved the `GeoLite2-City.mmdb` file.
+
+        *   **Local Scripts:** The Python scripts default to looking in `../firewatch-data-geoip-db/GeoLite2-City.mmdb`.
+        *   **Docker:** The `Makefile` targets (`make run`, `make run-official`) are configured to mount this local directory to `/data/geoip` in the container.
 
 
 ## Usage
