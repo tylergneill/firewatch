@@ -69,7 +69,7 @@ def update_cache(start_date, end_date, rebuild_all=False, cache_file=None, data_
                 for log_file in access_log_files_for_app:
                     log_file_str = str(log_file)
                     print(f"    Processing access file: {log_file_str}")
-                    processed_data = _process_single_log_file(log_file_str, app_names)
+                    processed_data = _process_single_log_file(log_file_str, app_name)
                     cache[log_file_str] = processed_data
                     time.sleep(0.05)
                 print(f"    Finished processing {len(access_log_files_for_app)} access file(s) for {app_name}.")
@@ -82,7 +82,7 @@ def update_cache(start_date, end_date, rebuild_all=False, cache_file=None, data_
                 for log_file in junk_log_files_for_app:
                     log_file_str = str(log_file)
                     print(f"    Processing junk file: {log_file_str}")
-                    processed_data = _process_single_junk_log_file(log_file_str, app_names)
+                    processed_data = _process_single_junk_log_file(log_file_str, app_name)
                     cache[f"junk_{log_file_str}"] = processed_data
                     time.sleep(0.05)
                 print(f"    Finished processing {len(junk_log_files_for_app)} junk file(s) for {app_name}.")
