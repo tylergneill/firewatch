@@ -6,7 +6,10 @@ import shelve
 import sys
 from collections import deque, defaultdict
 
-from primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
+# Add project root to sys.path to allow importing from utils package
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
+from utils.primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 
 """
 Usage: python move_old_primary_junk.py \

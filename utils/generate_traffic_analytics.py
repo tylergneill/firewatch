@@ -9,6 +9,10 @@ from collections import defaultdict, Counter
 from urllib.robotparser import RobotFileParser
 from tqdm import tqdm
 
+# Add project root to sys.path to allow importing from utils package
+# We use insert(0, ...) to ensure it takes precedence over the local directory
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 from utils.primary_junk_definitions import BLOCKED_NETWORKS, is_junk_probe
 from utils.utils import parse_line
 

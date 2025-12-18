@@ -9,6 +9,9 @@ import datetime
 from collections import defaultdict, Counter
 from tqdm import tqdm
 
+# Add project root to sys.path to allow importing from utils package
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 """
 Usage: python summarize_traffic_analytics.py --db-file <path> [options]
 

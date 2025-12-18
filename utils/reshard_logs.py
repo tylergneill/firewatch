@@ -7,6 +7,9 @@ from collections import defaultdict
 import shutil
 import argparse # Import argparse
 
+# Add project root to sys.path to allow importing from utils package
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 # Nginx $time_local format: [15/Nov/2025:13:51:02 +0000]
 TIME_FMT = "%d/%b/%Y:%H:%M:%S %z"
 
