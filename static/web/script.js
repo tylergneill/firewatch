@@ -84,40 +84,7 @@ function select_all_prd(is_checked) {
 function select_all_stg(is_checked) {
     set_apps_checked_state(STG_APPS, is_checked);
 }
-// Event listener for the "Find Locations" button
-document.getElementById('find-locations-btn').addEventListener('click', function() {
-    this.disabled = true; // Disable button to prevent multiple clicks
-    this.textContent = '...'; // Change button text to indicate loading
 
-    // Iterate over each IP row in the table
-    document.querySelectorAll('.ip-row').forEach(row => {
-        const ip = row.dataset.ip; // Get IP from data attribute
-        const locationCell = row.querySelector('.geo-location');
-        locationCell.textContent = 'Loading...'; // Show loading text in location cell
-
-        // Fetch geolocation data for the IP
-        fetch(`/api/geo/${ip}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    // Display error if API returns one
-                    locationCell.innerHTML = `<span class="text-danger" title="${data.error}">Error</span>`;
-                } else if (data.status === 'success') {
-                    // Display formatted location if successful
-                    const locationParts = [data.city, data.regionName, data.country].filter(Boolean);
-                    locationCell.textContent = locationParts.join(', ') || '?';
-                } else {
-                    // Indicate unknown status
-                    locationCell.textContent = 'Unknown';
-                }
-            })
-            .catch(error => {
-                // Log and display fetch errors
-                console.error('Error fetching geo location:', error);
-                locationCell.innerHTML = `<span class="text-danger" title="${error}">Error</span>`;
-            });
-    });
-});
 
 function toggle_collapsible(elementId) {
     var wrapper = document.getElementById(elementId);
@@ -224,35 +191,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const requests_by_day_labels = JSON.parse(document.getElementById('requests_by_day_labels').textContent);
     const requests_by_day_data = JSON.parse(document.getElementById('requests_by_day_data').textContent);
+    const junk_requests_by_day_data = JSON.parse(document.getElementById('junk_requests_by_day_data').textContent);
 
     function updateChartControls() {
-        const chartContainers = document.querySelectorAll('#comparison-charts-container [id^="chart-container-"]');
+        const chartContainers = document.querySelectorAll('#comparison-charts-container .chart-container');
         const showControls = chartContainers.length > 1;
         chartContainers.forEach(container => {
-            const controls = container.querySelector('.chart-controls');
-            if (controls) {
-                controls.style.display = showControls ? 'block' : 'none';
-            }
+            const moveUpBtn = container.querySelector('.move-up-btn');
+            const moveDownBtn = container.querySelector('.move-down-btn');
+            const removeBtn = container.querySelector('.remove-chart-btn');
+            
+            if (moveUpBtn) moveUpBtn.style.display = showControls ? 'inline-block' : 'none';
+            if (moveDownBtn) moveDownBtn.style.display = showControls ? 'inline-block' : 'none';
+            if (removeBtn) removeBtn.style.display = showControls ? 'inline-block' : 'none';
         });
     }
 
     // Function to render the chart
-    function renderRequestsByDayChart(canvasId, selectedApp) {
+    function renderChart(canvasId, selectedApp, isJunk = false) {
         const ctx = document.getElementById(canvasId).getContext('2d');
         
         if (charts[canvasId]) {
             charts[canvasId].destroy(); // Destroy previous chart instance
         }
 
+        const datasetLabel = isJunk ? `Total Junk Requests for ${selectedApp}` : `Total Requests for ${selectedApp}`;
+        const datasetData = isJunk ? junk_requests_by_day_data[selectedApp] : requests_by_day_data[selectedApp];
+        const bgColor = isJunk ? 'rgba(255, 99, 132, 0.2)' : 'rgba(54, 162, 235, 0.2)';
+        const borderColor = isJunk ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)';
+
         charts[canvasId] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: requests_by_day_labels,
                 datasets: [{
-                    label: `Total Requests for ${selectedApp}`,
-                    data: requests_by_day_data[selectedApp],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    label: datasetLabel,
+                    data: datasetData,
+                    backgroundColor: bgColor,
+                    borderColor: borderColor,
                     borderWidth: 1
                 }]
             },
@@ -274,38 +250,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function addChartEventListeners(chartContainer, chartId) {
+    function addChartEventListeners(chartContainer, chartId, junkChartId) {
         const moveUpButton = chartContainer.querySelector('.move-up-btn');
         const moveDownButton = chartContainer.querySelector('.move-down-btn');
         const removeButton = chartContainer.querySelector('.remove-chart-btn');
+        const toggleJunkButton = chartContainer.querySelector('.toggle-junk-btn');
 
-        moveUpButton.addEventListener('click', () => {
-            const parent = chartContainer.parentNode;
-            if (chartContainer.previousElementSibling) {
-                parent.insertBefore(chartContainer, chartContainer.previousElementSibling);
-            }
-        });
+        if (moveUpButton) {
+            moveUpButton.addEventListener('click', () => {
+                const parent = chartContainer.parentNode;
+                if (chartContainer.previousElementSibling) {
+                    parent.insertBefore(chartContainer, chartContainer.previousElementSibling);
+                }
+            });
+        }
 
-        moveDownButton.addEventListener('click', () => {
-            const parent = chartContainer.parentNode;
-            if (chartContainer.nextElementSibling) {
-                parent.insertBefore(chartContainer.nextElementSibling, chartContainer);
-            }
-        });
+        if (moveDownButton) {
+            moveDownButton.addEventListener('click', () => {
+                const parent = chartContainer.parentNode;
+                if (chartContainer.nextElementSibling) {
+                    parent.insertBefore(chartContainer.nextElementSibling, chartContainer);
+                }
+            });
+        }
         
-        removeButton.addEventListener('click', () => {
-            if (charts[chartId]) {
-                charts[chartId].destroy(); // Destroy Chart.js instance
-                delete charts[chartId]; // Remove from charts object
-            }
-            chartContainer.remove(); // Remove the entire container from DOM
-            updateChartControls(); // Update controls after removing a chart
-        });
+        if (removeButton) {
+            removeButton.addEventListener('click', () => {
+                if (charts[chartId]) {
+                    charts[chartId].destroy();
+                    delete charts[chartId];
+                }
+                if (charts[junkChartId]) {
+                    charts[junkChartId].destroy();
+                    delete charts[junkChartId];
+                }
+                chartContainer.remove();
+                updateChartControls();
+            });
+        }
+
+        if (toggleJunkButton) {
+            toggleJunkButton.addEventListener('click', () => {
+                const junkWrapper = chartContainer.querySelector('.junk-chart-wrapper');
+                if (junkWrapper.style.display === 'none') {
+                    junkWrapper.style.display = 'block';
+                    toggleJunkButton.textContent = 'Hide Junk';
+                } else {
+                    junkWrapper.style.display = 'none';
+                    toggleJunkButton.textContent = 'Show Junk';
+                }
+            });
+        }
     }
 
     // Initial chart
     const initialChartContainer = document.getElementById('chart-container-0');
     const initialAppSelector = document.getElementById('requests_by_day_app_selector');
+    
     if (SELECTED_APPS.length > 0) {
         SELECTED_APPS.forEach(app => {
             const option = document.createElement('option');
@@ -313,13 +314,18 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = app;
             initialAppSelector.appendChild(option);
         });
-        renderRequestsByDayChart('requests_by_day_chart', SELECTED_APPS[0]);
+        
+        // Render initial charts
+        renderChart('requests_by_day_chart', SELECTED_APPS[0], false);
+        renderChart('junk_requests_by_day_chart', SELECTED_APPS[0], true);
+
         initialAppSelector.addEventListener('change', (event) => {
-            renderRequestsByDayChart('requests_by_day_chart', event.target.value);
+            renderChart('requests_by_day_chart', event.target.value, false);
+            renderChart('junk_requests_by_day_chart', event.target.value, true);
         });
-        addChartEventListeners(initialChartContainer, 'requests_by_day_chart');
+        
+        addChartEventListeners(initialChartContainer, 'requests_by_day_chart', 'junk_requests_by_day_chart');
     } else {
-        // If there are no selected apps, hide the initial chart container
         initialChartContainer.style.display = 'none';
     }
 
@@ -328,19 +334,30 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('add-comparison-chart-btn').addEventListener('click', () => {
         chartCounter++;
         const newChartId = `comparison_chart_${chartCounter}`;
+        const newJunkChartId = `junk_comparison_chart_${chartCounter}`;
         const newSelectorId = `comparison_selector_${chartCounter}`;
         
         const newChartContainer = document.createElement('div');
-        newChartContainer.id = `chart-container-${chartCounter}`; // Add an ID to the container
+        newChartContainer.id = `chart-container-${chartCounter}`;
+        newChartContainer.className = 'chart-container';
         newChartContainer.innerHTML = `
-            <label for="${newSelectorId}">Select App:</label>
-            <select id="${newSelectorId}"></select>
-            <div class="chart-controls" style="float: right;">
-                <button class="move-up-btn">Move Up</button>
-                <button class="move-down-btn">Move Down</button>
-                <button class="remove-chart-btn" data-chart-id="${newChartId}">Remove</button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label for="${newSelectorId}">Select App:</label>
+                    <select id="${newSelectorId}"></select>
+                </div>
+                <div class="chart-controls">
+                    <button class="toggle-junk-btn">Show Junk</button>
+                    <button class="move-up-btn">Move Up</button>
+                    <button class="move-down-btn">Move Down</button>
+                    <button class="remove-chart-btn" data-chart-id="${newChartId}">Remove</button>
+                </div>
             </div>
             <canvas id="${newChartId}" width="400" height="100"></canvas>
+            <div class="junk-chart-wrapper" style="display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                <h5 style="margin-top: 0;">Junk Traffic</h5>
+                <canvas id="${newJunkChartId}" width="400" height="100"></canvas>
+            </div>
             <hr>
         `;
         
@@ -354,16 +371,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.textContent = app;
                 newSelector.appendChild(option);
             });
-            renderRequestsByDayChart(newChartId, SELECTED_APPS[0]);
+            
+            renderChart(newChartId, SELECTED_APPS[0], false);
+            renderChart(newJunkChartId, SELECTED_APPS[0], true);
+            
             newSelector.addEventListener('change', (event) => {
-                renderRequestsByDayChart(newChartId, event.target.value);
+                renderChart(newChartId, event.target.value, false);
+                renderChart(newJunkChartId, event.target.value, true);
             });
-            addChartEventListeners(newChartContainer, newChartId);
+            
+            addChartEventListeners(newChartContainer, newChartId, newJunkChartId);
         }
-        updateChartControls(); // Update controls after adding a new chart
+        updateChartControls();
     });
 
-    updateChartControls(); // Initial check
+    updateChartControls();
 });
 
 // Dark mode toggle

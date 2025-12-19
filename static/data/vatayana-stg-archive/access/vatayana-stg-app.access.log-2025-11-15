@@ -1,0 +1,2 @@
+vatayana-stg.duckdns.org 443 176.34.150.21 - - [15/Nov/2025:02:34:35 +0000] "GET / HTTP/1.0" 502 157 "-" "Mozilla/5.0 (compatible; NetcraftSurveyAgent/1.0; +info@netcraft.com)" 0.001
+vatayana-stg.duckdns.org 443 138.246.253.24 - - [15/Nov/2025:10:27:47 +0000] "GET /robots.txt HTTP/1.1" 502 559 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36" 0.000

@@ -147,6 +147,7 @@
                               {% for code in all_status_codes %}
                                   <th><a href="{{ url_for('index', view_mode='requests', status=code, start_date=start_date, end_date=end_date) }}" title="{{ http_status_codes.get(code, '') }}">{{ code }}</a></th>
                               {% endfor %}
+                              <th style="border-left: 5px solid #444; padding-left: 10px;">Junk</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -157,6 +158,13 @@
                               {% for code in all_status_codes %}
                                   <td>{{ app_data.statuses[code]|commify }}</td>
                               {% endfor %}
+                              {% set junk_c = junk_counts.get(app_data.name, 0) %}
+                              {% set grand_total = app_data.total + junk_c %}
+                              {% set pct = (junk_c / grand_total * 100) if grand_total > 0 else 0 %}
+                              <td style="border-left: 5px solid #444; padding-left: 10px;">
+                                  {{ junk_c|commify }}
+                                  <small class="text-muted">({{ "%.1f"|format(pct) }}%)</small>
+                              </td>
                           </tr>
                           {% endfor %}
                       </tbody>
@@ -167,6 +175,12 @@
                               {% for code in all_status_codes %}
                                   <td><strong><a href="{{ url_for('index', view_mode='logs', status=code, start_date=start_date, end_date=end_date) }}">{{ app_counts_totals[code]|commify }}</a></strong></td>
                               {% endfor %}
+                              {% set grand_junk_total = total_junk_count + app_counts_totals.total %}
+                              {% set total_pct = (total_junk_count / grand_junk_total * 100) if grand_junk_total > 0 else 0 %}
+                              <td style="border-left: 5px solid #444; padding-left: 10px;">
+                                  <strong>{{ total_junk_count|commify }}</strong>
+                                  <small class="text-muted">({{ "%.1f"|format(total_pct) }}%)</small>
+                              </td>
                           </tr>
                       </tfoot>
                   </table>
@@ -174,15 +188,24 @@
               <div class="col-md-12">
                   <h3>Per App Per Day</h3>
                   <div id="comparison-charts-container">
-                      <div id="chart-container-0">
-                          <label for="requests_by_day_app_selector">Select App:</label>
-                          <select id="requests_by_day_app_selector"></select>
-                          <div class="chart-controls" style="float: right;">
-                              <button class="move-up-btn">Move Up</button>
-                              <button class="move-down-btn">Move Down</button>
-                              <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                      <div id="chart-container-0" class="chart-container">
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                              <div>
+                                  <label for="requests_by_day_app_selector">Select App:</label>
+                                  <select id="requests_by_day_app_selector"></select>
+                              </div>
+                              <div class="chart-controls">
+                                  <button class="toggle-junk-btn">Show Junk</button>
+                                  <button class="move-up-btn">Move Up</button>
+                                  <button class="move-down-btn">Move Down</button>
+                                  <button class="remove-chart-btn" data-chart-id="requests_by_day_chart">Remove</button>
+                              </div>
                           </div>
                           <canvas id="requests_by_day_chart" width="400" height="100"></canvas>
+                          <div class="junk-chart-wrapper" style="display: none; margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                              <h5 style="margin-top: 0;">Junk Traffic</h5>
+                              <canvas id="junk_requests_by_day_chart" width="400" height="100"></canvas>
+                          </div>
                           <hr>
                       </div>
                   </div>
@@ -256,7 +279,6 @@
           </div>
             <div id="bottom_view_ip" class="bottom_view col-md-4" style="display: none;">
                 <h3>By IP (Top {{ top_n }})</h3>
-                <button id="find-locations-btn" class="btn btn-secondary btn-sm">Find Locations</button>
                 <table class="table table-sm">
                     <thead>
                         <tr>
@@ -271,7 +293,13 @@
                     <tr class="ip-row" data-ip="{{ item.ip }}">
                         <td><a href="{{ url_for('index', view_mode='logs', start_date=start_date, end_date=end_date, ip=item.ip) }}" onclick="showLoading()">{{ item.ip }}</a></td>
                         <td>{{ item.count|commify }}</td>
-                        <td class="geo-location">-</td>
+                        <td class="geo-location">
+                            {% if item.geo.error %}
+                                <span class="text-danger" title="{{ item.geo.error }}">Error</span>
+                            {% else %}
+                                {{ [item.geo.city, item.geo.state, item.geo.country] | select('ne', 'N/A') | join(', ') }}
+                            {% endif %}
+                        </td>
                         <td>
                             {% for status, count in item.status_summary.items() %}
                                 <a href="{{ url_for('index', view_mode='logs', ip=item.ip, status=status, start_date=start_date, end_date=end_date) }}">{{ status }}: {{ count }}</a><br>
@@ -382,6 +410,7 @@
     </script>
     <script id="requests_by_day_labels" type="application/json">{{ requests_by_day_labels|safe }}</script>
     <script id="requests_by_day_data" type="application/json">{{ requests_by_day_data|safe }}</script>
+    <script id="junk_requests_by_day_data" type="application/json">{{ junk_requests_by_day_data|safe }}</script>
     <script src="{{ url_for('static', filename='web/script.js') }}"></script>
     <script>
         // On page load, set the initial view mode based on the value passed from the Flask backend

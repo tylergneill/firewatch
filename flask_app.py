@@ -1,72 +1,32 @@
 import os
 from collections import Counter, defaultdict
-import pathlib
+
 import datetime
 import json
-
+import re
+import shelve
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from urllib.parse import urlparse, parse_qs
+import geoip2
 
-from utils import (
-    find_app_version, parse_line, get_geo_for_ip,
-    get_log_sources_for_app,
-    read_lines_from_files, get_dates_from_request_args, tail_lines
-)
+from utils.utils import (find_app_version, parse_line, get_geo_for_ip, get_log_sources_for_app, get_junk_log_sources_for_app, read_lines_from_files, get_dates_from_request_args, tail_lines, _process_single_log_file, _process_single_junk_log_file)
+from utils.constants import app_names, LOG_FILE_PATH, HTTP_STATUS_CODES
 
 # Detect debug mode from environment
 DEBUG_ENV = os.environ.get("FLASK_DEBUG") == "1"
 
 APP_VERSION= find_app_version()
 
-LOG_FILE_PATH = pathlib.Path("static/data")
-
-app_names = [
-    "skrutable",
-    "splitter-server",
-    "vatayana",
-    "panditya",
-    "hansel",
-    "firewatch",
-    "kalpataru-grove",
-]
-app_names += [
-    app_name + '-stg'
-    for app_name in app_names
-    if app_name != "splitter-server"
-]
-
-LOG_FILES = {
-    app_name: LOG_FILE_PATH / f"{app_name}-archive"
-    for app_name in app_names
-}
-
-HTTP_STATUS_CODES = {
-    '200': 'OK',
-    '201': 'Created',
-    '202': 'Accepted',
-    '204': 'No Content',
-    '206': 'Partial Content',
-    '301': 'Moved Permanently',
-    '302': 'Found',
-    '304': 'Not Modified',
-    '400': 'Bad Request',
-    '401': 'Unauthorized',
-    '403': 'Forbidden',
-    '404': 'Not Found',
-    '405': 'Method Not Allowed',
-    '444': 'No Response',
-    '499': 'Client Closed Request',
-    '500': 'Internal Server Error',
-    '502': 'Bad Gateway',
-    '503': 'Service Unavailable',
-    '504': 'Gateway Timeout',
-}
-
 MAX_LINES_PER_FILE = 20
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.debug = DEBUG_ENV
+
+# Ensure the cache directory exists once at startup.
+CACHE_DIR = "static/cache"
+os.makedirs(os.path.join(app.root_path, CACHE_DIR), exist_ok=True)
+CACHE_FILE = os.path.join(CACHE_DIR, "firewatch_cache.db")
 
 @app.template_filter('commify')
 def commify_filter(value):
@@ -123,6 +83,7 @@ def index():
     filter_status = request.args.get('status')
 
     # --- Data Processing ---
+    # Initialize aggregated data structures
     total = 0
     total_req_time = 0.0
     ip_counts = Counter()
@@ -134,6 +95,7 @@ def index():
     app_response_times = defaultdict(list)
     app_ip_sets = defaultdict(set)
     app_requests_by_day = defaultdict(lambda: defaultdict(int))
+    junk_requests_by_day = defaultdict(lambda: defaultdict(int))
     
     # Initialize uptime data structures
     uptime_data = {}
@@ -143,80 +105,101 @@ def index():
             (start_date + datetime.timedelta(days=i)): {'2xx': 0, '5xx': 0, 'total': 0} for i in range(num_days)
         }
 
-    app_logs = {}
-    for app_name in selected_apps:
-        log_files = get_log_sources_for_app(app_name, LOG_FILES, LOG_FILE_PATH, start_date, end_date)
-        
-        # Raw view data
-        if tail_filter_ip or tail_filter_status:
-            # When filtering, read all lines from the date range and filter them.
-            filtered_lines = []
-            for line_bytes in read_lines_from_files(log_files):
-                p = parse_line(line_bytes)
-                if not p:
+    today_str = datetime.date.today().isoformat()
+    app_logs = {} # Still need to collect raw lines for the 'logs' view
+
+    with shelve.open(CACHE_FILE) as cache:
+        for app_name in selected_apps:
+            log_files_for_app = get_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
+            junk_log_files_for_app = get_junk_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
+            
+            for log_file in log_files_for_app:
+                log_file_str = str(log_file.resolve())
+                # A log file is considered "current active" if its name doesn't end with a date suffix
+                # (e.g., "app-app.access.log" vs "app-app.access.log-2023-10-27")
+                is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
+
+                processed_file_data = None
+                
+                # We don't cache filtered results
+                if any([filter_ip, filter_ua, filter_status]):
+                    processed_file_data = _process_single_log_file(log_file_str, app_name, filter_ip, filter_ua, filter_status)
+                elif not is_current_active_log_file and log_file_str in cache:
+                    processed_file_data = cache[log_file_str]
+                else:
+                    processed_file_data = _process_single_log_file(log_file_str, app_name)
+                    if not is_current_active_log_file: # Only cache if it's not the current active log
+                        cache[log_file_str] = processed_file_data
+                
+                if not processed_file_data:
+                    continue
+
+                total += processed_file_data["total"]
+                total_req_time += processed_file_data["total_req_time"]
+                ip_counts.update(processed_file_data["ip_counts"])
+                ua_counts.update(processed_file_data["ua_counts"])
+                for route, counts in processed_file_data["route_app_counts"].items():
+                    route_app_counts[route].update(counts)
+                status_counts.update(processed_file_data["status_counts"])
+                for app_n, counts in processed_file_data["app_counts"].items():
+                    app_counts[app_n].update(counts)
+                for ip, counts in processed_file_data["ip_status_counts"].items():
+                    ip_status_counts[ip].update(counts)
+                app_response_times[app_name].extend(processed_file_data["app_response_times"].get(app_name, []))
+                app_ip_sets[app_name].update(processed_file_data["app_ip_sets"].get(app_name, []))
+                
+                for date_str, count in processed_file_data["app_requests_by_day"].get(app_name, {}).items():
+                    app_requests_by_day[app_name][datetime.date.fromisoformat(date_str)] += count
+
+                for date_str, counts in processed_file_data["uptime_data"].get(app_name, {}).items():
+                    date_obj = datetime.date.fromisoformat(date_str)
+                    if date_obj in uptime_data.get(app_name, {}):
+                        uptime_data[app_name][date_obj]['2xx'] += counts.get('2xx', 0)
+                        uptime_data[app_name][date_obj]['5xx'] += counts.get('5xx', 0)
+                        uptime_data[app_name][date_obj]['total'] += counts.get('total', 0)
+
+            for log_file in junk_log_files_for_app:
+                log_file_str = str(log_file.resolve())
+                is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
+
+                processed_file_data = None
+                cache_key = f"junk_{log_file_str}"
+                if not is_current_active_log_file and cache_key in cache:
+                    processed_file_data = cache[cache_key]
+                else:
+                    processed_file_data = _process_single_junk_log_file(log_file_str, app_name)
+                    if not is_current_active_log_file:
+                        cache[cache_key] = processed_file_data
+                
+                if not processed_file_data:
                     continue
                 
-                ip_match = (not tail_filter_ip) or (p['ip'] == tail_filter_ip)
-                status_match = (not tail_filter_status) or (p['status'] == tail_filter_status)
+                for date_str, count in processed_file_data["junk_requests_by_day"].get(app_name, {}).items():
+                    junk_requests_by_day[app_name][datetime.date.fromisoformat(date_str)] += count
 
-                if ip_match and status_match:
-                    filtered_lines.append(line_bytes.decode("utf-8", errors="replace"))
-            
-            app_logs[app_name] = filtered_lines
-        else:
-            # Original behavior: tail the last num_lines when no filters are applied
-            raw_lines_to_fetch = num_lines
-            all_lines_bytes = []
-            for log_file in log_files:
-                all_lines_bytes.extend(tail_lines(log_file, raw_lines_to_fetch))
-            if len(all_lines_bytes) > raw_lines_to_fetch:
-                all_lines_bytes = all_lines_bytes[-raw_lines_to_fetch:]
-            app_logs[app_name] = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
+            # Raw view data
+            if tail_filter_ip or tail_filter_status:
+                filtered_lines = []
+                for line_bytes in read_lines_from_files(log_files_for_app):
+                    p = parse_line(line_bytes)
+                    if not p:
+                        continue
+                    
+                    ip_match = (not tail_filter_ip) or (p['ip'] == tail_filter_ip)
+                    status_match = (not tail_filter_status) or (p['status'] == tail_filter_status)
 
-        # Requests and Uptime data processing
-        for line in read_lines_from_files(log_files):
-            p = parse_line(line)
-            if not p:
-                continue
-            
-            # Apply filters for requests view
-            if filter_ip and p["ip"] != filter_ip:
-                continue
-            if filter_ua and p["ua"] != filter_ua:
-                continue
-            if filter_status and p["status"] != filter_status:
-                continue
-
-            # Uptime data
-            if p['time']:
-                log_date = p['time'].date()
-                if start_date <= log_date <= end_date:
-                    app_requests_by_day[app_name][log_date] += 1
-                if log_date in uptime_data.get(app_name, {}):
-                    uptime_data[app_name][log_date]['total'] += 1
-                    try:
-                        status_code = int(p['status'])
-                        if 200 <= status_code < 300:
-                            uptime_data[app_name][log_date]['2xx'] += 1
-                        elif 500 <= status_code < 600:
-                            uptime_data[app_name][log_date]['5xx'] += 1
-                    except (ValueError, TypeError):
-                        # Ignore statuses that are not integers
-                        pass
-
-            # Requests data
-            total += 1
-            ip_counts[p["ip"]] += 1
-            ua_counts[p["ua"]] += 1
-            route = p["path"].split('?')[0]
-            route_app_counts[route][app_name] += 1
-            status_counts[p["status"]] += 1
-            app_counts[app_name][p["status"]] += 1
-            ip_status_counts[p["ip"]][p["status"]] += 1
-            app_ip_sets[app_name].add(p['ip'])
-            if p["req_time"] is not None:
-                total_req_time += p["req_time"]
-                app_response_times[app_name].append(p["req_time"])
+                    if ip_match and status_match:
+                        filtered_lines.append(line_bytes.decode("utf-8", errors="replace"))
+                
+                app_logs[app_name] = filtered_lines
+            else:
+                raw_lines_to_fetch = num_lines
+                all_lines_bytes = []
+                for log_file in log_files_for_app:
+                    all_lines_bytes.extend(tail_lines(log_file, raw_lines_to_fetch))
+                if len(all_lines_bytes) > raw_lines_to_fetch:
+                    all_lines_bytes = all_lines_bytes[-raw_lines_to_fetch:]
+                app_logs[app_name] = [l.decode("utf-8", errors="replace") for l in all_lines_bytes]
     
     # --- Post-processing and Preparation for Render ---
 
@@ -226,6 +209,9 @@ def index():
     requests_by_day_data = {}
     for app_name in selected_apps:
         requests_by_day_data[app_name] = [app_requests_by_day[app_name].get(date, 0) for date in all_dates]
+    junk_requests_by_day_data = {}
+    for app_name in selected_apps:
+        junk_requests_by_day_data[app_name] = [junk_requests_by_day[app_name].get(date, 0) for date in all_dates]
 
     # Finalize uptime data colors
     final_uptime_data = {}
@@ -255,6 +241,14 @@ def index():
     
     uptime_data = final_uptime_data
 
+    # Calculate junk totals per app
+    junk_counts = {}
+    total_junk_count = 0
+    for app_name in selected_apps:
+        count = sum(junk_requests_by_day[app_name].values())
+        junk_counts[app_name] = count
+        total_junk_count += count
+
     ip_counts_top = []
     for ip, count in ip_counts.most_common(top_n):
         ip_counts_top.append({
@@ -262,6 +256,21 @@ def index():
             "count": count,
             "status_summary": dict(ip_status_counts[ip].most_common())
         })
+    
+    for ip_data in ip_counts_top:
+        geo_info = get_geo_for_ip(ip_data['ip'])
+        if isinstance(geo_info, dict) and 'error' in geo_info:
+            ip_data['geo'] = geo_info
+        else:
+            ip_data['geo'] = {
+                'country': geo_info.country.name if geo_info.country else 'N/A',
+                'country_iso': geo_info.country.iso_code if geo_info.country else 'N/A',
+                'city': geo_info.city.name if geo_info.city else 'N/A',
+                'state': geo_info.subdivisions[0].name if geo_info.subdivisions else 'N/A',
+                'latitude': geo_info.location.latitude if geo_info.location else 'N/A',
+                'longitude': geo_info.location.longitude if geo_info.location else 'N/A',
+                'time_zone': geo_info.location.time_zone if geo_info.location else 'N/A',
+            }
     
     avg_req_time = total_req_time / total if total > 0 else 0
 
@@ -405,14 +414,10 @@ def index():
         uptime_color_explanations=uptime_color_explanations,
         requests_by_day_labels=json.dumps(requests_by_day_labels),
         requests_by_day_data=json.dumps(requests_by_day_data),
+        junk_requests_by_day_data=json.dumps(junk_requests_by_day_data),
+        junk_counts=junk_counts,
+        total_junk_count=total_junk_count,
     )
-
-
-@app.route('/api/geo/<ip>')
-def geo_for_ip(ip):
-    geo_info = get_geo_for_ip(ip)
-    return jsonify(geo_info)
-
 
 @app.route("/select_apps", methods=['POST'])
 def select_apps():
@@ -429,7 +434,7 @@ def select_apps():
         # Convert list values from parse_qs to single values suitable for url_for.
         redirect_args = {k: v[0] for k, v in query_params.items()}
         
-        # Prioritize parameters submitted directly with the form (e.g., view_mode),
+        # Prioritize parameters submitted directly with the form (e.g., view_memode),
         # then fallback to parameters from the referrer's query string,
         # and finally to hardcoded defaults if neither is available.
         # This ensures view state and other filters are maintained across app selections.
