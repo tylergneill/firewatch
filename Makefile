@@ -62,3 +62,11 @@ data-refresh-recent-local:
 	python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db && \
 	python utils/move_old_junk.py --start-date $$SINCE --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db && \
 	python utils/update_cache.py --start-date $$SINCE --end-date $$(date +%Y-%m-%d) --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+
+# Rebuild the local cache without re-running the full data pipeline.
+# On the server, run: python utils/update_cache.py --rebuild-all  (no extra flags needed inside the container)
+cache-rebuild:
+	python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+
+cache-rebuild-recent:
+	python utils/update_cache.py --since-last-processed --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
