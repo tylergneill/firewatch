@@ -33,15 +33,32 @@ run-official:
 
 data-refresh-full:
 	bash utils/sync_data_down.sh
-	python utils/reshard_logs.py --data-dir /Users/tyler/Git/firewatch-data
-	python utils/generate_traffic_analytics.py --data-dir /Users/tyler/Git/firewatch-data --db-file /Users/tyler/Git/firewatch-data-cache/traffic_analytics.db
-	python utils/move_old_junk.py --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
-	python utils/update_cache.py --rebuild-all --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
+	python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH)
+	python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db
+	python utils/move_old_junk.py --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+	python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
 	bash utils/sync_data_up.sh
 
 data-refresh-local:
 	bash utils/sync_data_down.sh
-	python utils/reshard_logs.py --data-dir /Users/tyler/Git/firewatch-data
-	python utils/generate_traffic_analytics.py --data-dir /Users/tyler/Git/firewatch-data --db-file /Users/tyler/Git/firewatch-data-cache/traffic_analytics.db
-	python utils/move_old_junk.py --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
-	python utils/update_cache.py --rebuild-all --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
+	python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH)
+	python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db
+	python utils/move_old_junk.py --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+	python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+
+data-refresh-recent:
+	bash utils/sync_data_down.sh
+	SINCE=$$(python utils/get_last_processed_date.py --data-dir $(LOCAL_DATA_PATH)) && \
+	python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH) --since $$SINCE && \
+	python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db && \
+	python utils/move_old_junk.py --start-date $$SINCE --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db && \
+	python utils/update_cache.py --start-date $$SINCE --end-date $$(date +%Y-%m-%d) --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db
+	bash utils/sync_data_up.sh
+
+data-refresh-recent-local:
+	bash utils/sync_data_down.sh
+	SINCE=$$(python utils/get_last_processed_date.py --data-dir $(LOCAL_DATA_PATH)) && \
+	python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH) --since $$SINCE && \
+	python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db && \
+	python utils/move_old_junk.py --start-date $$SINCE --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db && \
+	python utils/update_cache.py --start-date $$SINCE --end-date $$(date +%Y-%m-%d) --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db

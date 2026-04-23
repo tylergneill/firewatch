@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import sys
 import re
+import datetime as dt
 from pathlib import Path
 from datetime import datetime, timezone
 from collections import defaultdict
 import shutil
-import argparse # Import argparse
+import argparse
 
 # Add project root to sys.path to allow importing from utils package
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -66,10 +67,15 @@ def get_log_parts(path, root):
     return archive_dir, base_filename
 
 
+_DATE_SUFFIX_RE = re.compile(r'(\d{4}-\d{2}-\d{2})$')
+
+
 def main():
     parser = argparse.ArgumentParser(description="Shard log files by timestamp.")
     parser.add_argument("--data-dir", dest="log_root_dir", default="static/data",
                         help="Path to the root directory containing log files. Defaults to 'static/data'.")
+    parser.add_argument("--since", default=None,
+                        help="If set, skip already-archived files dated before this date (YYYY-MM-DD). Top-level logs are always processed.")
     args = parser.parse_args()
 
     log_root_dir = Path(args.log_root_dir).resolve()
@@ -77,8 +83,26 @@ def main():
         print(f"Log directory not found: {log_root_dir}", file=sys.stderr)
         sys.exit(1)
 
+    since_date = None
+    if args.since:
+        try:
+            since_date = dt.date.fromisoformat(args.since)
+        except ValueError:
+            print(f"Error: --since must be in YYYY-MM-DD format, got: {args.since}", file=sys.stderr)
+            sys.exit(1)
+
     all_files = [p for p in log_root_dir.rglob('*') if p.is_file()]
-    
+
+    def _keep_file(p):
+        if since_date is None:
+            return True
+        m = _DATE_SUFFIX_RE.search(p.name)
+        if not m:
+            return True  # top-level log, no date suffix — always process
+        return dt.date.fromisoformat(m.group(1)) >= since_date
+
+    all_files = [p for p in all_files if _keep_file(p)]
+
     # We'll collect all data in memory first for each app individually.
     today = datetime.now(timezone.utc).date()
 
@@ -88,7 +112,7 @@ def main():
     for app_name in app_names:
         print(f"\n--- Processing app: {app_name} ---", file=sys.stderr)
         app_files_to_process = sorted([
-            p for p in all_files 
+            p for p in all_files
             if p.name.startswith(app_name + '-app.') and get_log_parts(p, log_root_dir)[0] is not None
         ])
         
