@@ -246,8 +246,7 @@ def main(args):
 
                     # If we purged lines, the cache is stale and must be deleted.
                     if junk_count > 0:
-                        # Use the absolute path as the key, just like the web app does.
-                        log_file_key = str(log_file.resolve())
+                        log_file_key = str(log_file.resolve().relative_to(data_path.resolve()))
                         if log_file_key in cache:
                             print(f"    - Deleting stale cache entry for: {log_file.name}")
                             del cache[log_file_key]

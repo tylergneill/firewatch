@@ -27,6 +27,7 @@ app.debug = DEBUG_ENV
 CACHE_DIR = "static/cache"
 os.makedirs(os.path.join(app.root_path, CACHE_DIR), exist_ok=True)
 CACHE_FILE = os.path.join(CACHE_DIR, "firewatch_cache.db")
+LOG_FILE_PATH_RESOLVED = LOG_FILE_PATH.resolve()
 
 @app.template_filter('commify')
 def commify_filter(value):
@@ -114,7 +115,7 @@ def index():
             junk_log_files_for_app = get_junk_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
             
             for log_file in log_files_for_app:
-                log_file_str = str(log_file.resolve())
+                log_file_str = str(log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED))
                 # A log file is considered "current active" if its name doesn't end with a date suffix
                 # (e.g., "app-app.access.log" vs "app-app.access.log-2023-10-27")
                 is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
@@ -159,7 +160,7 @@ def index():
                         uptime_data[app_name][date_obj]['total'] += counts.get('total', 0)
 
             for log_file in junk_log_files_for_app:
-                log_file_str = str(log_file.resolve())
+                log_file_str = str(log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED))
                 is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
 
                 processed_file_data = None
