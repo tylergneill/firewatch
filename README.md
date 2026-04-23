@@ -133,6 +133,14 @@ nice -n 19 python utils/update_cache.py --rebuild-all
 ```
 (`nice` helps deprioritize this backend task if any other requests on the host machine need resources.)
 
+If you ran a `-local` variant for local testing and later want to push the processed data to the server, you can run the sync-up step on its own:
+
+```bash
+bash utils/sync_data_up.sh
+```
+
+Then run `update_cache` on the server as described above (using `--rebuild-all` or `--since-last-processed` as appropriate).
+
 #### Recent-only refresh
 
 `data-refresh-recent` and `data-refresh-recent-local` run the same pipeline but skip already-processed historical data. They auto-detect the last processed date from the archive filenames and limit resharding, junk-moving, and cache-building to that date onward.
