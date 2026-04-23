@@ -115,22 +115,23 @@ def index():
             junk_log_files_for_app = get_junk_log_sources_for_app(app_name, LOG_FILE_PATH, start_date, end_date)
             
             for log_file in log_files_for_app:
-                log_file_str = str(log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED))
+                log_file_abs = str(log_file.resolve())
+                cache_key = str(log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED))
                 # A log file is considered "current active" if its name doesn't end with a date suffix
                 # (e.g., "app-app.access.log" vs "app-app.access.log-2023-10-27")
                 is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
 
                 processed_file_data = None
-                
+
                 # We don't cache filtered results
                 if any([filter_ip, filter_ua, filter_status]):
-                    processed_file_data = _process_single_log_file(log_file_str, app_name, filter_ip, filter_ua, filter_status)
-                elif not is_current_active_log_file and log_file_str in cache:
-                    processed_file_data = cache[log_file_str]
+                    processed_file_data = _process_single_log_file(log_file_abs, app_name, filter_ip, filter_ua, filter_status)
+                elif not is_current_active_log_file and cache_key in cache:
+                    processed_file_data = cache[cache_key]
                 else:
-                    processed_file_data = _process_single_log_file(log_file_str, app_name)
+                    processed_file_data = _process_single_log_file(log_file_abs, app_name)
                     if not is_current_active_log_file: # Only cache if it's not the current active log
-                        cache[log_file_str] = processed_file_data
+                        cache[cache_key] = processed_file_data
                 
                 if not processed_file_data:
                     continue
@@ -160,15 +161,15 @@ def index():
                         uptime_data[app_name][date_obj]['total'] += counts.get('total', 0)
 
             for log_file in junk_log_files_for_app:
-                log_file_str = str(log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED))
+                log_file_abs = str(log_file.resolve())
+                cache_key = f"junk_{log_file.resolve().relative_to(LOG_FILE_PATH_RESOLVED)}"
                 is_current_active_log_file = not re.search(r'\d{4}-\d{2}-\d{2}$', log_file.stem)
 
                 processed_file_data = None
-                cache_key = f"junk_{log_file_str}"
                 if not is_current_active_log_file and cache_key in cache:
                     processed_file_data = cache[cache_key]
                 else:
-                    processed_file_data = _process_single_junk_log_file(log_file_str, app_name)
+                    processed_file_data = _process_single_junk_log_file(log_file_abs, app_name)
                     if not is_current_active_log_file:
                         cache[cache_key] = processed_file_data
                 
