@@ -193,6 +193,8 @@ def main(args):
     """
     Main function to find and process all log files.
     """
+    import datetime
+    import re as _re
     data_path = pathlib.Path(args.data_dir)
 
     if not data_path.is_dir():
@@ -202,10 +204,31 @@ def main(args):
     if args.use_secondary_junk_tags:
         load_secondary_junk_tags([args.junk_prober_tags, args.restricted_path_tags])
 
+    start_date = None
+    if args.start_date:
+        try:
+            start_date = datetime.date.fromisoformat(args.start_date)
+        except ValueError:
+            print(f"Error: --start-date must be in YYYY-MM-DD format, got: {args.start_date}")
+            sys.exit(1)
+
     print(f"Starting crawler purge for directory: {data_path}")
+    if start_date:
+        print(f"Limiting to files on or after: {start_date.isoformat()}")
     print(f"Purging cache entries from: {args.cache_file}")
 
-    log_files = sorted(data_path.rglob('*.access.log*'))
+    _date_re = _re.compile(r'(\d{4}-\d{2}-\d{2})$')
+
+    all_log_files = sorted(data_path.rglob('*.access.log*'))
+    if start_date:
+        def _keep(p):
+            m = _date_re.search(p.name)
+            if not m:
+                return True  # top-level file with no date suffix — always process
+            return datetime.date.fromisoformat(m.group(1)) >= start_date
+        log_files = [p for p in all_log_files if _keep(p)]
+    else:
+        log_files = all_log_files
     print(f"Found {len(log_files)} log files to process.\n")
 
     app_stats = defaultdict(lambda: {'good': 0, 'newly_junk': 0})
@@ -223,8 +246,7 @@ def main(args):
 
                     # If we purged lines, the cache is stale and must be deleted.
                     if junk_count > 0:
-                        # Use the absolute path as the key, just like the web app does.
-                        log_file_key = str(log_file.resolve())
+                        log_file_key = str(log_file.resolve().relative_to(data_path.resolve()))
                         if log_file_key in cache:
                             print(f"    - Deleting stale cache entry for: {log_file.name}")
                             del cache[log_file_key]
@@ -303,6 +325,11 @@ if __name__ == "__main__":
         '--cache-file',
         default='static/cache/firewatch_cache.db',
         help="The path to the shelve cache file to purge."
+    )
+    parser.add_argument(
+        '--start-date',
+        default=None,
+        help="If set, skip archived log files dated before this date (YYYY-MM-DD). Top-level logs are always processed."
     )
     parser.add_argument(
         '--use-secondary-junk-tags',

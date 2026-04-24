@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import re
 import shelve
 import os
 import time
@@ -67,9 +68,9 @@ def update_cache(start_date, end_date, rebuild_all=False, cache_file=None, data_
                 print(f"    No access log files found for this date range.")
             else:
                 for log_file in access_log_files_for_app:
-                    log_file_str = str(log_file)
+                    log_file_str = str(log_file.resolve().relative_to(data_path))
                     print(f"    Processing access file: {log_file_str}")
-                    processed_data = _process_single_log_file(log_file_str, app_name)
+                    processed_data = _process_single_log_file(str(log_file), app_name)
                     cache[log_file_str] = processed_data
                     time.sleep(0.05)
                 print(f"    Finished processing {len(access_log_files_for_app)} access file(s) for {app_name}.")
@@ -80,9 +81,9 @@ def update_cache(start_date, end_date, rebuild_all=False, cache_file=None, data_
                 print(f"    No junk log files found for this date range.")
             else:
                 for log_file in junk_log_files_for_app:
-                    log_file_str = str(log_file)
+                    log_file_str = str(log_file.resolve().relative_to(data_path))
                     print(f"    Processing junk file: {log_file_str}")
-                    processed_data = _process_single_junk_log_file(log_file_str, app_name)
+                    processed_data = _process_single_junk_log_file(str(log_file), app_name)
                     cache[f"junk_{log_file_str}"] = processed_data
                     time.sleep(0.05)
                 print(f"    Finished processing {len(junk_log_files_for_app)} junk file(s) for {app_name}.")
@@ -106,7 +107,14 @@ if __name__ == "__main__":
         help="End date in YYYY-MM-DD format. Required unless --rebuild-all is set."
     )
     
-    # Option 2: Scorched earth (no dates needed)
+    # Option 2: Auto-detect since date from archive filenames
+    mode_group.add_argument(
+        '--since-last-processed',
+        action='store_true',
+        help="Auto-detect the most recent archived date from the data directory and update from that date to today."
+    )
+
+    # Option 3: Scorched earth (no dates needed)
     mode_group.add_argument(
         '--rebuild-all',
         action='store_true',
@@ -128,14 +136,30 @@ if __name__ == "__main__":
 
     # Validation
     if args.rebuild_all:
-        if args.start_date or args.end_date:
-            print("Warning: --start-date and --end-date are ignored when --rebuild-all is set.")
+        if args.start_date or args.end_date or args.since_last_processed:
+            print("Warning: date arguments are ignored when --rebuild-all is set.")
         start = None
         end = None
+    elif args.since_last_processed:
+        if args.start_date or args.end_date:
+            parser.error("--since-last-processed cannot be combined with --start-date or --end-date.")
+        _date_re = re.compile(r'(\d{4}-\d{2}-\d{2})$')
+        data_path = Path(args.data_dir).resolve()
+        max_date = None
+        for f in data_path.glob('*-archive/access/*'):
+            m = _date_re.search(f.name)
+            if m:
+                d = m.group(1)
+                if max_date is None or d > max_date:
+                    max_date = d
+        if max_date is None:
+            parser.error("--since-last-processed: no dated archive files found under data dir.")
+        start = datetime.date.fromisoformat(max_date)
+        end = datetime.date.today()
+        print(f"Auto-detected since date: {start.isoformat()}")
     else:
         if not args.start_date or not args.end_date:
-            parser.error("Both --start-date and --end-date are required for selective update mode.")
-        
+            parser.error("Must specify one of: --rebuild-all, --since-last-processed, or both --start-date and --end-date.")
         try:
             start = datetime.date.fromisoformat(args.start_date)
             end = datetime.date.fromisoformat(args.end_date)

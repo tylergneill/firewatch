@@ -121,7 +121,7 @@ This command performs the following operations:
 5.  **`python utils/update_cache.py --rebuild-all`**: Completely rebuilds the application's cache based on the newly processed and reclassified log data.
 6.  **`bash utils/sync_data_up.sh`**: Uploads the processed log data (archived only) back to the server.
 
-Afterward, the update_cache script still needs to be run on the server. 
+Afterward, `update_cache` still needs to be run on the server. Shell into the container:
 
 ```bash
 docker exec -it firewatch /bin/bash
@@ -132,3 +132,31 @@ And inside the container, at `/app`:
 nice -n 19 python utils/update_cache.py --rebuild-all
 ```
 (`nice` helps deprioritize this backend task if any other requests on the host machine need resources.)
+
+If you ran a `-local` variant for local testing and later want to push the processed data to the server, you can run the sync-up step on its own:
+
+```bash
+bash utils/sync_data_up.sh
+```
+
+Then run `update_cache` on the server as described above (using `--rebuild-all` or `--since-last-processed` as appropriate).
+
+#### Recent-only refresh
+
+`data-refresh-recent` and `data-refresh-recent-local` run the same pipeline but skip already-processed historical data. They auto-detect the last processed date from the archive filenames and limit resharding, junk-moving, and cache-building to that date onward.
+
+```bash
+make data-refresh-recent       # syncs updated logs up to server at the end
+make data-refresh-recent-local # local only, no server sync
+```
+
+After `data-refresh-recent`, run `update_cache` on the server for just the recent date range:
+
+```bash
+docker exec -it firewatch /bin/bash
+```
+
+Inside the container, at `/app`:
+```bash
+nice -n 19 python utils/update_cache.py --since-last-processed
+```

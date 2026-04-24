@@ -32,16 +32,59 @@ run-official:
 	  tylergneill/firewatch-app:$(VERSION)
 
 data-refresh-full:
-	bash utils/sync_data_down.sh
-	python utils/reshard_logs.py --data-dir /Users/tyler/Git/firewatch-data
-	python utils/generate_traffic_analytics.py --data-dir /Users/tyler/Git/firewatch-data --db-file /Users/tyler/Git/firewatch-data-cache/traffic_analytics.db
-	python utils/move_old_junk.py --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
-	python utils/update_cache.py --rebuild-all --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
-	bash utils/sync_data_up.sh
+	@T0=$$SECONDS; \
+	echo "==> [START] data-refresh-full $$(date)"; \
+	t=$$SECONDS; bash utils/sync_data_down.sh;                                                                                                                  echo "  [sync_data_down]          $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH);                                                                                     echo "  [reshard_logs]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db;                    echo "  [generate_traffic_analytics] $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/move_old_junk.py --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;                                echo "  [move_old_junk]           $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;                   echo "  [update_cache]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; bash utils/sync_data_up.sh;                                                                                                                    echo "  [sync_data_up]            $$((SECONDS-t))s"; \
+	echo "==> [DONE] data-refresh-full $$(date) (total: $$((SECONDS-T0))s)"
 
 data-refresh-local:
-	bash utils/sync_data_down.sh
-	python utils/reshard_logs.py --data-dir /Users/tyler/Git/firewatch-data
-	python utils/generate_traffic_analytics.py --data-dir /Users/tyler/Git/firewatch-data --db-file /Users/tyler/Git/firewatch-data-cache/traffic_analytics.db
-	python utils/move_old_junk.py --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
-	python utils/update_cache.py --rebuild-all --data-dir /Users/tyler/Git/firewatch-data --cache-file /Users/tyler/Git/firewatch-data-cache/firewatch_cache.db
+	@T0=$$SECONDS; \
+	echo "==> [START] data-refresh-local $$(date)"; \
+	t=$$SECONDS; bash utils/sync_data_down.sh;                                                                                                                  echo "  [sync_data_down]          $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH);                                                                                     echo "  [reshard_logs]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db;                    echo "  [generate_traffic_analytics] $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/move_old_junk.py --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;                                echo "  [move_old_junk]           $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;                   echo "  [update_cache]            $$((SECONDS-t))s"; \
+	echo "==> [DONE] data-refresh-local $$(date) (total: $$((SECONDS-T0))s)"
+
+data-refresh-recent:
+	@T0=$$SECONDS; \
+	echo "==> [START] data-refresh-recent $$(date)"; \
+	t=$$SECONDS; bash utils/sync_data_down.sh;                                                                                                                  echo "  [sync_data_down]          $$((SECONDS-t))s"; \
+	SINCE=$$(python utils/get_last_processed_date.py --data-dir $(LOCAL_DATA_PATH)); \
+	t=$$SECONDS; python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH) --since $$SINCE;                                                                     echo "  [reshard_logs]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db;                    echo "  [generate_traffic_analytics] $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/move_old_junk.py --start-date $$SINCE --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;           echo "  [move_old_junk]           $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/update_cache.py --start-date $$SINCE --end-date $$(date +%Y-%m-%d) --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db; echo "  [update_cache]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; bash utils/sync_data_up.sh;                                                                                                                    echo "  [sync_data_up]            $$((SECONDS-t))s"; \
+	echo "==> [DONE] data-refresh-recent $$(date) (total: $$((SECONDS-T0))s)"
+
+data-refresh-recent-local:
+	@T0=$$SECONDS; \
+	echo "==> [START] data-refresh-recent-local $$(date)"; \
+	t=$$SECONDS; bash utils/sync_data_down.sh;                                                                                                                  echo "  [sync_data_down]          $$((SECONDS-t))s"; \
+	SINCE=$$(python utils/get_last_processed_date.py --data-dir $(LOCAL_DATA_PATH)); \
+	t=$$SECONDS; python utils/reshard_logs.py --data-dir $(LOCAL_DATA_PATH) --since $$SINCE;                                                                     echo "  [reshard_logs]            $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/generate_traffic_analytics.py --data-dir $(LOCAL_DATA_PATH) --db-file $(LOCAL_CACHE_PATH)/traffic_analytics.db;                    echo "  [generate_traffic_analytics] $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/move_old_junk.py --start-date $$SINCE --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db;           echo "  [move_old_junk]           $$((SECONDS-t))s"; \
+	t=$$SECONDS; python utils/update_cache.py --start-date $$SINCE --end-date $$(date +%Y-%m-%d) --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db; echo "  [update_cache]            $$((SECONDS-t))s"; \
+	echo "==> [DONE] data-refresh-recent-local $$(date) (total: $$((SECONDS-T0))s)"
+
+# Rebuild the local cache without re-running the full data pipeline.
+# On the server, run: python utils/update_cache.py --rebuild-all  (no extra flags needed inside the container)
+cache-rebuild:
+	@T0=$$SECONDS; \
+	echo "==> [START] cache-rebuild $$(date)"; \
+	python utils/update_cache.py --rebuild-all --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db; \
+	echo "==> [DONE] cache-rebuild $$(date) (total: $$((SECONDS-T0))s)"
+
+cache-rebuild-recent:
+	@T0=$$SECONDS; \
+	echo "==> [START] cache-rebuild-recent $$(date)"; \
+	python utils/update_cache.py --since-last-processed --data-dir $(LOCAL_DATA_PATH) --cache-file $(LOCAL_CACHE_PATH)/firewatch_cache.db; \
+	echo "==> [DONE] cache-rebuild-recent $$(date) (total: $$((SECONDS-T0))s)"
